@@ -178,3 +178,19 @@ EASYTIER_TEST_PG_DSN='postgres://...' go test ./internal/db/... # 双数据库
 
 Noise 安全模式、Webhook 外部鉴权、GeoIP 尚未实现（UDP 传输已实现）；
 `NetworkConfig` 全字段 JSON↔proto 映射仍待生成。详见 `docs/REWRITE-PLAN.md` §9。
+
+## 镜像与工作流
+
+| 工作流 | 触发 | 产物 |
+|---|---|---|
+| `ci` | 每次 push / PR | `go vet`、`go test ./...`（带 PostgreSQL 服务，不允许跳过）、客户端构建、五个体检脚本 |
+| `docker-ci` | 每次 push（非 `v*` 标签） | `ghcr.io/wu-hins/easytier-web:CI` 与 `:ci-<sha>`，**不推 latest** |
+| `release` | 推送 `v*` 标签 | linux/amd64 + linux/arm64 的 tar.gz 与 sha256、多架构镜像 `:v<版本>` / `:<版本>` / `:latest`、GitHub Release |
+
+两个 Docker 工作流都**只做原生构建**：amd64 跑在 `ubuntu-latest`，arm64 跑在 `ubuntu-24.04-arm`，
+每个 job 第一步就断言 `uname -m` 与矩阵里的架构一致，不一致直接失败——不允许用 QEMU 模拟出"看起来能跑"的镜像。
+
+```bash
+docker pull ghcr.io/wu-hins/easytier-web:latest   # 发版镜像
+docker pull ghcr.io/wu-hins/easytier-web:CI       # 每次 push 的构建
+```
