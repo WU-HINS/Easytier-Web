@@ -1,0 +1,23 @@
+# device 22222222-2222-4222-8222-222222222222
+# hostname alpha
+# virtual_ipv4 10.42.0.1
+instance_id: "241d4e76-8d33-417f-bf24-07bde18edbff"
+virtual_ipv4: "10.42.0.1"
+network_length: 29
+hostname: "alpha"
+network_name: "golden-net"
+network_secret: "golden-secret"
+networking_method: Manual
+peer_urls: "tcp://relay.example.com:11010"
+acl: {
+  acl_v1: {
+    chains: {
+      name: "console-inbound"
+      chain_type: Inbound
+      enabled: true
+      default_action: Allow
+    }
+    group: {}
+  }
+}
+

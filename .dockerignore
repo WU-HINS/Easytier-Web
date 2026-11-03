@@ -1,0 +1,14 @@
+# Keep the build context small: the image only needs the sources.
+node_modules
+client/node_modules
+client/dist
+.git
+.github
+.toolchain
+*.db
+*.log
+psql
+ai-censorship
+docs
+scripts
+tools

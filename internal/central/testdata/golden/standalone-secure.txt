@@ -1,0 +1,27 @@
+# device 22222222-2222-4222-8222-222222222222
+# hostname alpha
+# virtual_ipv4 10.42.0.1
+instance_id: "241d4e76-8d33-417f-bf24-07bde18edbff"
+virtual_ipv4: "10.42.0.1"
+network_length: 29
+hostname: "alpha"
+network_name: "golden-net"
+network_secret: "golden-secret"
+networking_method: Standalone
+secure_mode: {
+  enabled: true
+  local_private_key: "ycRpVqOGJY1gcrHjCHaWZ1Xo7jn2+Gp93UvdVNyuWc4="
+  local_public_key: "jVkF02TEdD4x+trJqAOy9zosNgl+gNMCBhqFj1NpHU0="
+}
+acl: {
+  acl_v1: {
+    chains: {
+      name: "console-inbound"
+      chain_type: Inbound
+      enabled: true
+      default_action: Allow
+    }
+    group: {}
+  }
+}
+

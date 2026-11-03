@@ -1,0 +1,4 @@
+{
+  "files": {},
+  "note": "Inline CJK strings that predate the copy-table rule (r110). Empty since r113: every component now reads its text from client/src/copy/zh-CN.ts. The mechanism stays so a migration in progress can be grandfathered without losing the guard."
+}

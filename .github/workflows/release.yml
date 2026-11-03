@@ -1,0 +1,152 @@
+name: release
+
+# Tag pushes build the binaries for both architectures natively, publish a
+# multi-architecture image and attach the archives to the release.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  binaries:
+    name: binaries ${{ matrix.goarch }} on a native ${{ matrix.machine }} runner
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            machine: x86_64
+            goarch: amd64
+          - runner: ubuntu-24.04-arm
+            machine: aarch64
+            goarch: arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert the runner is the target architecture
+        run: |
+          set -euo pipefail
+          got="$(uname -m)"
+          want="${{ matrix.machine }}"
+          if [ "$got" != "$want" ]; then
+            echo "runner is $got but this entry wants $want" >&2
+            exit 1
+          fi
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Build the client
+        working-directory: client
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npm run build
+      - name: Build the daemon
+        env:
+          CGO_ENABLED: "0"
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist/stage
+          go build -trimpath -ldflags "-s -w -X main.version=${{ github.ref_name }}" -o dist/stage/easytier-webd ./cmd/easytier-webd
+          mkdir -p dist/stage/client
+          cp -r client/dist dist/stage/client/dist
+          cp README.md dist/stage/README.md
+      - name: Package and checksum
+        run: |
+          set -euo pipefail
+          name="easytier-web-${{ github.ref_name }}-linux-${{ matrix.goarch }}"
+          tar -C dist/stage -czf "dist/$name.tar.gz" .
+          cd dist
+          sha256sum "$name.tar.gz" > "$name.tar.gz.sha256"
+          ls -l
+      - uses: actions/upload-artifact@v4
+        with:
+          name: easytier-web-linux-${{ matrix.goarch }}
+          path: dist/*.tar.gz*
+          if-no-files-found: error
+
+  docker:
+    name: image ${{ matrix.arch }} on a native ${{ matrix.machine }} runner
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+            machine: x86_64
+            platform: linux/amd64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            machine: aarch64
+            platform: linux/arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert the runner is the target architecture
+        run: |
+          set -euo pipefail
+          got="$(uname -m)"
+          want="${{ matrix.machine }}"
+          if [ "$got" != "$want" ]; then
+            echo "runner is $got but this entry wants $want; refusing to emulate" >&2
+            exit 1
+          fi
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push the per-architecture release image
+        run: |
+          set -euo pipefail
+          image="ghcr.io/$(echo "${{ github.repository_owner }}" | tr "[:upper:]" "[:lower:]")/easytier-web"
+          docker buildx build --platform "${{ matrix.platform }}" --tag "$image:release-${{ matrix.arch }}" --label "org.opencontainers.image.version=${{ github.ref_name }}" --label "org.opencontainers.image.revision=${{ github.sha }}" --label "org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}" --cache-from "type=gha,scope=release-${{ matrix.arch }}" --cache-to "type=gha,mode=max,scope=release-${{ matrix.arch }}" --push .
+
+  manifest:
+    name: publish the release tags
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Merge both architectures and tag the release
+        run: |
+          set -euo pipefail
+          image="ghcr.io/$(echo "${{ github.repository_owner }}" | tr "[:upper:]" "[:lower:]")/easytier-web"
+          tag="${{ github.ref_name }}"
+          version="${tag#v}"
+          major_minor="${version%.*}"
+          docker buildx imagetools create --tag "$image:$tag" --tag "$image:$version" --tag "$image:$major_minor" --tag "$image:latest" "$image:release-amd64" "$image:release-arm64"
+          docker buildx imagetools inspect "$image:latest"
+
+  release:
+    name: attach the archives to the release
+    needs: binaries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.tar.gz
+            dist/*.sha256
+          generate_release_notes: true
+          fail_on_unmatched_files: true

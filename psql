@@ -1,0 +1,12 @@
+NOTICE:  drop cascades to 11 other objects
+DETAIL:  drop cascades to table users
+drop cascades to table blocked_devices
+drop cascades to table devices
+drop cascades to table managed_config_revisions
+drop cascades to table networks
+drop cascades to table network_credentials
+drop cascades to table network_members
+drop cascades to table schema_state
+drop cascades to table sessions
+drop cascades to table settings
+drop cascades to table user_running_network_configs

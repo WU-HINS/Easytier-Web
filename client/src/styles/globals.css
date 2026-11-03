@@ -1,0 +1,120 @@
+@import '../ui/tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'ss01' 1, 'cv05' 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.28);
+  }
+
+  *:focus-visible {
+    outline: var(--focus-ring-width) solid hsl(var(--ring));
+    outline-offset: var(--focus-ring-width);
+  }
+}
+
+@layer components {
+  /**
+   * Custom global background.
+   *
+   * Three procedural aurora fields plus an optional user supplied image,
+   * separated from content by a scrim so text contrast never depends on what
+   * the artwork happens to look like at that pixel.
+   */
+  .app-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
+    pointer-events: none;
+    background-color: hsl(var(--background));
+  }
+
+  .app-backdrop::before {
+    content: '';
+    position: absolute;
+    inset: -20%;
+    background:
+      radial-gradient(58% 48% at 12% 10%, hsl(var(--aurora-a) / 0.34), transparent 70%),
+      radial-gradient(46% 38% at 88% 6%, hsl(var(--aurora-b) / 0.28), transparent 72%),
+      radial-gradient(70% 58% at 50% 112%, hsl(var(--aurora-c) / 0.26), transparent 70%);
+    filter: saturate(115%);
+    animation: drift 32s ease-in-out infinite;
+  }
+
+  html[data-image='true'] .app-backdrop::before,
+  html[data-image='true'] .app-backdrop::after {
+    background-image: var(--app-bg-image);
+    background-size: cover;
+    background-position: center;
+    animation: none;
+    filter: none;
+    opacity: 0.55;
+    inset: 0;
+  }
+
+  html[data-image='true'] .app-backdrop::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: none;
+    background: rgb(var(--scrim-rgb) / var(--scrim-alpha));
+  }
+
+  /* φ guide: a 61.8 / 38.2 split, used by the auth screen. */
+  .phi-split {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 1024px) {
+    .phi-split {
+      grid-template-columns: 61.8% 38.2%;
+    }
+  }
+
+  .panel {
+    background: hsl(var(--card) / var(--panel-alpha));
+    border: var(--hairline) solid hsl(var(--border));
+    border-radius: calc(var(--radius) * 1.382);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .chrome {
+    background: hsl(var(--card) / var(--chrome-alpha));
+    backdrop-filter: blur(var(--chrome-blur));
+  }
+
+  .grid-lines {
+    background-image: linear-gradient(to right, hsl(var(--border) / 0.55) var(--hairline), transparent var(--hairline));
+    background-size: var(--u-11) 100%;
+  }
+
+
+  /* WCAG 2.3.3: the aurora drifts for 32s on a loop. Anyone who asked the system
+     to reduce motion gets a still background instead of a slow moving one. */
+  @media (prefers-reduced-motion: reduce) {
+    .app-backdrop::before,
+    .app-backdrop::after {
+      animation: none;
+    }
+  }
+  @keyframes drift {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(2%, -2%, 0) scale(1.06); }
+  }
+}

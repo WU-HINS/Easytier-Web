@@ -1,0 +1,50 @@
+# Minimal reference deployment.
+#
+# SQLite (default):
+#   docker compose up -d --build
+#
+# PostgreSQL: the driver and DSN are read from the host environment, so export
+# them in the same shell (or put them in .env next to this file) and pick the
+# postgres profile. Without the export the console keeps using SQLite.
+#   export EASYTIER_DB_DRIVER=postgres
+#   export EASYTIER_DB_DSN='postgres://easytier:change-me@db:5432/easytier?sslmode=disable'
+#   docker compose --profile postgres up -d --build
+services:
+  console:
+    build: .
+    ports:
+      - "11211:11211"   # web + REST + /@up/<user> websocket
+      - "22020:22020"   # TCP control plane
+    environment:
+      # Interpolated on purpose: a literal value here silently ignored the
+      # host environment, so the documented PostgreSQL switch did nothing
+      # (review team, r134).
+      EASYTIER_DB_DRIVER: ${EASYTIER_DB_DRIVER:-sqlite}
+      EASYTIER_DB_DSN: ${EASYTIER_DB_DSN:-/data/et.db}
+      EASYTIER_DB_BACKUP_DIR: /data/backups
+      EASYTIER_LOG_LEVEL: info
+    volumes:
+      - etdata:/data
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+        required: false
+
+  db:
+    image: postgres:16-alpine
+    profiles: ["postgres"]
+    environment:
+      POSTGRES_USER: easytier
+      POSTGRES_PASSWORD: change-me
+      POSTGRES_DB: easytier
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U easytier"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  etdata:
+  pgdata:

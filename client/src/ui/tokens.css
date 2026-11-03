@@ -1,0 +1,100 @@
+/**
+ * Design tokens (shadcn convention + golden-ratio geometry).
+ *
+ * Geometry ladder: every size is 8 * phi^(n/2), phi = 1.618034, so spacing,
+ * radii and type sizes all share one ratio. Colour values are HSL triplets so
+ * Tailwind can apply alpha without a second variable per shade.
+ */
+@layer base {
+  :root {
+    --phi: 1.618034;
+
+    /* ── semantic colours (light) ── */
+    --background: 220 33% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --muted: 216 28% 95%;
+    --muted-foreground: 215 22% 40%;
+    --primary: 199 89% 35%;
+    --primary-foreground: 0 0% 100%;
+    --destructive: 0 72% 45%;
+    --border: 216 22% 84%;
+    --input: 215 20% 58%;
+    --ring: 199 89% 35%;
+    --success: 158 64% 32%;
+    --warning: 32 94% 40%;
+    --radius: 0.5rem;
+		/* Geometry and elevation that globals.css references by name. r132
+		   tokenised these values but never declared them, so the focus ring,
+		   card borders, panel shadow and grid lines silently fell back to
+		   none (found by the review team in r134). */
+		--hairline: 1px;
+		--focus-ring-width: calc(var(--u-3) / 4);
+		/* A shadow is always dark. Using --foreground made every card glow white in
+		   the dark theme, because there the text colour is near white (review
+		   team, r140). */
+		--shadow-panel: 0 1px 2px hsl(222 47% 11% / 0.06), 0 18px 40px -28px hsl(222 47% 11% / 0.45);
+		/* The ladder stopped at 12 while two features already sized things at 16 and 24. */
+		--u-13: 89px;
+		--u-14: 113px;
+		--u-15: 144px;
+		--u-16: 183px;
+		--u-17: 232px;
+		--u-18: 295px;
+		--u-19: 376px;
+		--u-20: 478px;
+		--u-21: 608px;
+		--u-22: 774px;
+		--u-23: 984px;
+		--u-24: 1252px;
+
+    /* ── golden ratio geometry (8 * phi^(n/2)) ── */
+    --u-1: 5px;  --u-2: 6px;  --u-3: 8px;  --u-4: 10px;
+    --u-5: 13px; --u-6: 16px; --u-7: 21px; --u-8: 27px;
+    --u-9: 34px; --u-10: 43px; --u-11: 55px; --u-12: 70px;
+
+    --h-header: var(--u-11);
+    --w-sidebar: calc(var(--u-12) * 3.3);
+    --w-content: calc(var(--u-12) * 17.9);
+    --w-narrow: calc(var(--u-12) * 14);
+    --pad-card: var(--u-8);
+    --gap-card: var(--u-6);
+    --gap-section: var(--u-10);
+
+    /* ── background layers (L1 art / L2 scrim / L3 panels / L4 content) ── */
+    --app-bg-image: none;
+    --scrim-rgb: 248 250 252;
+    --scrim-alpha: 0.78;
+    --panel-alpha: 1;
+    --chrome-alpha: 0.92;
+    --chrome-blur: 18px;
+    --aurora-a: 199 89% 60%;
+    --aurora-b: 268 84% 66%;
+    --aurora-c: 162 76% 52%;
+  }
+
+  .dark {
+    --background: 222 47% 7%;
+    --foreground: 210 40% 96%;
+    --card: 222 40% 10%;
+    --card-foreground: 210 40% 96%;
+    --muted: 217 33% 15%;
+    --muted-foreground: 215 20% 68%;
+    --primary: 199 89% 48%;
+    --primary-foreground: 222 47% 7%;
+    --destructive: 0 72% 58%;
+    --border: 217 28% 20%;
+    --input: 215 22% 47%;
+    --ring: 199 89% 55%;
+    --success: 158 64% 45%;
+    --warning: 32 94% 55%;
+
+    --scrim-rgb: 9 14 24;
+    --scrim-alpha: 0.72;
+    --chrome-alpha: 0.86;
+    --aurora-a: 199 89% 40%;
+    --aurora-b: 268 74% 44%;
+    --aurora-c: 162 66% 34%;
+  }
+}
