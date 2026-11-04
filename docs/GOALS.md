@@ -332,14 +332,7 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r212 | `ai-censorship/review-20261101-r212.md` | 用公开节点做对照实验，问题收窄到"推送的 peer_urls"（0 项） |
 | r213 | `ai-censorship/review-20261101-r213.md` | 两台受管实例第一次真正连上了（1 项） |
 | r214 | `ai-censorship/review-20261101-r214.md` | 数据面卡在 /dev/net/tun，不是卡在代码（0 项） |
+| r215 | `ai-censorship/review-20261101-r215.md` | 给"对等"上锁，并把"做不到"写进门店（0 项） |
 
 台账：`ai-censorship/ledger.md`（282 项：271 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
-台账：`ai-censorship/ledger.md`（282 项：271 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
-台账：`ai-censorship/ledger.md`（281 项：270 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
-台账：`ai-censorship/ledger.md`（281 项：270 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
-台账：`ai-censorship/ledger.md`（279 项：269 FIXED / 9 ACCEPTED / 1 MONITOR / 0 OPEN）。
-台账：`ai-censorship/ledger.md`（279 项：268 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
-台账：`ai-censorship/ledger.md`（279 项：268 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
-台账：`ai-censorship/ledger.md`（278 项：266 FIXED / 9 ACCEPTED / 1 MONITOR / 2 OPEN）。
-台账：`ai-censorship/ledger.md`（277 项：266 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
-门禁脚本：`scripts/gate.sh`（26 项：24 必跑 + 2 按需——引证扫描 `EASYTIER_FULL_GATE=1`、真实客户端矩阵 `EASYTIER_REAL_CLIENTS=1` + `ET_CLIENTS` + `ET_TRANSPORTS`）。
+门禁脚本：`scripts/gate.sh`（27 项：24 必跑 + 3 按需——引证扫描、真实客户端矩阵、overlay smoke）。

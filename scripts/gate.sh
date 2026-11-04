@@ -110,6 +110,29 @@ elif [ -n "$EASYTIER_TEST_PG_DSN" ]; then
   else
     printf '== %-28s SKIP (set EASYTIER_REAL_CLIENTS=1 with ET_CLIENTS)%s' "real clients" "$NL"
   fi
+  # The overlay smoke builds a two node network through the console. Exit 3 means
+  # peering worked but the payload step needs a tun device: a skip, not a pass and
+  # not a failure.
+  if [ -n "$EASYTIER_OVERLAY_SMOKE" ]; then
+    if ./scripts/overlay-smoke.sh > /tmp/overlay-smoke.log 2>&1; then overlay_status=0; else overlay_status=$?; fi
+    if [ "$overlay_status" -eq 0 ]; then
+      printf "== %-28s PASS%s" "overlay smoke" "$NL"
+      summary="$summary
+  PASS  overlay smoke"
+    elif [ "$overlay_status" -eq 3 ]; then
+      printf '== %-28s SKIP (peering ok; payload needs a tun device)%s' "overlay smoke" "$NL"
+      summary="$summary
+  SKIP  overlay smoke (no tun device)"
+    else
+      printf "== %-28s FAIL%s" "overlay smoke" "$NL"
+      tail -n 20 /tmp/overlay-smoke.log | sed "s/^/    /"
+      summary="$summary
+  FAIL  overlay smoke"
+      FAILED=1
+    fi
+  else
+    printf '== %-28s SKIP (set EASYTIER_OVERLAY_SMOKE=1 with ET_BIN)%s' "overlay smoke" "$NL"
+  fi
 else
   printf '== %-28s SKIP (set EASYTIER_TEST_PG_DSN to enable)\n' "postgres tests"
   summary="$summary\n  SKIP  postgres tests (no DSN)"

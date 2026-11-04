@@ -179,7 +179,7 @@
 
 对应用例：`TestSecurityHeaders`、`TestHSTSOnlyOnSecureTransport`、`TestApiResponsesAreNeverCached`。
 
-## 6. 门禁（26 项，第 22、26 项按需）
+## 6. 门禁（27 项，第 22、26、27 项按需）
 
 一次全量跑：`./scripts/gate.sh`；加 `EASYTIER_RACE=1` 追加数据竞争检测。
 
@@ -211,6 +211,7 @@
 | 24 | shared database | 两个实例共库时必须播报降级模式 |
 | 25 | editor invariants | 成员编辑器必须保留：保存后推进基线、空 patch 不发、无改动禁用保存 |
 | 26 | real clients | 真实 EasyTier 客户端矩阵（按需：`EASYTIER_REAL_CLIENTS=1` 且 `ET_CLIENTS` 指定版本与路径） |
+| 27 | overlay smoke | 两台受管实例经公开节点互相可见；数据面需要 tun（按需：`EASYTIER_OVERLAY_SMOKE=1` 且 `ET_BIN`） |
 
 ## 7. 版本发布流程
 
