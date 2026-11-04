@@ -326,7 +326,9 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r206 | `ai-censorship/review-20261101-r206.md` | udp 修好了：16 字节是会话头，缺的是一个 Sack（1 项） |
 | r207 | `ai-censorship/review-20261101-r207.md` | udp 大部分通了，但 2.6.4 退回去了（1 项） |
 | r208 | `ai-censorship/review-20261101-r208.md` | 一个 padding 字节，卡住整个 2.6.4（1 项） |
+| r209 | `ai-censorship/review-20261101-r209.md` | ws 的两格：不是路径，是响应（0 项） |
 
+台账：`ai-censorship/ledger.md`（279 项：268 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（279 项：268 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（278 项：266 FIXED / 9 ACCEPTED / 1 MONITOR / 2 OPEN）。
 台账：`ai-censorship/ledger.md`（277 项：266 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
