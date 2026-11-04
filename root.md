@@ -251,6 +251,7 @@
 | UDP 乱序 | 已测：同事务两片按 1→0 到达仍只执行一次（TestReorderedPiecesOverUDPStillMerge） |
 | UDP 源端口重绑定 | 已测：重绑定对端拿到独立隧道且帧不串（TestUDPPeerThatChangesSourcePortGetsANewTunnel） |
 | 跨公网 NAT 的地址映射与穿透 | 未实测：需要第二台机器与一个真实 NAT，本环境无此条件 |
+| 真实 EasyTier 客户端实例上报 | 未实测：本环境无 Rust 工具链与 ET 二进制；已提供 scripts/real-instance-check.sh（无客户端时以退出码 2 明示"未验证"） |
 | 长时间压测 / fuzz 长跑 | 未做：目前是固定种子确定性序列 |
 
 ### 9.2 这套流程本身的可信度
