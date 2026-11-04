@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Badge, Card, CardBody, CardHeader, Skeleton } from '../../ui';
 
 export function DashboardPage() {
+  const copy = useCopy();
   // The original console could pause the polling; an operator watching a quiet
   // cluster should not be paying for a request every five seconds.
   const [autoRefresh, setAutoRefresh] = useState(true);

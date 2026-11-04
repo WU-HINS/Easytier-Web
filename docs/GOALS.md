@@ -349,7 +349,9 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r229 | `ai-censorship/review-20261101-r229.md` | 网络创建向导（1 项） |
 | r230 | `ai-censorship/review-20261101-r230.md` | 全局壳补齐三项，语言切换明确没做（1 项） |
 | r231 | `ai-censorship/review-20261101-r231.md` | 概览页补齐四张卡与轮询开关（1 项） |
+| r232 | `ai-censorship/review-20261101-r232.md` | 语言切换：先做管道，再谈覆盖率（1 项） |
 
+台账：`ai-censorship/ledger.md`（301 项：290 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（300 项：289 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（299 项：288 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（299 项：287 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。

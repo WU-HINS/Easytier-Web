@@ -51,6 +51,9 @@ export const copy = {
   shell: {
     disconnected: '无法连接控制台',
     skipToContent: '跳到主内容',
+    language: '语言',
+    languageZh: '中文',
+    languageEn: 'English',
   },
   appearance: {
     title: '外观',

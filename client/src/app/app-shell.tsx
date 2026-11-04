@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Ban, KeyRound, LayoutDashboard, LogOut, Monitor, Network, Server, Settings, Sun, Moon, UserCog, Users } from 'lucide-react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { copy } from '../copy/zh-CN';
+import { useCopy, useLocale } from '../copy/locale';
 import { api } from '../lib/http';
 import { useTheme } from '../lib/theme';
 import { Button, cn } from '../ui';
 
-const baseNavigation = [
+const buildBaseNavigation = (copy: ReturnType<typeof useCopy>) => [
   { to: '/', label: copy.nav.dashboard, icon: LayoutDashboard, end: true },
   { to: '/devices', label: copy.nav.devices, icon: Server, end: false },
   { to: '/networks', label: copy.nav.networks, icon: Network, end: false },
@@ -16,7 +16,7 @@ const baseNavigation = [
   { to: '/settings', label: copy.nav.settings, icon: Monitor, end: false },
 ];
 
-const adminNavigation = [
+const buildAdminNavigation = (copy: ReturnType<typeof useCopy>) => [
   { to: '/admin/users', label: copy.nav.adminUsers, icon: Users, end: false },
   { to: '/admin/settings', label: copy.nav.adminSettings, icon: Settings, end: false },
 ];
@@ -26,7 +26,12 @@ const themeIcon = { light: Sun, dark: Moon, auto: Monitor } as const;
 export function AppShell() {
   const { mode, setMode } = useTheme();
   const info = useQuery({ queryKey: ['console-info'], queryFn: api.consoleInfo });
-  const navigation = info.data?.role === 'admin' ? [...baseNavigation, ...adminNavigation] : baseNavigation;
+  const copy = useCopy();
+  const { locale, setLocale } = useLocale();
+  const navigation =
+    info.data && info.data.role === "admin"
+      ? [...buildBaseNavigation(copy), ...buildAdminNavigation(copy)]
+      : buildBaseNavigation(copy);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const Icon = themeIcon[mode];
@@ -87,6 +92,15 @@ export function AppShell() {
           </div>
           <div className="hidden text-phi-sm text-muted-foreground lg:block">{copy.brandTag}</div>
           <div className="flex items-center gap-[var(--u-2)]">
+            <select
+              aria-label={copy.shell.language}
+              value={locale}
+              onChange={(event) => setLocale(event.target.value === "en-US" ? "en-US" : "zh-CN")}
+              className="rounded-[var(--radius)] border border-input bg-card p-[var(--u-1)] text-phi-sm"
+            >
+              <option value="zh-CN">{copy.shell.languageZh}</option>
+              <option value="en-US">{copy.shell.languageEn}</option>
+            </select>
             <a
               className="text-phi-sm text-muted-foreground underline underline-offset-4"
               href="https://easytier.cn/"
