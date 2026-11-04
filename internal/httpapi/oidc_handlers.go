@@ -79,6 +79,7 @@ func (s *Server) routesOIDC() {
 	s.mux.HandleFunc("GET /api/v1/auth/oidc/config", s.handleOIDCConfig)
 	s.mux.HandleFunc("GET /api/v1/auth/oidc/login", s.handleOIDCLogin)
 	s.mux.HandleFunc("GET /api/v1/auth/oidc/callback", s.handleOIDCCallback)
+	s.mux.HandleFunc("POST /api/v1/auth/oidc/register", s.handleOIDCRegister)
 }
 
 func (s *Server) handleOIDCConfig(w http.ResponseWriter, r *http.Request) {
