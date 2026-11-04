@@ -63,6 +63,10 @@ export const copy = {
     placeholder: 'https://example.com/wallpaper.jpg（留空使用内置背景）',
   },
   dashboard: {
+    autoRefresh: '自动刷新',
+    instances: '网络实例',
+    viewAll: '查看全部',
+    noNetworks: '还没有网络',
     title: '概览',
     devices: '设备总数',
     online: '在线设备',
