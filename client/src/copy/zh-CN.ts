@@ -99,6 +99,10 @@ export const copy = {
     unblock: '解除阻止',
   },
   networks: {
+    overrideCopy: '复制',
+    overrideCopied: '已复制',
+    joinCommand: '临时接入命令',
+    joinCopy: '复制命令',
     advancedTitle: '高级设置',
     advancedHint: '网络级默认值，成员可在成员设置里逐项覆盖；命中白名单的设备会对账时自动并网。',
     advancedMtu: 'MTU（留空表示不设置）',

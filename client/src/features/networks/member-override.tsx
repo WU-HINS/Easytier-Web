@@ -13,6 +13,7 @@ export function MemberOverride({ networkID, deviceID }: { networkID: string; dev
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const config = useQuery({
     queryKey: ['member-config', networkID, deviceID],
@@ -74,6 +75,20 @@ export function MemberOverride({ networkID, deviceID }: { networkID: string; dev
           }}
         >
           {copy.networks.overrideClear}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(current);
+              setCopied(true);
+            } catch {
+              setCopied(false);
+            }
+          }}
+        >
+          {copied ? copy.networks.overrideCopied : copy.networks.overrideCopy}
         </Button>
         <span className="text-phi-sm text-muted-foreground">{copy.networks.overrideHint}</span>
       </div>

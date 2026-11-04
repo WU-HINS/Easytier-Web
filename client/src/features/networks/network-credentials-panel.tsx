@@ -18,7 +18,9 @@ function expiryLabel(credential: NetworkCredential): string {
 export function NetworkCredentialsPanel({ networkID }: { networkID: string }) {
   const queryClient = useQueryClient();
   const [secret, setSecret] = useState('');
+  const [copied, setCopied] = useState(false);
   const credentials = useQuery({ queryKey: ['credentials', networkID], queryFn: () => api.credentials(networkID) });
+  const network = useQuery({ queryKey: ['network', networkID], queryFn: () => api.network(networkID) });
 
   const refresh = () => {
     void queryClient.invalidateQueries({ queryKey: ['credentials', networkID] });
@@ -38,6 +40,20 @@ export function NetworkCredentialsPanel({ networkID }: { networkID: string }) {
     },
   });
 
+  const networkName = network.data ? network.data.network_name : '';
+  const joinCommand =
+    secret && networkName
+      ? "easytier-core -d --network-name " + networkName + " --network-secret " + secret
+      : '';
+  const copyJoin = async () => {
+    try {
+      await navigator.clipboard.writeText(joinCommand);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  };
+
   const issued = credentials.data ? credentials.data.credentials : [];
 
   return (
@@ -51,9 +67,20 @@ export function NetworkCredentialsPanel({ networkID }: { networkID: string }) {
         </div>
         {credentials.isLoading ? <Skeleton className="h-[var(--u-10)]" /> : null}
         {secret ? (
-          <p className="break-all text-phi-sm text-muted-foreground">
-            {copy.networkSettings.secretOnce}: <span className="font-mono text-foreground">{secret}</span>
-          </p>
+          <div className="space-y-[var(--u-2)]">
+            <p className="break-all text-phi-sm text-muted-foreground">
+              {copy.networkSettings.secretOnce}: <span className="font-mono text-foreground">{secret}</span>
+            </p>
+            <p className="text-phi-sm text-muted-foreground">{copy.networks.joinCommand}</p>
+            <div className="flex flex-wrap items-center gap-[var(--u-2)]">
+              <code className="min-w-0 flex-1 break-all rounded-[var(--radius)] border border-border bg-card p-[var(--u-2)] font-mono text-phi-sm">
+                {joinCommand}
+              </code>
+              <Button type="button" variant="ghost" onClick={copyJoin}>
+                {copied ? copy.networks.overrideCopied : copy.networks.joinCopy}
+              </Button>
+            </div>
+          </div>
         ) : null}
         {issued.length === 0 ? (
           <p className="text-phi-sm text-muted-foreground">{copy.networkSettings.noCredentials}</p>
