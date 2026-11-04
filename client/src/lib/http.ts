@@ -9,6 +9,7 @@ export interface ConsoleInfo {
   username: string;
   role: string;
   config_server_protocol: string;
+  config_server_port: number;
   webhook_auth: boolean;
 }
 

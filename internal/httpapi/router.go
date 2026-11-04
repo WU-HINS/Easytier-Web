@@ -46,6 +46,9 @@ type Config struct {
 	WebDir string
 	// OIDC, when non-nil, enables the authorization-code login flow.
 	OIDC *oidc.Provider
+	// ConfigServerPort is the control-plane port devices dial. The enrolment guide
+	// shows it, so the console has to know it rather than guess.
+	ConfigServerPort int
 	// SessionKey signs short lived cookies such as the OIDC login state.
 	SessionKey []byte
 	// PostLogoutRedirect is handed to the provider on logout.
@@ -461,6 +464,7 @@ func (s *Server) handleConsoleInfo(w http.ResponseWriter, r *http.Request, user 
 		"username":               user.Username,
 		"role":                   user.Role,
 		"config_server_protocol": "tcp",
+		"config_server_port":     s.cfg.ConfigServerPort,
 		"webhook_auth":           false,
 	})
 }

@@ -344,7 +344,9 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r224 | `ai-censorship/review-20261101-r224.md` | 网络列表的搜索与排序（1 项） |
 | r225 | `ai-censorship/review-20261101-r225.md` | 凭据表格补齐原版列（1 项） |
 | r226 | `ai-censorship/review-20261101-r226.md` | ACL 从 JSON 文本框变成规则构建器（2 项） |
+| r227 | `ai-censorship/review-20261101-r227.md` | 设备接入引导、搜索与实例数（2 项） |
 
+台账：`ai-censorship/ledger.md`（296 项：285 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（294 项：283 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（292 项：281 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（291 项：280 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。

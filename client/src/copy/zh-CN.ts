@@ -68,6 +68,13 @@ export const copy = {
     empty: '还没有设备接入。在设备上运行 easytier-core --config-server 即可接入。',
   },
   devices: {
+    enrollTitle: '设备接入',
+    enrollHint: '在设备上执行下面的命令即可接入本控制台；用户名即登录账号。',
+    enrollCopy: '复制命令',
+    enrollCopied: '已复制',
+    search: '搜索设备',
+    searchEmpty: '没有匹配的设备',
+    instances: '实例',
     detailBack: '返回设备列表',
     detailNetworks: '所属网络',
     detailNoNetworks: '这台设备还没有加入任何网络。',

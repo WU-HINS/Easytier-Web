@@ -8,8 +8,8 @@
 | 能力 | 原版 | 我们 | 结论 |
 |---|---|---|---|
 | ACL 规则构建器 | AclPolicyTab.vue（494 行）：规则表、增删改、action、protocol、source/target、端口、默认动作、启用开关 | **已实现**：默认动作、规则卡片（名称/动作/启用/源/目标/协议端口）、上传下载顺序、删除、JSON 视图切换 | 已对齐 |
-| 设备接入引导 | DeviceList/MainPage：enroll token、命令复制、说明 | 无 | 缺 |
-| 设备列表增强 | DeviceList：搜索、别名、封禁/解封、删除、实例数、位置、公网 IP、刷新/重试 | 有别名/删除；缺搜索、实例数、位置、公网 IP | 缺 |
+| 设备接入引导 | DeviceList/MainPage：enroll token、命令复制、说明 | **已实现**：从 console-info 拼出 `easytier-core --config-server <proto>://<host>:<port>/<user>`，一键复制 | 已对齐 |
+| 设备列表增强 | DeviceList：搜索、别名、封禁、删除、实例数、位置、公网 IP | 已有别名/删除/封禁；**新增搜索、实例数列**；位置与公网 IP 缺（需要 geoip，我们只有接入地址） | 部分 |
 | 设备详情 | DeviceDetails：central_networks、hostname、last_report、location、public_ip、status、version | 有页头 + 所属网络；缺 location/public_ip/last_report | 部分 |
 | 网络详情增强 | NetworkDetail（1660 行）：临时成员（凭证加入）、配置复制/重置、ACL 统计（bytes/packets/rule）、对端与路由 | 有成员增删改、凭据、高级设置；缺临时成员、配置复制/重置、ACL 统计 | 部分 |
 | 网络创建 | NetworkList：networking_method（standalone/manual/gateway/public server）、secure mode、initial nodes、advanced mode | 只有名称 + 网段 | 缺 |

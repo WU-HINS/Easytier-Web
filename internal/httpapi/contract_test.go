@@ -24,7 +24,7 @@ func TestResponseShapesMatchClientInterfaces(t *testing.T) {
 		path string
 		keys []string
 	}{
-		{"/api/v1/console-info", []string{"username", "role", "config_server_protocol", "webhook_auth"}},
+		{"/api/v1/console-info", []string{"username", "role", "config_server_protocol", "config_server_port", "webhook_auth"}},
 		{"/api/v1/summary", []string{"device_count", "online_device_count"}},
 		{"/api/v1/machines", []string{"machines"}},
 		{"/api/v1/networks", []string{"networks"}},

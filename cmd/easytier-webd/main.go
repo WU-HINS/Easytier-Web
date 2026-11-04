@@ -18,6 +18,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync"
 	"syscall"
 	"time"
@@ -44,6 +45,20 @@ type options struct {
 	setupToken      string
 	heartbeatMin    time.Duration
 	heartbeatMax    time.Duration
+}
+
+// rpcPort reads the port out of the control-plane listen address, falling back
+// to zero when the address has no port (the enrolment guide then omits it).
+func rpcPort(listen string) int {
+	_, portText, err := net.SplitHostPort(listen)
+	if err != nil {
+		return 0
+	}
+	port, err := strconv.Atoi(portText)
+	if err != nil {
+		return 0
+	}
+	return port
 }
 
 func main() {
@@ -149,13 +164,14 @@ func run() error {
 	}
 
 	api, err := httpapi.New(httpapi.Config{
-		Store:         store,
-		Sessions:      manager,
-		SecureCookies: opts.secureCookies,
-		SetupToken:    opts.setupToken,
-		WebDir:        opts.webDir,
-		OIDC:          provider,
-		Settings:      cfgLayer,
+		Store:            store,
+		Sessions:         manager,
+		SecureCookies:    opts.secureCookies,
+		SetupToken:       opts.setupToken,
+		WebDir:           opts.webDir,
+		OIDC:             provider,
+		Settings:         cfgLayer,
+		ConfigServerPort: rpcPort(opts.listenRPC),
 	})
 	if err != nil {
 		return err
