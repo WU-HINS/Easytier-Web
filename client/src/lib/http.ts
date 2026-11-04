@@ -244,6 +244,14 @@ export const api = {
     }),
   // First OIDC sign-in: the console carries the verified identity in a signed
   // cookie, and the name chosen here becomes the account name for good.
+  // Network level settings: one JSON blob shared by the compiler layers.
+  networkAdvanced: (networkID: string) =>
+    request<{ advanced: string }>('/networks/' + networkID + '/advanced'),
+  putNetworkAdvanced: (networkID: string, advanced: string) =>
+    request<void>('/networks/' + networkID + '/advanced', {
+      method: 'PUT',
+      body: JSON.stringify({ advanced }),
+    }),
   registerOidc: (username: string) =>
     request<{ username: string }>('/auth/oidc/register', {
       method: 'POST',

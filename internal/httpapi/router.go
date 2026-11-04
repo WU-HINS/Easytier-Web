@@ -160,6 +160,8 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("DELETE /api/v1/networks/{networkID}/members/{deviceID}", s.requireUser(s.handleRemoveMember))
 	s.mux.HandleFunc("GET /api/v1/networks/{networkID}/acl-policy", s.requireUser(s.handleGetACLPolicy))
 	s.mux.HandleFunc("PUT /api/v1/networks/{networkID}/acl-policy", s.requireUser(s.handlePutACLPolicy))
+	s.mux.HandleFunc("GET /api/v1/networks/{networkID}/advanced", s.requireUser(s.handleGetNetworkAdvanced))
+	s.mux.HandleFunc("PUT /api/v1/networks/{networkID}/advanced", s.requireUser(s.handlePutNetworkAdvanced))
 	s.mux.HandleFunc("GET /api/v1/networks/{networkID}/members/{deviceID}/config", s.requireUser(s.handleGetMemberConfig))
 	s.mux.HandleFunc("PUT /api/v1/networks/{networkID}/members/{deviceID}/config", s.requireUser(s.handlePutMemberConfig))
 	s.mux.HandleFunc("GET /api/v1/networks/{networkID}/credentials", s.requireUser(s.handleListCredentials))
