@@ -11,7 +11,7 @@
 | 设备接入引导 | DeviceList/MainPage：enroll token、命令复制、说明 | **已实现**：从 console-info 拼出 `easytier-core --config-server <proto>://<host>:<port>/<user>`，一键复制 | 已对齐 |
 | 设备列表增强 | DeviceList：搜索、别名、封禁、删除、实例数、位置、公网 IP | 已有别名/删除/封禁；**新增搜索、实例数列**；位置与公网 IP 缺（需要 geoip，我们只有接入地址） | 部分 |
 | 设备详情 | DeviceDetails：central_networks、hostname、last_report、location、public_ip、status、version | 有页头 + 所属网络；缺 location/public_ip/last_report | 部分 |
-| 网络详情增强 | NetworkDetail（1660 行）：临时成员、配置复制/重置、ACL 统计（bytes/packets/rule）、对端与路由 | **已做**：临时成员（签发凭据 → 现拼 `easytier-core -d --network-name <net> --network-secret <cred>` 并复制）、成员 override 的复制与清空；**缺**：ACL 统计（需要代理实例侧 RPC，控制面目前只代理 WebClientService）、对端/路由（设备详情页已有网络维度，未做实例维度） | 部分 |
+| 网络详情增强 | NetworkDetail：临时成员、配置复制/重置、ACL 统计、对端与路由 | **已实现**：临时成员（接入命令）、override 复制/清空、**ACL 统计**（成员列表按实例调用 `AclManageRpc.GetAclStats`，经由新增的 `GET /machines/{id}/networks/info/{instance}/acl-stats`）；对端/路由仍是设备维度 | 已对齐（对端/路由未做实例维度） |
 | 网络创建 | NetworkList：networking_method（standalone/manual/gateway/public server）、secure mode、initial nodes | **已实现**：四种方法的select、Manual 显示节点地址、Gateway/PublicServer 显示公共服务器地址、安全模式复选框 | 已对齐 |
 | 全局壳 | MainPage：语言切换、主题、文档链接、设备接入、封禁设备页、改密页、登出 | **已实现**：主题、登出、文档入口、封禁设备页、改密页，**语言切换**（zh-CN ⇄ en-US，选择持久化到 localStorage 并同步 html lang）；英文表覆盖 品牌/导航/外壳/通用/概览/登录，其余页面回落到中文（缺键自动回落，不显示 key 名） | 已对齐（英文覆盖部分页面） |
 | Dashboard | Dashboard.vue：自动刷新、实例计数、在线成员、view all | **已实现**：四张统计卡（设备/在线/网络/实例）、自动刷新开关（关掉即停止轮询）、设备与网络两个预览列（各带「查看全部」） | 已对齐 |

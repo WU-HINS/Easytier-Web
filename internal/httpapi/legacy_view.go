@@ -126,3 +126,19 @@ func (s *Server) decodeLegacyConfig(w http.ResponseWriter, r *http.Request) (*ma
 	}
 	return cfg, true
 }
+
+// handleLegacyAclStats serves the ACL counters of one running instance. The
+// numbers live on the device, on the per instance AclManageRpc service, so this
+// is the one place in the console that reaches past WebClientService.
+func (s *Server) handleLegacyAclStats(w http.ResponseWriter, r *http.Request, user bal.User) {
+	stats, err := s.legacyView().GetAclStats(r.Context(), user.ID, r.PathValue("machineID"), r.PathValue("instanceID"))
+	if err != nil {
+		writeError(w, http.StatusBadGateway, "device did not answer: "+err.Error())
+		return
+	}
+	if stats == nil {
+		writeJSON(w, http.StatusOK, map[string]any{"rules": []any{}, "global": map[string]uint64{}})
+		return
+	}
+	writeProto(w, stats)
+}

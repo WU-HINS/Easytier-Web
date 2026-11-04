@@ -139,6 +139,7 @@ func (s *Server) routes() {
 	// The original device-first view, translated by internal/legacyview.
 	s.mux.HandleFunc("GET /api/v1/machines/{machineID}/networks/info", s.requireUser(s.handleLegacyCollectInfo))
 	s.mux.HandleFunc("GET /api/v1/machines/{machineID}/networks/info/{instanceID}", s.requireUser(s.handleLegacyCollectInfo))
+	s.mux.HandleFunc("GET /api/v1/machines/{machineID}/networks/info/{instanceID}/acl-stats", s.requireUser(s.handleLegacyAclStats))
 	s.mux.HandleFunc("POST /api/v1/machines/{machineID}/networks/metas", s.requireUser(s.handleLegacyMetas))
 	s.mux.HandleFunc("GET /api/v1/machines/{machineID}/networks/config/{instanceID}", s.requireUser(s.handleLegacyGetConfig))
 	s.mux.HandleFunc("DELETE /api/v1/machines/{machineID}/networks/{instanceID}", s.requireUser(s.handleLegacyDeleteInstance))

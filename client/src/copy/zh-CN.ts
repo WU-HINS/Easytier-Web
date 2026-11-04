@@ -109,6 +109,11 @@ export const copy = {
     unblock: '解除阻止',
   },
   networks: {
+    aclStats: 'ACL 统计',
+    aclStatsEmpty: '这个实例还没有 ACL 计数',
+    aclRule: '规则',
+    aclPackets: '包数',
+    aclBytes: '字节',
     method: '组网方式',
     methodStandalone: '独立（不连任何公网节点）',
     methodManual: '手动（连接指定节点）',

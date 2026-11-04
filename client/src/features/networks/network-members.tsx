@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { AclStatsPanel } from './acl-stats-panel';
 import { copy } from '../../copy/zh-CN';
 import { api, type NetworkMember } from '../../lib/http';
 import { MemberEditor } from './member-editor';
@@ -15,6 +16,7 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
   const queryClient = useQueryClient();
   const [pick, setPick] = useState('');
   const [advanced, setAdvanced] = useState<string | null>(null);
+  const [statsFor, setStatsFor] = useState<string | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
 
   const members = useQuery({
@@ -132,6 +134,15 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
                 >
                   {copy.networks.advanced}
                 </Button>
+                {member.running && member.instance_id ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setStatsFor(statsFor === member.device_id ? null : member.device_id)}
+                  >
+                    {copy.networks.aclStats}
+                  </Button>
+                ) : null}
                 <Button
                   variant="ghost"
                   disabled={remove.isPending}
@@ -155,6 +166,9 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
                 <div className="w-full">
                   <MemberOverride networkID={networkID} deviceID={member.device_id} />
                 </div>
+              ) : null}
+              {statsFor === member.device_id && member.instance_id ? (
+                <AclStatsPanel machineID={member.device_id} instanceID={member.instance_id} />
               ) : null}
             </div>
           ))}

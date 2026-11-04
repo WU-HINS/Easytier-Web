@@ -14,6 +14,8 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/easytier/easytier-console/internal/central"
+	"github.com/easytier/easytier-console/internal/pb/acl"
+	instanceapi "github.com/easytier/easytier-console/internal/pb/api/instance"
 	"github.com/easytier/easytier-console/internal/pb/api/manage"
 	"github.com/easytier/easytier-console/internal/pb/common"
 	"github.com/easytier/easytier-console/internal/rpc"
@@ -149,4 +151,33 @@ func (s *Service) ValidateConfig(ctx context.Context, userID int64, machine stri
 		return nil, fmt.Errorf("legacyview: decode validate response: %w", err)
 	}
 	return response, nil
+}
+
+// AclServiceKey addresses the per instance ACL service. The device registers it
+// next to WebClientService, so the same caller reaches it; only the key changes.
+var AclServiceKey = rpc.ServiceKey{ProtoName: "AclManageRpc", ServiceName: "AclManageRpc"}
+
+// MethodGetAclStats is GetAclStats on AclManageRpc.
+const MethodGetAclStats uint32 = 1
+
+// GetAclStats asks one running instance for its ACL counters. An instance that is
+// not running answers with an empty message rather than an error, so callers can
+// treat a nil result as "no counters yet".
+func (s *Service) GetAclStats(ctx context.Context, userID int64, machineID, instanceID string) (*acl.AclStats, error) {
+	id, err := parseUUID(instanceID)
+	if err != nil {
+		return nil, err
+	}
+	request := &instanceapi.GetAclStatsRequest{
+		Instance: &instanceapi.InstanceIdentifier{Selector: &instanceapi.InstanceIdentifier_Id{Id: id}},
+	}
+	body, err := s.Caller.Call(ctx, userID, machineID, AclServiceKey, MethodGetAclStats, request)
+	if err != nil {
+		return nil, err
+	}
+	var response instanceapi.GetAclStatsResponse
+	if err := proto.Unmarshal(body, &response); err != nil {
+		return nil, fmt.Errorf("legacyview: decode acl stats: %w", err)
+	}
+	return response.AclStats, nil
 }

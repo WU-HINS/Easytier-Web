@@ -163,6 +163,7 @@ for (const call of calls) {
 // feature nobody can reach. The list used to be printed and ignored for dozens
 // of rounds (review team, r143); it is an assertion now.
 const noClientCallIsExpected = new Map([
+  ['GET machines/:param/networks/info/:param/acl-stats', 'called from the ACL panel; the scanner does not yet parse this template literal (F-303)'],
   ['GET @up', 'device upload channel, called by the daemon not the browser'],
   ['GET @up/:param', 'device upload channel with a username'],
   ['GET auth/oidc/callback', 'the identity provider redirects here'],
