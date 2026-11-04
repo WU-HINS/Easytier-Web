@@ -317,6 +317,7 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r197 | `ai-censorship/review-20261101-r197.md` | 给网络高级设置开一扇门（API）（1 项） |
 | r198 | `ai-censorship/review-20261101-r198.md` | 给高级设置一块能点的界面（1 项） |
 | r199 | `ai-censorship/review-20261101-r199.md` | 把"没验证过"变成一条可执行的检查（1 项） |
+| r200 | `ai-censorship/review-20261101-r200.md` | 下载真机二进制，跑出来的第一个结论是"连不上"（1 项） |
 
-台账：`ai-censorship/ledger.md`（270 项：261 FIXED / 8 ACCEPTED / 1 MONITOR / 0 OPEN）。
-门禁脚本：`scripts/gate.sh`（25 项必跑 + 1 项按需；设 `EASYTIER_RACE=1` 可加数据竞争检测；设 `EASYTIER_FULL_GATE=1` 额外跑引用证据扫描；真实客户端检查见 `scripts/real-instance-check.sh`）。
+台账：`ai-censorship/ledger.md`（271 项：261 FIXED / 8 ACCEPTED / 1 MONITOR / 1 OPEN）。
+门禁脚本：`scripts/gate.sh`（25 项必跑 + 1 项按需；另见 `scripts/real-instance-check.sh` 需要真实 ET 客户端）。

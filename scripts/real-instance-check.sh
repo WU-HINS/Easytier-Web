@@ -10,8 +10,11 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
-ET_BIN=easytier-core
+# Read the environment before assigning anything: assigning to an already exported
+# variable rewrites the exported value too, which silently discarded ET_BIN and
+# turned a runnable check into "no client found".
 FROM_ENV=$(printenv ET_BIN || true)
+ET_BIN=easytier-core
 if [ -n "$FROM_ENV" ]; then ET_BIN="$FROM_ENV"; fi
 if ! command -v "$ET_BIN" >/dev/null 2>&1; then
   echo "real instance check: no EasyTier client found (ET_BIN=$ET_BIN)" >&2
@@ -65,7 +68,9 @@ python3 -c 'import json;print(json.dumps({"advanced": json.dumps({"whitelist": [
 curl -sf -o /dev/null -b "$COOKIE" -X PUT "$BASE/api/v1/networks/$NETWORK_ID/advanced" -H 'Content-Type: application/json' -d @"$WORK/advanced.json" || fail "whitelist"
 
 echo "== start the real client against the control plane =="
-"$ET_BIN" --config-server "tcp://127.0.0.1:$RPC_PORT" --machine-id real-et-instance-0001 --hostname real-et > "$WORK/client.log" 2>&1 &
+# The upstream client carries the account name in the URL path and presents it as
+# the heartbeat token, so that path is the console username.
+"$ET_BIN" --config-server "tcp://127.0.0.1:$RPC_PORT/root-owner" --machine-id 11111111-2222-3333-4444-555555555501 --hostname real-et > "$WORK/client.log" 2>&1 &
 CLIENT_PID=$!
 
 echo "== wait for the device to report itself =="
@@ -73,7 +78,7 @@ SEEN=
 for _ in $(seq 1 150); do
   MACHINES=$(curl -sf -b "$COOKIE" "$BASE/api/v1/machines" 2>/dev/null || true)
   case "$MACHINES" in
-    *real-et-instance-0001*) SEEN=1; break ;;
+    *11111111-2222-3333-4444-555555555501*) SEEN=1; break ;;
   esac
   sleep 0.2
 done
@@ -84,7 +89,7 @@ JOINED=
 for _ in $(seq 1 150); do
   MEMBERS=$(curl -sf -b "$COOKIE" "$BASE/api/v1/networks/$NETWORK_ID/members" 2>/dev/null || true)
   case "$MEMBERS" in
-    *real-et-instance-0001*) JOINED=1; break ;;
+    *11111111-2222-3333-4444-555555555501*) JOINED=1; break ;;
   esac
   sleep 0.2
 done
