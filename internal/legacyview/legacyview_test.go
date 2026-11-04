@@ -101,3 +101,42 @@ func TestAdapterRejectsAMalformedInstanceID(t *testing.T) {
 		t.Fatalf("the device was called %d times for a malformed id", caller.calls)
 	}
 }
+
+// TestAdapterStartsAndValidates covers the two write paths: both must carry the
+// caller's config to the device, and starting one without an instance id is a
+// client error rather than a call with a zeroed uuid.
+func TestAdapterStartsAndValidates(t *testing.T) {
+	ctx := context.Background()
+
+	run := &stubCaller{}
+	cfg := &manage.NetworkConfig{InstanceId: proto.String(instanceID), Hostname: proto.String("node")}
+	if err := legacyview.New(run).RunNetworkInstance(ctx, 1, "machine", cfg, true); err != nil {
+		t.Fatalf("run: %v", err)
+	}
+	if run.method != central.MethodRunNetworkInstance {
+		t.Fatalf("run method = %d, want %d", run.method, central.MethodRunNetworkInstance)
+	}
+	if got := run.req.(*manage.RunNetworkInstanceRequest); got.GetConfig().GetHostname() != "node" || !got.GetOverwrite() {
+		t.Fatalf("run request lost the config or the overwrite flag: %v", got)
+	}
+
+	validateBody, err := proto.Marshal(&manage.ValidateConfigResponse{})
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	validate := &stubCaller{body: validateBody}
+	if _, err := legacyview.New(validate).ValidateConfig(ctx, 1, "machine", cfg); err != nil {
+		t.Fatalf("validate: %v", err)
+	}
+	if validate.method != central.MethodValidateConfig {
+		t.Fatalf("validate method = %d, want %d", validate.method, central.MethodValidateConfig)
+	}
+
+	noID := &stubCaller{}
+	if err := legacyview.New(noID).RunNetworkInstance(ctx, 1, "machine", &manage.NetworkConfig{}, true); err == nil {
+		t.Fatal("a config without an instance id must be rejected")
+	}
+	if noID.calls != 0 {
+		t.Fatalf("the device was called %d times without an instance id", noID.calls)
+	}
+}

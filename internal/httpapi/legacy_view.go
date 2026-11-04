@@ -9,6 +9,7 @@ import (
 
 	"github.com/easytier/easytier-console/internal/db/bal"
 	"github.com/easytier/easytier-console/internal/legacyview"
+	"github.com/easytier/easytier-console/internal/pb/api/manage"
 )
 
 // The original console exposed a device-first view (machine -> instances). The
@@ -77,4 +78,51 @@ func (s *Server) handleLegacyDeleteInstance(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// handleLegacyRunInstance starts an instance on a device with a config the
+// caller supplies, the way the original console's device view did.
+func (s *Server) handleLegacyRunInstance(w http.ResponseWriter, r *http.Request, user bal.User) {
+	cfg, ok := s.decodeLegacyConfig(w, r)
+	if !ok {
+		return
+	}
+	if err := s.legacyView().RunNetworkInstance(r.Context(), user.ID, r.PathValue("machineID"), cfg, true); err != nil {
+		writeError(w, http.StatusBadGateway, "device refused the instance: "+err.Error())
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// handleLegacyValidateConfig asks the device whether it would accept a config.
+func (s *Server) handleLegacyValidateConfig(w http.ResponseWriter, r *http.Request, user bal.User) {
+	cfg, ok := s.decodeLegacyConfig(w, r)
+	if !ok {
+		return
+	}
+	response, err := s.legacyView().ValidateConfig(r.Context(), user.ID, r.PathValue("machineID"), cfg)
+	if err != nil {
+		writeError(w, http.StatusBadGateway, "device did not answer: "+err.Error())
+		return
+	}
+	writeProto(w, response)
+}
+
+// decodeLegacyConfig reads the config object out of the request body.
+func (s *Server) decodeLegacyConfig(w http.ResponseWriter, r *http.Request) (*manage.NetworkConfig, bool) {
+	var payload map[string]json.RawMessage
+	if err := decodeJSON(w, r, &payload); err != nil {
+		return nil, false
+	}
+	raw, ok := payload["config"]
+	if !ok {
+		writeError(w, http.StatusBadRequest, "config is required")
+		return nil, false
+	}
+	cfg := &manage.NetworkConfig{}
+	if err := protojson.Unmarshal(raw, cfg); err != nil {
+		writeError(w, http.StatusBadRequest, "config does not parse: "+err.Error())
+		return nil, false
+	}
+	return cfg, true
 }

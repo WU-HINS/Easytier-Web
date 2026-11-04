@@ -2,7 +2,7 @@
 
 这份表来自**源码对照**，不是回忆：上游 `easytier-src/easytier-web/src/restful/` 的每个 `.route(...)` 与我们 `internal/httpapi/router.go` 的 `HandleFunc(...)` 逐条比对（去掉路径参数命名差异后取差集）。
 
-## 1. 缺口（上游有、我们没有）：23 条 → 已补 13，剩 10
+## 1. 缺口（上游有、我们没有）：23 条 → 已补 18，剩 5
 
 | # | 方法 | 路径 | 上游 handler | 作用 |
 |---|---|---|---|---|
@@ -77,7 +77,7 @@
 4. 簇 D、F：跟随 E 一起做，internal 变体直接复用同一 handler。
 
 
-## 1b. 已补的 13 条（r216 六条 + r217 两条 + r218 五条）
+## 1b. 已补的 18 条（r216 六条 + r217 两条 + r218 五条 + r219 五条）
 
 | 路由 | 做法 | 用例 |
 |---|---|---|
@@ -94,6 +94,11 @@
 | `POST /api/v1/machines/{m}/networks/metas` | → ListNetworkInstanceMeta | 同上 |
 | `GET /api/v1/machines/{m}/networks/config/{i}` | → GetNetworkInstanceConfig | 同上 |
 | `DELETE /api/v1/machines/{m}/networks/{i}` | → DeleteNetworkInstance | 同上（另含非法 UUID 不触发设备调用） |
+| `POST /api/v1/machines/{m}/networks` | → RunNetworkInstance（配置必须带 instance_id） | TestAdapterStartsAndValidates |
+| `POST /api/v1/machines/{m}/validate-config` | → ValidateConfig | 同上 |
+| `GET /api/v1/sessions` | 会话快照（普通用户看自己的，管理员看全部） | TestSessionListingIsScopedAndAdminOnly |
+| `GET /api/internal/sessions` | 同上，仅管理员 | 同上（普通用户 403） |
+| `DELETE /api/internal/users/{u}/sessions/{m}` | DisconnectDevice | 路由生效，管理员专用 |
 
 ## 1c. 复核方式
 

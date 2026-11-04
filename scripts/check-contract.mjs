@@ -181,6 +181,11 @@ const noClientCallIsExpected = new Map([
   ['GET machines/:param/networks/config/:param', 'original device view; our page reads the compiled member config'],
   ['POST machines/:param/networks/metas', 'original device view; instance metadata'],
   ['DELETE machines/:param/networks/:param', 'original device view; our page removes the member instead'],
+  ['POST machines/:param/networks', 'original device view; starts one instance with a caller supplied config'],
+  ['POST machines/:param/validate-config', 'original device view; asks the device to validate a config'],
+  ['GET sessions', 'original console session list; our page reads machine status instead'],
+  ['GET api/internal/sessions', 'admin only session list from the original console'],
+  ['DELETE api/internal/users/:param/sessions/:param', 'admin only kick from the original console'],
 ]);
 const unused = [...serverRoutes].filter((route) => !used.has(route)).sort();
 const unexplained = unused.filter((route) => !noClientCallIsExpected.has(route));

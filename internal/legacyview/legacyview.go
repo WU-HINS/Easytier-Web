@@ -125,3 +125,28 @@ func (s *Service) DeleteNetworkInstance(ctx context.Context, userID int64, machi
 		&manage.DeleteNetworkInstanceRequest{InstIds: []*common.UUID{uuid}})
 	return err
 }
+
+// RunNetworkInstance starts one instance on the device with the given config.
+func (s *Service) RunNetworkInstance(ctx context.Context, userID int64, machine string, cfg *manage.NetworkConfig, overwrite bool) error {
+	uuid, err := parseUUID(cfg.GetInstanceId())
+	if err != nil {
+		return fmt.Errorf("legacyview: the config needs an instance_id: %w", err)
+	}
+	_, err = s.Caller.Call(ctx, userID, machine, central.WebClientKey, central.MethodRunNetworkInstance,
+		&manage.RunNetworkInstanceRequest{InstId: uuid, Config: cfg, Overwrite: overwrite})
+	return err
+}
+
+// ValidateConfig asks the device whether it would accept this config.
+func (s *Service) ValidateConfig(ctx context.Context, userID int64, machine string, cfg *manage.NetworkConfig) (*manage.ValidateConfigResponse, error) {
+	body, err := s.Caller.Call(ctx, userID, machine, central.WebClientKey, central.MethodValidateConfig,
+		&manage.ValidateConfigRequest{Config: cfg})
+	if err != nil {
+		return nil, err
+	}
+	response := &manage.ValidateConfigResponse{}
+	if err := proto.Unmarshal(body, response); err != nil {
+		return nil, fmt.Errorf("legacyview: decode validate response: %w", err)
+	}
+	return response, nil
+}

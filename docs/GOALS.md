@@ -336,7 +336,9 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r216 | `ai-censorship/review-20261101-r216.md` | 先把"到底缺什么"变成一张能复核的表（1 项） |
 | r217 | `ai-censorship/review-20261101-r217.md` | 簇 C：配置 ⇄ TOML，单独一层（1 项） |
 | r218 | `ai-censorship/review-20261101-r218.md` | 簇 E 第一批：把"设备视图"挡在适配层外（1 项） |
+| r219 | `ai-censorship/review-20261101-r219.md` | 设备视图的写入路径与会话可见性（缺口 10 → 5）（1 项） |
 
+台账：`ai-censorship/ledger.md`（286 项：275 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（285 项：274 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（284 项：273 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（283 项：272 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。

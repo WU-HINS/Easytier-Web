@@ -139,6 +139,12 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("POST /api/v1/machines/{machineID}/networks/metas", s.requireUser(s.handleLegacyMetas))
 	s.mux.HandleFunc("GET /api/v1/machines/{machineID}/networks/config/{instanceID}", s.requireUser(s.handleLegacyGetConfig))
 	s.mux.HandleFunc("DELETE /api/v1/machines/{machineID}/networks/{instanceID}", s.requireUser(s.handleLegacyDeleteInstance))
+	s.mux.HandleFunc("POST /api/v1/machines/{machineID}/networks", s.requireUser(s.handleLegacyRunInstance))
+	s.mux.HandleFunc("POST /api/v1/machines/{machineID}/validate-config", s.requireUser(s.handleLegacyValidateConfig))
+	// Live device sessions, as the original console listed them.
+	s.mux.HandleFunc("GET /api/v1/sessions", s.requireUser(s.handleListSessions))
+	s.mux.HandleFunc("GET /api/internal/sessions", s.requireAdmin(s.handleListSessionsInternal))
+	s.mux.HandleFunc("DELETE /api/internal/users/{userID}/sessions/{machineID}", s.requireAdmin(s.handleDisconnectSessionInternal))
 	s.mux.HandleFunc("PUT /api/v1/auth/password", s.requireUser(s.handleChangePasswordCompat))
 	s.mux.HandleFunc("GET /api/v1/blocked-devices", s.requireUser(s.handleListBlockedDevicesCompat))
 	s.mux.HandleFunc("DELETE /api/v1/blocked-devices/{machineID}", s.requireUser(s.handleUnblockDeviceCompat))
