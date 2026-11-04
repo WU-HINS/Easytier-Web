@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { copy } from '../../copy/zh-CN';
 import { api, type Machine } from '../../lib/http';
-import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
+import { Badge, Card, CardBody, Skeleton } from '../../ui';
 import { DeviceActions } from './device-actions';
 import { BlockedDevices } from './blocked-devices';
 import { DeviceRoutes } from './device-routes';
@@ -72,13 +73,12 @@ export function DevicesPage() {
                       </td>
                       <td className="px-[var(--pad-card)] py-[var(--u-4)]">
                         <div className="flex flex-wrap items-center justify-end gap-[var(--u-2)]">
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={() => setSelected(selected === machine.machine_id ? null : machine.machine_id)}
+                          <Link
+                            className="text-phi-sm underline underline-offset-4"
+                            to={'/devices/' + machine.machine_id}
                           >
-                            {copy.routes.title}
-                          </Button>
+                            {copy.devices.detailView}
+                          </Link>
                           <DeviceActions machine={machine} />
                         </div>
                       </td>

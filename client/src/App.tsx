@@ -4,6 +4,7 @@ import { SetupGate } from './app/setup-gate';
 import { AppShell } from './app/app-shell';
 import { LoginPage } from './features/auth/login-page';
 import { DashboardPage } from './features/dashboard/dashboard-page';
+import { DeviceDetailPage } from './features/devices/device-detail-page';
 import { DevicesPage } from './features/devices/devices-page';
 import { NetworkDetailPage } from './features/networks/network-detail-page';
 import { NetworksPage } from './features/networks/networks-page';
@@ -22,6 +23,7 @@ export default function App() {
         <Route element={<AppShell />}>
           <Route index element={<DashboardPage />} />
           <Route path="/devices" element={<DevicesPage />} />
+          <Route path="/devices/:machineID" element={<DeviceDetailPage />} />
           <Route path="/networks" element={<NetworksPage />} />
           <Route path="/networks/:networkID" element={<NetworkDetailPage />} />
           <Route path="/account" element={<AccountPage />} />

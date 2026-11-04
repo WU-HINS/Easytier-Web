@@ -8,6 +8,7 @@
 | `01-login.png` | /login | 登录页 |
 | `02-dashboard.png` | / | 概览 |
 | `03-devices.png` | /devices | 设备 |
+| `03-devices.png` | /devices | 设备列表（每行一个「详情」链接） |
 | `04-networks.png` | /networks | 网络列表（每行一个「管理」链接） |
 | `05-network-members.png` | /networks/{id} · 成员 | 子页面·成员页签 |
 | `05a-network-acl.png` | /networks/{id} · 访问控制 | 子页面·访问控制页签（ACL JSON 编辑器） |
@@ -38,3 +39,10 @@ members / acl / credentials / settings。我们现在是同样的结构：
 ## 复现
 
     ./cmd/easytier-webd --http 127.0.0.1:28201 --config-server 127.0.0.1:28202 --web-dir ./client/dist
+
+## 设备：也是单独子页面
+
+与原版 `deviceList/device/:deviceId` 一致：列表只负责找到设备，
+`/devices/{id}` 显示页头（名称 / machine id / 在线 / 版本 / 接入地址 / 最后在线）与「所属网络」列表
+（网络名、虚拟 IP、运行中标记，并可跳到网络子页面）。
+浏览器实测：URL 变为 `/devices/{id}`、页头与网络行都渲染、刷新后仍可打开、0 console error。
