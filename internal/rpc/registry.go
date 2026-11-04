@@ -66,12 +66,23 @@ func (r *Registry) Register(key ServiceKey, methodIndex uint32, h Handler) error
 func (r *Registry) Lookup(key ServiceKey, methodIndex uint32) (Handler, bool) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	methods, ok := r.services[key]
-	if !ok {
-		return nil, false
+	if methods, ok := r.services[key]; ok {
+		if handler, ok := methods[methodIndex]; ok {
+			return handler, true
+		}
 	}
-	h, ok := methods[methodIndex]
-	return h, ok
+	// Not every client fills proto_name the same way: the official 2.7.0 client
+	// sends an empty one, which made every heartbeat answer InvalidMethodIndex.
+	// Matching on the service name keeps the dispatch stable across versions.
+	for registered, methods := range r.services {
+		if registered.ServiceName != key.ServiceName || registered.DomainName != key.DomainName {
+			continue
+		}
+		if handler, ok := methods[methodIndex]; ok {
+			return handler, true
+		}
+	}
+	return nil, false
 }
 
 // HasService reports whether any method is registered for the key.

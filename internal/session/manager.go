@@ -62,6 +62,8 @@ type Session struct {
 	MachineID string
 	UserID    int64
 	ClientURL string
+	// protoName caches the spelling of the device service this peer accepted.
+	protoName string
 	// Transport is "tcp", "ws" or "udp"; it is set once at registration.
 	Transport string
 	StartedAt time.Time
@@ -345,12 +347,56 @@ func (m *Manager) ByMachine(userID int64, machineID string) (*Session, bool) {
 
 // Call forwards one RPC into a connected device. This is the primitive behind
 // the console's proxy-rpc endpoint.
+// protoNameVariants lists how the same service is addressed across client
+// versions: the generated descriptors moved between file names, and the client
+// compares the whole key, so one spelling cannot serve 2.4.x through 2.7.x.
+var protoNameVariants = []string{"api.manage", "api_manage", ""}
+
+// wantsAnotherProtoName reports whether the peer refused the service key.
+func wantsAnotherProtoName(err error) bool {
+	if err == nil {
+		return false
+	}
+	return strings.Contains(err.Error(), "InvalidService")
+}
+
 func (m *Manager) Call(ctx context.Context, userID int64, machineID string, key rpc.ServiceKey, method uint32, req proto.Message) ([]byte, error) {
 	session, ok := m.ByMachine(userID, machineID)
 	if !ok {
 		return nil, bal.ErrNotFound
 	}
-	return session.mux.Call(ctx, key, method, req)
+	session.mu.Lock()
+	preferred := session.protoName
+	session.mu.Unlock()
+	if preferred != "" {
+		key.ProtoName = preferred
+	}
+	out, err := session.mux.Call(ctx, key, method, req)
+	if !wantsAnotherProtoName(err) {
+		return out, err
+	}
+	// The peer knows the service but not under this proto name: try the other
+	// spellings once and remember the one it accepted.
+	var lastErr error = err
+	for _, variant := range protoNameVariants {
+		if variant == key.ProtoName {
+			continue
+		}
+		candidate := key
+		candidate.ProtoName = variant
+		out, err = session.mux.Call(ctx, candidate, method, req)
+		if err == nil {
+			session.mu.Lock()
+			session.protoName = variant
+			session.mu.Unlock()
+			return out, nil
+		}
+		if !wantsAnotherProtoName(err) {
+			return nil, err
+		}
+		lastErr = err
+	}
+	return nil, lastErr
 }
 
 // Snapshots renders every live session, optionally filtered by tenant.
