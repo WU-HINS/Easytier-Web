@@ -152,7 +152,14 @@ func buildConfig(
 	publicServer := ""
 	switch network.NetworkingMethod {
 	case "Standalone":
-		method = manage.NetworkingMethod_Standalone
+		// Upstream ignores peer_urls for Standalone: that method means "no peers at
+		// all". A standalone network that does list peers is a manual one, and the
+		// manual branch is the only one that turns peer_urls into connections.
+		if len(peerURLs) > 0 {
+			method = manage.NetworkingMethod_Manual
+		} else {
+			method = manage.NetworkingMethod_Standalone
+		}
 	case "Manual":
 		method = manage.NetworkingMethod_Manual
 	case "Gateway":
