@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { copy } from '../../copy/zh-CN';
 import { api } from '../../lib/http';
 import { Button, Card, CardBody, Input, Skeleton } from '../../ui';
+import { NetworkAdvanced } from './network-advanced';
 
 /**
  * Name, access control list and admission credentials for one network. The ACL
@@ -62,6 +63,7 @@ export function NetworkSettings({ networkID, displayName }: { networkID: string;
   const issued = credentials.data?.credentials ?? [];
 
   return (
+    <>
     <Card>
       <CardBody className="space-y-[var(--gap-card)]">
         <section>
@@ -146,5 +148,7 @@ export function NetworkSettings({ networkID, displayName }: { networkID: string;
         </section>
       </CardBody>
     </Card>
+    <NetworkAdvanced networkID={networkID} />
+    </>
   );
 }
