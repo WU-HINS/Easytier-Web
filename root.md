@@ -252,7 +252,7 @@
 | UDP 乱序 | 已测：同事务两片按 1→0 到达仍只执行一次（TestReorderedPiecesOverUDPStillMerge） |
 | UDP 源端口重绑定 | 已测：重绑定对端拿到独立隧道且帧不串（TestUDPPeerThatChangesSourcePortGetsANewTunnel） |
 | 跨公网 NAT 的地址映射与穿透 | 未实测：需要第二台机器与一个真实 NAT，本环境无此条件 |
-| 真实 EasyTier 客户端接入 | **已实测通过**：官方 2.4.0 / 2.5.0 / 2.6.4 / 2.7.0 在 tcp:// 下均能注册、被白名单并网并收到配置（pushed=1，客户端日志出现 instance started）。键为 proto_name == service_name == WebClientService（F-272）。回归入口：scripts/real-instance-matrix.sh 配合 ET_CLIENTS |
+| 真实 EasyTier 客户端接入 | **tcp:// 与 ws:// 已实测通过**：官方 2.4.0 / 2.5.0 / 2.6.4 / 2.7.0 在 tcp 下全部通过（矩阵 8/8），2.7.0 在 ws 下同样注册、并网并收到配置（F-272 / F-276）。**udp:// 不兼容**：客户端反复发 16 字节探测，控制台不建立会话（F-277）。回归入口：scripts/real-instance-matrix.sh 配合 ET_CLIENTS |
 | 长时间压测 / fuzz 长跑 | 未做：目前是固定种子确定性序列 |
 
 ### 9.2 这套流程本身的可信度
