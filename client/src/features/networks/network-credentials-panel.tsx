@@ -1,75 +1,110 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { copy } from '../../copy/zh-CN';
-import { api } from '../../lib/http';
-import { Button, Card, CardBody, Skeleton } from '../../ui';
+import { api, type NetworkCredential } from '../../lib/http';
+import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
+
+// expiryLabel renders 0 as permanent and anything else as a local timestamp.
+function expiryLabel(credential: NetworkCredential): string {
+  if (!credential.expiry_unix) return copy.networkSettings.forever;
+  return new Date(credential.expiry_unix * 1000).toLocaleString('zh-CN', { hour12: false });
+}
 
 /**
- * Admission credentials for one network, on their own tab. The secret is shown
- * once, right after it is issued, because the server never returns it again.
+ * Admission credentials on their own tab. The table carries the same columns the
+ * first console showed: the groups a credential belongs to, whether it may relay,
+ * whether it can be reused, and when it expires.
  */
 export function NetworkCredentialsPanel({ networkID }: { networkID: string }) {
-	const queryClient = useQueryClient();
-	const [secret, setSecret] = useState('');
-	const credentials = useQuery({ queryKey: ['credentials', networkID], queryFn: () => api.credentials(networkID) });
+  const queryClient = useQueryClient();
+  const [secret, setSecret] = useState('');
+  const credentials = useQuery({ queryKey: ['credentials', networkID], queryFn: () => api.credentials(networkID) });
 
-	const refresh = () => {
-		void queryClient.invalidateQueries({ queryKey: ['credentials', networkID] });
-	};
-	const issue = useMutation({
-		mutationFn: () => api.createCredential(networkID, { reusable: true }),
-		onSuccess: (created) => {
-			setSecret(created.credential_secret);
-			refresh();
-		},
-	});
-	const revoke = useMutation({
-		mutationFn: (credentialID: string) => api.revokeCredential(networkID, credentialID),
-		onSuccess: () => {
-			setSecret('');
-			refresh();
-		},
-	});
+  const refresh = () => {
+    void queryClient.invalidateQueries({ queryKey: ['credentials', networkID] });
+  };
+  const issue = useMutation({
+    mutationFn: () => api.createCredential(networkID, { reusable: true }),
+    onSuccess: (created) => {
+      setSecret(created.credential_secret);
+      refresh();
+    },
+  });
+  const revoke = useMutation({
+    mutationFn: (credentialID: string) => api.revokeCredential(networkID, credentialID),
+    onSuccess: () => {
+      setSecret('');
+      refresh();
+    },
+  });
 
-	const issued = credentials.data?.credentials ?? [];
+  const issued = credentials.data ? credentials.data.credentials : [];
 
-	return (
-		<Card>
-			<CardBody className="space-y-[var(--u-3)]">
-				<div className="flex flex-wrap items-center justify-between gap-[var(--u-3)]">
-					<h2 className="text-phi-lg font-semibold">{copy.networkSettings.credentials}</h2>
-					<Button type="button" disabled={issue.isPending} onClick={() => issue.mutate()}>
-						{copy.networkSettings.issue}
-					</Button>
-				</div>
-				{credentials.isLoading ? <Skeleton className="h-[var(--u-10)]" /> : null}
-				{secret ? (
-					<p className="break-all text-phi-sm text-muted-foreground">
-						{copy.networkSettings.secretOnce}: <span className="font-mono text-foreground">{secret}</span>
-					</p>
-				) : null}
-				<div className="space-y-[var(--u-2)]">
-					{issued.length === 0 ? (
-						<p className="text-phi-sm text-muted-foreground">{copy.networkSettings.noCredentials}</p>
-					) : null}
-					{issued.map((credential) => (
-						<div
-							key={credential.credential_id}
-							className="flex flex-wrap items-center justify-between gap-[var(--u-3)] border-b border-border pb-[var(--u-2)] last:border-0"
-						>
-							<span className="break-all font-mono text-phi-sm">{credential.credential_id}</span>
-							<Button type="button" variant="ghost" onClick={() => revoke.mutate(credential.credential_id)}>
-								{copy.networkSettings.revoke}
-							</Button>
-						</div>
-					))}
-				</div>
-				{issue.isError ? (
-					<p role="alert" className="text-phi-sm text-destructive">
-						{(issue.error as Error).message}
-					</p>
-				) : null}
-			</CardBody>
-		</Card>
-	);
+  return (
+    <Card>
+      <CardBody className="space-y-[var(--u-3)]">
+        <div className="flex flex-wrap items-center justify-between gap-[var(--u-3)]">
+          <h2 className="text-phi-lg font-semibold">{copy.networkSettings.credentials}</h2>
+          <Button type='button' disabled={issue.isPending} onClick={() => issue.mutate()}>
+            {copy.networkSettings.issue}
+          </Button>
+        </div>
+        {credentials.isLoading ? <Skeleton className="h-[var(--u-10)]" /> : null}
+        {secret ? (
+          <p className="break-all text-phi-sm text-muted-foreground">
+            {copy.networkSettings.secretOnce}: <span className="font-mono text-foreground">{secret}</span>
+          </p>
+        ) : null}
+        {issued.length === 0 ? (
+          <p className="text-phi-sm text-muted-foreground">{copy.networkSettings.noCredentials}</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left text-phi-sm">
+              <thead>
+                <tr className="border-b border-border text-muted-foreground">
+                  <th className="py-[var(--u-3)] pr-[var(--u-3)] font-medium">{copy.networkSettings.columnId}</th>
+                  <th className="py-[var(--u-3)] pr-[var(--u-3)] font-medium">{copy.networkSettings.columnAcl}</th>
+                  <th className="py-[var(--u-3)] pr-[var(--u-3)] font-medium">{copy.networkSettings.columnRelay}</th>
+                  <th className="py-[var(--u-3)] pr-[var(--u-3)] font-medium">{copy.networkSettings.columnReusable}</th>
+                  <th className="py-[var(--u-3)] pr-[var(--u-3)] font-medium">{copy.networkSettings.columnExpiry}</th>
+                  <th className="py-[var(--u-3)] text-right font-medium">{copy.networkSettings.columnActions}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {issued.map((credential) => (
+                  <tr key={credential.credential_id} className="border-b border-border last:border-0">
+                    <td className="py-[var(--u-3)] pr-[var(--u-3)] break-all font-mono">{credential.credential_id}</td>
+                    <td className="py-[var(--u-3)] pr-[var(--u-3)]">
+                      {credential.acl_groups && credential.acl_groups.length > 0
+                        ? credential.acl_groups.join(', ')
+                        : '—'}
+                    </td>
+                    <td className="py-[var(--u-3)] pr-[var(--u-3)]">
+                      <Badge tone={credential.allow_relay ? 'success' : 'neutral'}>
+                        {credential.allow_relay ? copy.networkSettings.yes : copy.networkSettings.no}
+                      </Badge>
+                    </td>
+                    <td className="py-[var(--u-3)] pr-[var(--u-3)]">
+                      {credential.reusable ? copy.networkSettings.yes : copy.networkSettings.no}
+                    </td>
+                    <td className="py-[var(--u-3)] pr-[var(--u-3)] tabular-nums">{expiryLabel(credential)}</td>
+                    <td className="py-[var(--u-3)] text-right">
+                      <Button type='button' variant='ghost' onClick={() => revoke.mutate(credential.credential_id)}>
+                        {copy.networkSettings.revoke}
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {issue.isError ? (
+          <p role='alert' className="text-phi-sm text-destructive">
+            {(issue.error as Error).message}
+          </p>
+        ) : null}
+      </CardBody>
+    </Card>
+  );
 }

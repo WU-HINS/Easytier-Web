@@ -13,7 +13,7 @@
 | `04a-networks-filtered.png` | /networks（搜索后） | 搜索命中只剩一条，计数随之变化 |
 | `05-network-members.png` | /networks/{id} · 成员 | 子页面·成员页签 |
 | `05a-network-acl.png` | /networks/{id} · 访问控制 | 子页面·访问控制页签（ACL JSON 编辑器） |
-| `05b-network-credentials.png` | /networks/{id} · 凭据 | 子页面·凭据页签（签发/吊销，密钥只显示一次） |
+| `05b-network-credentials.png` | /networks/{id} · 凭据 | 子页面·凭据页签：表头为 凭据 ID / ACL 组 / 允许中继 / 可复用 / 过期 / 操作 |
 | `05c-network-settings.png` | /networks/{id} · 设置 | 子页面·设置页签（改名 + 高级设置） |
 | `06-account.png` | /account | 账户与 OIDC 绑定 |
 | `07-settings.png` | /settings | 外观 |

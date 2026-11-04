@@ -342,7 +342,9 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r222 | `ai-censorship/review-20261101-r222.md` | 四个页签，与原版信息架构对齐（1 项） |
 | r223 | `ai-censorship/review-20261101-r223.md` | 设备也做成子页面（1 项） |
 | r224 | `ai-censorship/review-20261101-r224.md` | 网络列表的搜索与排序（1 项） |
+| r225 | `ai-censorship/review-20261101-r225.md` | 凭据表格补齐原版列（1 项） |
 
+台账：`ai-censorship/ledger.md`（292 项：281 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（291 项：280 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（290 项：279 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（289 项：278 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
