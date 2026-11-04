@@ -171,7 +171,7 @@ export const api = {
   accountOidc: () => request<{ bound: boolean; issuer: string }>('/account/oidc'),
   changePassword: (currentPassword: string, newPassword: string) =>
     request<void>("/account/password", {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
     }),
   unbindOidc: () => request<void>('/account/oidc/unbind', { method: 'POST' }),
@@ -261,12 +261,19 @@ export const api = {
   removeNetworkMember: (networkID: string, deviceID: string) =>
     request<void>('/networks/' + networkID + '/members/' + deviceID, { method: 'DELETE' }),
   deleteNetwork: (networkID: string) => request<void>('/networks/' + networkID, { method: 'DELETE' }),
-  createNetwork: (displayName: string, virtualCidr: string) =>
+  // The wizard decides the method and its extra fields, so the call takes the
+  // whole settings object instead of a fixed pair of arguments.
+  createNetwork: (settings: {
+    display_name: string;
+    networking_method: string;
+    virtual_cidr: string;
+    peer_urls?: string[];
+    public_server_url?: string;
+    secure_mode?: boolean;
+  }) =>
     request<{ network_id: string }>('/networks', {
-      method: 'POST',
-      body: JSON.stringify({
-        settings: { display_name: displayName, networking_method: 'Standalone', virtual_cidr: virtualCidr },
-      }),
+      method: "POST",
+      body: JSON.stringify({ settings }),
     }),
 };
 

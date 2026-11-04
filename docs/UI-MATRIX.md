@@ -12,7 +12,7 @@
 | 设备列表增强 | DeviceList：搜索、别名、封禁、删除、实例数、位置、公网 IP | 已有别名/删除/封禁；**新增搜索、实例数列**；位置与公网 IP 缺（需要 geoip，我们只有接入地址） | 部分 |
 | 设备详情 | DeviceDetails：central_networks、hostname、last_report、location、public_ip、status、version | 有页头 + 所属网络；缺 location/public_ip/last_report | 部分 |
 | 网络详情增强 | NetworkDetail（1660 行）：临时成员、配置复制/重置、ACL 统计（bytes/packets/rule）、对端与路由 | **已做**：临时成员（签发凭据 → 现拼 `easytier-core -d --network-name <net> --network-secret <cred>` 并复制）、成员 override 的复制与清空；**缺**：ACL 统计（需要代理实例侧 RPC，控制面目前只代理 WebClientService）、对端/路由（设备详情页已有网络维度，未做实例维度） | 部分 |
-| 网络创建 | NetworkList：networking_method（standalone/manual/gateway/public server）、secure mode、initial nodes、advanced mode | 只有名称 + 网段 | 缺 |
+| 网络创建 | NetworkList：networking_method（standalone/manual/gateway/public server）、secure mode、initial nodes | **已实现**：四种方法的select、Manual 显示节点地址、Gateway/PublicServer 显示公共服务器地址、安全模式复选框 | 已对齐 |
 | 全局壳 | MainPage：语言切换、主题、文档链接、设备接入、封禁设备页、改密页、登出 | 有主题、登出、用户管理、系统设置；缺语言、文档、封禁页、改密页 | 部分 |
 | Dashboard | Dashboard：自动刷新、实例计数、在线成员、view all | 有设备/在线/最近在线 | 部分 |
 | 登录 | Login：验证码、注册、SSO | 有注册（setup）、OIDC、无验证码 | 部分 |
