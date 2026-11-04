@@ -44,6 +44,9 @@ export const copy = {
     account: '账户',
     adminUsers: '用户管理',
     adminSettings: '系统设置',
+    blocked: '封禁设备',
+    password: '修改密码',
+    docs: '文档',
   },
   shell: {
     disconnected: '无法连接控制台',
@@ -219,6 +222,8 @@ export const copy = {
     noCredentials: '还没有凭据',
   },
   account: {
+    passwordMismatch: '两次输入的新密码不一致',
+    confirmPassword: '确认新密码',
     title: '账户',
     passwordTitle: '修改密码',
     passwordHint: '修改后会退出其它设备上的会话，当前浏览器保持登录。',

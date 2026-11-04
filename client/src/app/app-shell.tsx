@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { LayoutDashboard, LogOut, Monitor, Network, Server, Settings, Sun, Moon, UserCog, Users } from 'lucide-react';
+import { Ban, KeyRound, LayoutDashboard, LogOut, Monitor, Network, Server, Settings, Sun, Moon, UserCog, Users } from 'lucide-react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { copy } from '../copy/zh-CN';
 import { api } from '../lib/http';
@@ -10,6 +10,8 @@ const baseNavigation = [
   { to: '/', label: copy.nav.dashboard, icon: LayoutDashboard, end: true },
   { to: '/devices', label: copy.nav.devices, icon: Server, end: false },
   { to: '/networks', label: copy.nav.networks, icon: Network, end: false },
+  { to: '/devices/blocked', label: copy.nav.blocked, icon: Ban, end: false },
+  { to: '/account/password', label: copy.nav.password, icon: KeyRound, end: false },
   { to: '/account', label: copy.nav.account, icon: UserCog, end: false },
   { to: '/settings', label: copy.nav.settings, icon: Monitor, end: false },
 ];
@@ -85,6 +87,14 @@ export function AppShell() {
           </div>
           <div className="hidden text-phi-sm text-muted-foreground lg:block">{copy.brandTag}</div>
           <div className="flex items-center gap-[var(--u-2)]">
+            <a
+              className="text-phi-sm text-muted-foreground underline underline-offset-4"
+              href="https://easytier.cn/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {copy.nav.docs}
+            </a>
             <Button variant="ghost" size="sm" onClick={cycle} aria-label={copy.common.theme}>
               <Icon size={16} aria-hidden />
             </Button>
