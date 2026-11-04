@@ -63,16 +63,19 @@ func ParsePolicy(raw *string) (Policy, error) {
 
 // Overrides is the per-member escape hatch stored as JSON on the membership.
 type Overrides struct {
-	NoTun             *bool    `json:"no_tun,omitempty"`
-	DisableIPv6       *bool    `json:"disable_ipv6,omitempty"`
-	MultiThread       *bool    `json:"multi_thread,omitempty"`
-	LatencyFirst      *bool    `json:"latency_first,omitempty"`
-	ProxyCIDRs        []string `json:"proxy_cidrs,omitempty"`
-	ListenerURLs      []string `json:"listener_urls,omitempty"`
-	DisableP2P        *bool    `json:"disable_p2p,omitempty"`
-	MTU               *int32   `json:"mtu,omitempty"`
-	EnableExitNode    *bool    `json:"enable_exit_node,omitempty"`
-	DisableEncryption *bool    `json:"disable_encryption,omitempty"`
+	NoTun        *bool    `json:"no_tun,omitempty"`
+	DisableIPv6  *bool    `json:"disable_ipv6,omitempty"`
+	MultiThread  *bool    `json:"multi_thread,omitempty"`
+	LatencyFirst *bool    `json:"latency_first,omitempty"`
+	ProxyCIDRs   []string `json:"proxy_cidrs,omitempty"`
+	ListenerURLs []string `json:"listener_urls,omitempty"`
+	DisableP2P   *bool    `json:"disable_p2p,omitempty"`
+	MTU          *int32   `json:"mtu,omitempty"`
+	// InstanceRecvBpsLimit caps how fast one instance may receive. It maps to
+	// NetworkConfig.instance_recv_bps_limit, the field upstream also exposes.
+	InstanceRecvBpsLimit *uint64 `json:"instance_recv_bps_limit,omitempty"`
+	EnableExitNode       *bool   `json:"enable_exit_node,omitempty"`
+	DisableEncryption    *bool   `json:"disable_encryption,omitempty"`
 }
 
 // MergeOverrides layers two override blobs. The network supplies the defaults
@@ -104,6 +107,9 @@ func MergeOverrides(network, member Overrides) Overrides {
 	}
 	if member.MTU != nil {
 		out.MTU = member.MTU
+	}
+	if member.InstanceRecvBpsLimit != nil {
+		out.InstanceRecvBpsLimit = member.InstanceRecvBpsLimit
 	}
 	if member.EnableExitNode != nil {
 		out.EnableExitNode = member.EnableExitNode

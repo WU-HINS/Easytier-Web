@@ -211,6 +211,9 @@ func buildConfig(
 	if overrides.MTU != nil {
 		cfg.Mtu = proto.Int32(*overrides.MTU)
 	}
+	if overrides.InstanceRecvBpsLimit != nil {
+		cfg.InstanceRecvBpsLimit = proto.Uint64(*overrides.InstanceRecvBpsLimit)
+	}
 	if overrides.EnableExitNode != nil {
 		cfg.EnableExitNode = proto.Bool(*overrides.EnableExitNode)
 	}
