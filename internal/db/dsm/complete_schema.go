@@ -159,6 +159,7 @@ func All() []Table {
 				{Name: "virtual_cidr", Kind: Text},
 				{Name: "secure_mode", Kind: Bool, NotNull: true, Default: "false"},
 				{Name: "acl_policy", Kind: Text},
+				{Name: "advanced", Kind: Text, NotNull: true, Default: "''"},
 				{Name: "create_time", Kind: Timestamp, NotNull: true},
 				{Name: "update_time", Kind: Timestamp, NotNull: true},
 			},

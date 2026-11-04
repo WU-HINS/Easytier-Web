@@ -13,7 +13,7 @@ import (
 	"github.com/easytier/easytier-console/internal/db/dal/query"
 )
 
-const networkColumns = "user_id, id, display_name, network_name, network_secret, networking_method, public_server_url, peer_urls, virtual_cidr, secure_mode, acl_policy, create_time, update_time"
+const networkColumns = "user_id, id, display_name, network_name, network_secret, networking_method, public_server_url, peer_urls, virtual_cidr, secure_mode, acl_policy, advanced, create_time, update_time"
 
 const memberColumns = "user_id, network_id, id, device_id, hostname_override, virtual_ipv4, allocated_ipv4, override_config, credential_id, acl_group_secret, create_time, update_time"
 
@@ -39,14 +39,23 @@ func decodeStrings(raw string) []string {
 	return out
 }
 
+// advancedValue writes an empty blob rather than NULL: the column is NOT NULL so
+// a network without advanced settings still inserts.
+func advancedValue(raw *string) string {
+	if raw == nil {
+		return ""
+	}
+	return *raw
+}
+
 // CreateNetwork inserts a network intent.
 func (s *Store) CreateNetwork(ctx context.Context, network Network) error {
 	statement, args := query.Into("networks").
 		Columns("user_id", "id", "display_name", "network_name", "network_secret", "networking_method",
-			"public_server_url", "peer_urls", "virtual_cidr", "secure_mode", "acl_policy", "create_time", "update_time").
+			"public_server_url", "peer_urls", "virtual_cidr", "secure_mode", "acl_policy", "advanced", "create_time", "update_time").
 		Values(network.UserID, network.ID, network.DisplayName, network.NetworkName, network.NetworkSecret,
 			network.NetworkingMethod, network.PublicServerURL, encodeStrings(network.PeerURLs),
-			network.VirtualCIDR, dal.BoolArg(s.Dialect(), network.SecureMode), network.ACLPolicy,
+			network.VirtualCIDR, dal.BoolArg(s.Dialect(), network.SecureMode), network.ACLPolicy, advancedValue(network.Advanced),
 			dal.TimeArg(s.Dialect(), network.CreateTime), dal.TimeArg(s.Dialect(), network.UpdateTime)).
 		Build(s.Dialect())
 	if _, err := s.conn.Exec(ctx, statement, args...); err != nil {
@@ -66,12 +75,13 @@ func (s *Store) scanNetwork(row dal.Row) (Network, error) {
 		virtualCIDR sql.NullString
 		secureMode  any
 		aclPolicy   sql.NullString
+		advanced    sql.NullString
 		created     any
 		updated     any
 	)
 	err := row.Scan(&network.UserID, &network.ID, &network.DisplayName, &network.NetworkName,
 		&network.NetworkSecret, &network.NetworkingMethod, &publicURL, &peers, &virtualCIDR,
-		&secureMode, &aclPolicy, &created, &updated)
+		&secureMode, &aclPolicy, &advanced, &created, &updated)
 	if errors.Is(err, sql.ErrNoRows) {
 		return Network{}, ErrNotFound
 	}
@@ -89,6 +99,10 @@ func (s *Store) scanNetwork(row dal.Row) (Network, error) {
 	if aclPolicy.Valid {
 		value := aclPolicy.String
 		network.ACLPolicy = &value
+	}
+	if advanced.Valid && advanced.String != "" {
+		value := advanced.String
+		network.Advanced = &value
 	}
 	network.PeerURLs = decodeStrings(peers)
 	network.SecureMode = dal.ParseBool(secureMode)
@@ -140,6 +154,7 @@ func (s *Store) UpdateNetwork(ctx context.Context, network Network) error {
 		Set("virtual_cidr", network.VirtualCIDR).
 		Set("secure_mode", dal.BoolArg(s.Dialect(), network.SecureMode)).
 		Set("acl_policy", network.ACLPolicy).
+		Set("advanced", advancedValue(network.Advanced)).
 		Set("update_time", dal.TimeArg(s.Dialect(), network.UpdateTime)).
 		Where("user_id", "=", network.UserID).Where("id", "=", network.ID).
 		Build(s.Dialect())

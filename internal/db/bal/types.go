@@ -105,8 +105,11 @@ type Network struct {
 	VirtualCIDR      *string
 	SecureMode       bool
 	ACLPolicy        *string
-	CreateTime       time.Time
-	UpdateTime       time.Time
+	// Advanced carries the network level settings that every member inherits;
+	// a member override wins field by field.
+	Advanced   *string
+	CreateTime time.Time
+	UpdateTime time.Time
 }
 
 // NetworkMember binds one device to a network intent.

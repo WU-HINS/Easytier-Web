@@ -95,12 +95,18 @@ func Compile(network bal.Network, members []bal.NetworkMember, devices map[strin
 		}
 	}
 
+	networkOverrides, err := ParseOverrides(network.Advanced)
+	if err != nil {
+		return Plan{}, fmt.Errorf("central: network advanced settings: %w", err)
+	}
 	plan := Plan{NetworkID: network.ID}
 	for _, member := range ordered {
-		overrides, err := ParseOverrides(member.OverrideConfig)
+		memberOverrides, err := ParseOverrides(member.OverrideConfig)
 		if err != nil {
 			return Plan{}, err
 		}
+		// Network settings are inherited; the member wins field by field.
+		overrides := MergeOverrides(networkOverrides, memberOverrides)
 		device := devices[member.DeviceID]
 		hostname := device.Hostname
 		if member.HostnameOverride != nil && *member.HostnameOverride != "" {

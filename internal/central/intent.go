@@ -75,6 +75,45 @@ type Overrides struct {
 	DisableEncryption *bool    `json:"disable_encryption,omitempty"`
 }
 
+// MergeOverrides layers two override blobs. The network supplies the defaults
+// every member inherits and the member supplies whatever it wants to change, so
+// a field is taken from the member when it is set there and from the network
+// otherwise. Slices follow the same rule: an empty member value inherits.
+func MergeOverrides(network, member Overrides) Overrides {
+	out := network
+	if member.NoTun != nil {
+		out.NoTun = member.NoTun
+	}
+	if member.DisableIPv6 != nil {
+		out.DisableIPv6 = member.DisableIPv6
+	}
+	if member.MultiThread != nil {
+		out.MultiThread = member.MultiThread
+	}
+	if member.LatencyFirst != nil {
+		out.LatencyFirst = member.LatencyFirst
+	}
+	if len(member.ProxyCIDRs) > 0 {
+		out.ProxyCIDRs = member.ProxyCIDRs
+	}
+	if len(member.ListenerURLs) > 0 {
+		out.ListenerURLs = member.ListenerURLs
+	}
+	if member.DisableP2P != nil {
+		out.DisableP2P = member.DisableP2P
+	}
+	if member.MTU != nil {
+		out.MTU = member.MTU
+	}
+	if member.EnableExitNode != nil {
+		out.EnableExitNode = member.EnableExitNode
+	}
+	if member.DisableEncryption != nil {
+		out.DisableEncryption = member.DisableEncryption
+	}
+	return out
+}
+
 // ParseOverrides decodes a member override blob.
 func ParseOverrides(raw *string) (Overrides, error) {
 	if raw == nil || *raw == "" {
