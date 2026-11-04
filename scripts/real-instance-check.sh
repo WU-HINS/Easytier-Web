@@ -94,7 +94,10 @@ curl -sf -o /dev/null -b "$COOKIE" -X PUT "$BASE/api/v1/networks/$NETWORK_ID/adv
 
 case "$TRANSPORT" in
   tcp) CONFIG_SERVER="tcp://127.0.0.1:$RPC_PORT/root-owner" ;;
-  ws)  CONFIG_SERVER="ws://127.0.0.1:$WS_PORT/@up/root-owner" ;;
+  ws)  # The username is the whole path: 2.4.0 and 2.5.0 send the first path segment as
+# the heartbeat token, and 2.6.4 onwards take the last one, so /<user> is the
+# only spelling all four releases agree on.
+WS_PREFIX=$(printenv ET_WS_PREFIX || true); if [ -n "$WS_PREFIX" ]; then CONFIG_SERVER="ws://127.0.0.1:$WS_PORT/$WS_PREFIX/root-owner"; else CONFIG_SERVER="ws://127.0.0.1:$WS_PORT/root-owner"; fi ;;
   udp) CONFIG_SERVER="udp://127.0.0.1:$UDP_PORT/root-owner" ;;
 esac
 

@@ -35,7 +35,7 @@ OIDC（issuer/client_id/secret/按钮文案/开关）、全局背景、密码安
 OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（非 https 时前端禁用绑定并提示）。
 
 ### G8 实例接入通道
-- WebSocket 与面板**复用同一端口**，路径 `/@up/<用户名>`。
+- WebSocket 与面板**复用同一端口**，路径 /@up/<用户名>；官方客户端另有约定：2.4.0 / 2.5.0 取**第一段**路径当心跳 token，2.6.4 起取**最后一段**，因此给客户端的控制面地址写成 ws://host:port/<用户名>（两种解析都得到正确用户名）。
 - 后台可额外开启 **TCP / UDP**，与 WS **同端口号**（可自定义），可同时开启。
 
 ## 2. 评审机制（对齐 HiDNS 代码审核团）
@@ -327,7 +327,9 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r207 | `ai-censorship/review-20261101-r207.md` | udp 大部分通了，但 2.6.4 退回去了（1 项） |
 | r208 | `ai-censorship/review-20261101-r208.md` | 一个 padding 字节，卡住整个 2.6.4（1 项） |
 | r209 | `ai-censorship/review-20261101-r209.md` | ws 的两格：不是路径，是响应（0 项） |
+| r210 | `ai-censorship/review-20261101-r210.md` | ws 的两格：是 URL 约定，不是协议（0 项） |
 
+台账：`ai-censorship/ledger.md`（279 项：269 FIXED / 9 ACCEPTED / 1 MONITOR / 0 OPEN）。
 台账：`ai-censorship/ledger.md`（279 项：268 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（279 项：268 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（278 项：266 FIXED / 9 ACCEPTED / 1 MONITOR / 2 OPEN）。
