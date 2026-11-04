@@ -127,6 +127,13 @@ func (s *Server) routes() {
 	})
 	s.mux.HandleFunc("POST /api/v1/auth/login", s.handleLogin)
 	s.mux.HandleFunc("POST /api/v1/auth/logout", s.handleLogout)
+	// Aliases the original console exposes; see docs/FEATURE-MATRIX.md.
+	s.mux.HandleFunc("GET /api/v1/auth/logout", s.handleLogoutCompat)
+	s.mux.HandleFunc("GET /api/v1/auth/check_login_status", s.handleCheckLoginStatus)
+	s.mux.HandleFunc("GET /api/v1/auth/captcha", s.handleCaptcha)
+	s.mux.HandleFunc("PUT /api/v1/auth/password", s.requireUser(s.handleChangePasswordCompat))
+	s.mux.HandleFunc("GET /api/v1/blocked-devices", s.requireUser(s.handleListBlockedDevicesCompat))
+	s.mux.HandleFunc("DELETE /api/v1/blocked-devices/{machineID}", s.requireUser(s.handleUnblockDeviceCompat))
 	s.mux.HandleFunc("GET /api/v1/console-info", s.requireUser(s.handleConsoleInfo))
 	s.mux.HandleFunc("GET /api/v1/summary", s.requireUser(s.handleSummary))
 	s.mux.HandleFunc("GET /api/v1/machines", s.requireUser(s.handleListMachines))

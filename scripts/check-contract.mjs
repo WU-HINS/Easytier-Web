@@ -168,6 +168,12 @@ const noClientCallIsExpected = new Map([
   ['GET auth/oidc/callback', 'the identity provider redirects here'],
   ['GET auth/oidc/login', 'built from the server supplied login_path at runtime'],
   ['GET healthz', 'probed by the operator, not by the page'],
+  ['GET auth/logout', 'original console alias; our client posts to auth/logout'],
+  ['PUT auth/password', 'original console alias; our client posts to account/password'],
+  ['GET auth/check_login_status', 'original console frontend poll; our client reads /api/v1/me'],
+  ['GET auth/captcha', 'original console path, answered with enabled=false'],
+  ['GET blocked-devices', 'original console path; our client reads machines/blocked'],
+  ['DELETE blocked-devices/:param', 'original console path; our client deletes machines/blocked/:id'],
 ]);
 const unused = [...serverRoutes].filter((route) => !used.has(route)).sort();
 const unexplained = unused.filter((route) => !noClientCallIsExpected.has(route));

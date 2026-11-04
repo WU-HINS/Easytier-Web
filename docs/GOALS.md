@@ -333,6 +333,8 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r213 | `ai-censorship/review-20261101-r213.md` | 两台受管实例第一次真正连上了（1 项） |
 | r214 | `ai-censorship/review-20261101-r214.md` | 数据面卡在 /dev/net/tun，不是卡在代码（0 项） |
 | r215 | `ai-censorship/review-20261101-r215.md` | 给"对等"上锁，并把"做不到"写进门店（0 项） |
+| r216 | `ai-censorship/review-20261101-r216.md` | 先把"到底缺什么"变成一张能复核的表（1 项） |
 
+台账：`ai-censorship/ledger.md`（283 项：272 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（282 项：271 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 门禁脚本：`scripts/gate.sh`（27 项：24 必跑 + 3 按需——引证扫描、真实客户端矩阵、overlay smoke）。
