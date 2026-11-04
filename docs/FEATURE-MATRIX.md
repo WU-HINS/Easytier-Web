@@ -2,7 +2,7 @@
 
 这份表来自**源码对照**，不是回忆：上游 `easytier-src/easytier-web/src/restful/` 的每个 `.route(...)` 与我们 `internal/httpapi/router.go` 的 `HandleFunc(...)` 逐条比对（去掉路径参数命名差异后取差集）。
 
-## 1. 缺口（上游有、我们没有）：23 条 → 已补 8，剩 15
+## 1. 缺口（上游有、我们没有）：23 条 → 已补 13，剩 10
 
 | # | 方法 | 路径 | 上游 handler | 作用 |
 |---|---|---|---|---|
@@ -77,7 +77,7 @@
 4. 簇 D、F：跟随 E 一起做，internal 变体直接复用同一 handler。
 
 
-## 1b. 已补的 8 条（r216 六条 + r217 两条）
+## 1b. 已补的 13 条（r216 六条 + r217 两条 + r218 五条）
 
 | 路由 | 做法 | 用例 |
 |---|---|---|
@@ -89,6 +89,11 @@
 | `DELETE /api/v1/blocked-devices/{id}` | 同上 | 同上 |
 | `POST /api/v1/generate-config` | 新增 `internal/configtext`：配置 → TOML | TestConfigRoundTripsThroughToml |
 | `POST /api/v1/parse-config` | 同上反向；错误按上游习惯放在 200 的 error 字段里 | 同上（含坏 TOML 仍返回 200 + error） |
+| `GET /api/v1/machines/{m}/networks/info` | internal/legacyview → CollectNetworkInfo | TestAdapterUsesTheClientServiceMethods |
+| `GET /api/v1/machines/{m}/networks/info/{i}` | 同上，带单个 inst_ids | 同上 |
+| `POST /api/v1/machines/{m}/networks/metas` | → ListNetworkInstanceMeta | 同上 |
+| `GET /api/v1/machines/{m}/networks/config/{i}` | → GetNetworkInstanceConfig | 同上 |
+| `DELETE /api/v1/machines/{m}/networks/{i}` | → DeleteNetworkInstance | 同上（另含非法 UUID 不触发设备调用） |
 
 ## 1c. 复核方式
 

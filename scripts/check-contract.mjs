@@ -176,6 +176,11 @@ const noClientCallIsExpected = new Map([
   ['DELETE blocked-devices/:param', 'original console path; our client deletes machines/blocked/:id'],
   ['POST generate-config', 'original console config editor; no page uses it yet (docs/FEATURE-MATRIX.md)'],
   ['POST parse-config', 'original console config editor; no page uses it yet'],
+  ['GET machines/:param/networks/info', 'original device view; our page reads the network members'],
+  ['GET machines/:param/networks/info/:param', 'original device view; single instance info'],
+  ['GET machines/:param/networks/config/:param', 'original device view; our page reads the compiled member config'],
+  ['POST machines/:param/networks/metas', 'original device view; instance metadata'],
+  ['DELETE machines/:param/networks/:param', 'original device view; our page removes the member instead'],
 ]);
 const unused = [...serverRoutes].filter((route) => !used.has(route)).sort();
 const unexplained = unused.filter((route) => !noClientCallIsExpected.has(route));
