@@ -56,6 +56,11 @@ export interface NetworkDetail {
   secure_mode: Record<string, unknown> | null;
 }
 
+export interface AclStatsResponse {
+  rules?: AclRuleStat[];
+  global?: Record<string, number>;
+}
+
 export interface AclRuleStat {
   rule?: { id?: string; name?: string };
   stat?: { packet_count?: number; byte_count?: number };
@@ -227,7 +232,7 @@ export const api = {
     request<void>('/networks/' + networkID + '/credentials/' + credentialID, { method: 'DELETE' }),
   // ACL counters live on the device, one call per running instance.
   aclStats: (machineID: string, instanceID: string) =>
-    request<{ rules?: AclRuleStat[]; global?: Record<string, number> }>(
+    request<AclStatsResponse>(
       `/machines/${machineID}/networks/info/${instanceID}/acl-stats`,
     ),
   networkMembers: (networkID: string) =>
