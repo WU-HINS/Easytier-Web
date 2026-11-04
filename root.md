@@ -147,6 +147,7 @@
 | `docs/REVIEW-TEAM.md` | 评审团运作与门禁明细 | `scripts/check-docs.mjs`（门禁表与脚本一致） |
 | `docs/FEATURE-MATRIX.md` | 与原版 easytier-web 的路由对照与缺口清单 | 差集由脚本算出（见该文件末节） |
 | `docs/screenshots/` | 真机截图与索引 | 由 Playwright 驱动 Chromium 渲染本仓库构建产物 |
+| `docs/UI-MATRIX.md` | 界面功能对照（原版组件 → 我们的实现） | 逐组件读源码 + i18n key 抽取 |
 | `ai-censorship/ledger.md` | 逐条发现与状态 | `scripts/check-docs.mjs`（状态词表、编号连续） |
 | `ai-censorship/review-*.md` | 每轮记录 | `scripts/check-docs.mjs`（连续编号、被 GOALS 引用） |
 | `docs/DEEP-CHECKS.md` | 深检记录（数据竞争 / 浸泡 / 模糊长跑） | `scripts/check-docs.mjs`（引用的轮次必须有评审记录、不得空表） |
