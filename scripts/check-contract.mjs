@@ -168,7 +168,6 @@ const noClientCallIsExpected = new Map([
   ['GET auth/oidc/callback', 'the identity provider redirects here'],
   ['GET auth/oidc/login', 'built from the server supplied login_path at runtime'],
   ['GET healthz', 'probed by the operator, not by the page'],
-  ['POST auth/oidc/register', 'the registration form lands in goal round 2; until then the browser posts it directly'],
 ]);
 const unused = [...serverRoutes].filter((route) => !used.has(route)).sort();
 const unexplained = unused.filter((route) => !noClientCallIsExpected.has(route));

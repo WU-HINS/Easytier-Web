@@ -20,6 +20,21 @@ export function LoginPage() {
 
   const oidc = useQuery({ queryKey: ['oidc-config'], queryFn: api.oidcConfig, staleTime: 60_000 });
 
+  // First OIDC sign-in lands back here with ?register=1: the identity is verified
+  // but has no account, and the name typed now never changes afterwards.
+  const registering = new URLSearchParams(window.location.search).get('register') === '1';
+  const [newUsername, setNewUsername] = useState('');
+  const register = useMutation({
+    mutationFn: () => api.registerOidc(newUsername),
+    onSuccess: () => navigate('/', { replace: true }),
+    onError: (failure: Error) => setError(failure.message || copy.login.registerFailed),
+  });
+  const submitRegister = (event: FormEvent) => {
+    event.preventDefault();
+    setError(null);
+    register.mutate();
+  };
+
   const login = useMutation({
     mutationFn: () => api.login(username, password),
     onSuccess: () => navigate('/', { replace: true }),
@@ -53,9 +68,26 @@ export function LoginPage() {
 
       <section className="flex items-center justify-center p-[var(--gap-card)]">
         <div className="panel w-full max-w-[calc(var(--u-12)*6.2)] p-[var(--pad-card)]">
-          <h1 className="text-phi-xl font-semibold tracking-tight">{copy.login.title}</h1>
-          <p className="mt-[var(--u-2)] text-phi-sm text-muted-foreground">{copy.login.subtitle}</p>
+          <h1 className="text-phi-xl font-semibold tracking-tight">{registering ? copy.login.registerTitle : copy.login.title}</h1>
+          <p className="mt-[var(--u-2)] text-phi-sm text-muted-foreground">{registering ? copy.login.registerHint : copy.login.subtitle}</p>
 
+          {registering ? (
+            <form className="mt-[var(--u-8)] space-y-[var(--u-5)]" onSubmit={submitRegister}>
+              <label className="block">
+                <span className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">{copy.login.username}</span>
+                <Input
+                  value={newUsername}
+                  autoComplete="username"
+                  onChange={(event) => setNewUsername(event.target.value)}
+                  required
+                />
+              </label>
+              {error ? <p role="alert" className="text-phi-sm text-destructive">{error}</p> : null}
+              <Button type="submit" size="lg" className="w-full" disabled={register.isPending}>
+                {register.isPending ? copy.login.submitting : copy.login.registerSubmit}
+              </Button>
+            </form>
+          ) : (
           <form className="mt-[var(--u-8)] space-y-[var(--u-5)]" onSubmit={submit}>
             <label className="block">
               <span className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">{copy.login.username}</span>
@@ -81,7 +113,9 @@ export function LoginPage() {
               {login.isPending ? copy.login.submitting : copy.login.submit}
             </Button>
           </form>
+          )}
 
+          {registering ? null : (<>
           {oidc.isLoading ? (
             <p className="mt-[var(--u-4)] text-phi-sm text-muted-foreground">{copy.login.checkingSso}</p>
           ) : null}
@@ -102,6 +136,7 @@ export function LoginPage() {
               </Button>
             </>
           ) : null}
+          </>)}
         </div>
       </section>
     </div>

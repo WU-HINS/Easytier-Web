@@ -3,6 +3,10 @@ export const copy = {
   brand: 'EasyTier',
   brandTag: '控制台',
   login: {
+    registerTitle: '注册账户',
+    registerHint: '这是你第一次用身份提供方登录。用户名只在此刻设定一次，之后不可修改。',
+    registerSubmit: '用这个用户名继续',
+    registerFailed: '注册失败，请重新开始登录',
     title: '登录控制台',
     subtitle: '管理你的设备、网络与访问策略',
     username: '用户名',

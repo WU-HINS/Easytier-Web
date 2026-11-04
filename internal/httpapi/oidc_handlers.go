@@ -266,7 +266,18 @@ func (s *Server) handleOIDCCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := s.provisionOIDCUser(r, claims)
+	// Bind only: an unbound identity must not get an account from the claims.
+	// It finishes here with a signed pending cookie and picks a username on the
+	// registration form; that name never changes afterwards.
+	user, err := s.cfg.Store.GetUserByOIDC(r.Context(), claims.Issuer, claims.Subject)
+	if errors.Is(err, bal.ErrNotFound) {
+		writePendingRegistration(w, s.cfg.SecureCookies,
+			encodePendingRegistration(s.cfg.SessionKey, pendingRegistration{
+				Issuer: claims.Issuer, Subject: claims.Subject, Email: claims.Email, Name: claims.Name,
+			}, s.cfg.Now()))
+		http.Redirect(w, r, "/?register=1", http.StatusFound)
+		return
+	}
 	if err != nil {
 		log.Sub("HTTP").Tag("ERROR").Error("unhandled: " + err.Error())
 		writeError(w, http.StatusInternalServerError, "internal error")

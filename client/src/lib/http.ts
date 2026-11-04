@@ -242,6 +242,13 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ device_ids: deviceIDs }),
     }),
+  // First OIDC sign-in: the console carries the verified identity in a signed
+  // cookie, and the name chosen here becomes the account name for good.
+  registerOidc: (username: string) =>
+    request<{ username: string }>('/auth/oidc/register', {
+      method: 'POST',
+      body: JSON.stringify({ username }),
+    }),
   removeNetworkMember: (networkID: string, deviceID: string) =>
     request<void>('/networks/' + networkID + '/members/' + deviceID, { method: 'DELETE' }),
   deleteNetwork: (networkID: string) => request<void>('/networks/' + networkID, { method: 'DELETE' }),

@@ -309,6 +309,7 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r189 | `ai-censorship/review-20261101-r189.md` | 乱序：不用真 NAT 也能测（0 项） |
 | r190 | `ai-censorship/review-20261101-r190.md` | 地址映射：能测的那一半也测了（0 项） |
 | r191 | `ai-censorship/review-20261101-r191.md` | 把边界写回章程（0 项） |
+| r192 | `ai-censorship/review-20261101-r192.md` | OIDC 只保留绑定模式（0 项） |
 
-台账：`ai-censorship/ledger.md`（260 项：252 FIXED / 8 ACCEPTED / 0 MONITOR / 0 OPEN）。
-门禁脚本：`scripts/gate.sh`（25 项必跑 + 1 项按需；设 `EASYTIER_RACE=1` 可加数据竞争检测；设 `EASYTIER_FULL_GATE=1` 额外跑引用证据扫描；长跑见 `scripts/soak.sh`；模糊测试见 `scripts/fuzz.sh`；深检记录见 `docs/DEEP-CHECKS.md`；下一个记录编号见 `scripts/next-review.sh`；编辑工具见 `scripts/edit-once.py`）。
+台账：`ai-censorship/ledger.md`（262 项：254 FIXED / 8 ACCEPTED / 0 MONITOR / 0 OPEN）。
+门禁脚本：`scripts/gate.sh`（25 项必跑 + 1 项按需；设 `EASYTIER_RACE=1` 可加数据竞争检测；设 `EASYTIER_FULL_GATE=1` 额外跑引用证据扫描）。

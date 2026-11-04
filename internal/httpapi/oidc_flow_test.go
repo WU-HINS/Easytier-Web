@@ -141,26 +141,54 @@ func TestOIDCLoginFlow(t *testing.T) {
 			t.Fatalf("the clearing cookie is missing %s: %q", attribute, clearingCookie)
 		}
 	}
-	if response.Header.Get("Location") != "/" {
-		t.Fatalf("callback redirect = %q", response.Header.Get("Location"))
+	// 4. Bind only: the callback must not mint an account from the claims. The
+	// verified identity travels to the registration form instead, and no session
+	// exists yet.
+	if got := response.Header.Get("Location"); got != "/?register=1" {
+		t.Fatalf("callback redirect = %q, want the registration form", got)
 	}
-
-	// 4. The session cookie now authenticates REST calls.
+	if _, err := store.GetUserByOIDC(ctx, idp.Server.URL, "user-1234"); err == nil {
+		t.Fatal("the callback provisioned an account without asking for a username")
+	}
 	response, err = client.Get(server.URL + "/api/v1/console-info")
 	if err != nil {
 		t.Fatalf("console-info: %v", err)
 	}
-	if response.StatusCode != http.StatusOK {
-		t.Fatalf("console-info status = %d (session not established)", response.StatusCode)
+	if response.StatusCode != http.StatusUnauthorized {
+		t.Fatalf("console-info before registration = %d, want 401", response.StatusCode)
 	}
 
-	// 5. The account was provisioned once, keyed by issuer + subject.
+	// 5. The username chosen here is the account name.
+	response, err = client.Post(server.URL+"/api/v1/auth/oidc/register", "application/json", strings.NewReader("{\"username\":\"alice\"}"))
+	if err != nil {
+		t.Fatalf("register: %v", err)
+	}
+	if response.StatusCode != http.StatusCreated {
+		t.Fatalf("register status = %d, want 201", response.StatusCode)
+	}
 	user, err := store.GetUserByOIDC(ctx, idp.Server.URL, "user-1234")
 	if err != nil {
-		t.Fatalf("provisioned user: %v", err)
+		t.Fatalf("registered user: %v", err)
 	}
 	if user.Username != "alice" {
-		t.Fatalf("username = %q, want the preferred_username", user.Username)
+		t.Fatalf("username = %q, want the one chosen at registration", user.Username)
+	}
+
+	// 6. Registration issued the session, and the pending cookie is gone: a
+	// second registration cannot rename the account.
+	response, err = client.Get(server.URL + "/api/v1/console-info")
+	if err != nil {
+		t.Fatalf("console-info after register: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Fatalf("console-info after register = %d, want 200", response.StatusCode)
+	}
+	response, err = client.Post(server.URL+"/api/v1/auth/oidc/register", "application/json", strings.NewReader("{\"username\":\"bob\"}"))
+	if err != nil {
+		t.Fatalf("second register: %v", err)
+	}
+	if response.StatusCode != http.StatusBadRequest {
+		t.Fatalf("second register = %d, want 400 (the pending cookie was cleared)", response.StatusCode)
 	}
 	var _ bal.User = user
 }
