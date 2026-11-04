@@ -11,7 +11,7 @@ import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
  * network but never put a device in it, which made the central network feature
  * unusable from the browser.
  */
-export function NetworkMembers({ networkID, onClose }: { networkID: string; onClose: () => void }) {
+export function NetworkMembers({ networkID, onClose }: { networkID: string; onClose?: () => void }) {
   const queryClient = useQueryClient();
   const [pick, setPick] = useState('');
   const [advanced, setAdvanced] = useState<string | null>(null);
@@ -47,7 +47,7 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
     mutationFn: () => api.deleteNetwork(networkID),
     onSuccess: () => {
       refresh();
-      onClose();
+      onClose?.();
     },
   });
 
@@ -61,9 +61,11 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
         <div className="flex flex-wrap items-center justify-between gap-[var(--u-3)]">
           <h2 className="text-phi-lg font-semibold">{copy.networks.membersTitle}</h2>
           <div className="flex items-center gap-[var(--u-2)]">
-            <Button variant="ghost" onClick={onClose}>
-              {copy.networks.back}
-            </Button>
+            {onClose ? (
+              <Button variant="ghost" onClick={onClose}>
+                {copy.networks.back}
+              </Button>
+            ) : null}
             <Button
               variant="ghost"
               disabled={destroy.isPending}

@@ -5,6 +5,7 @@ import { AppShell } from './app/app-shell';
 import { LoginPage } from './features/auth/login-page';
 import { DashboardPage } from './features/dashboard/dashboard-page';
 import { DevicesPage } from './features/devices/devices-page';
+import { NetworkDetailPage } from './features/networks/network-detail-page';
 import { NetworksPage } from './features/networks/networks-page';
 import { AppearancePage } from './features/settings/appearance-page';
 import { AccountPage } from './features/account/account-page';
@@ -22,6 +23,7 @@ export default function App() {
           <Route index element={<DashboardPage />} />
           <Route path="/devices" element={<DevicesPage />} />
           <Route path="/networks" element={<NetworksPage />} />
+          <Route path="/networks/:networkID" element={<NetworkDetailPage />} />
           <Route path="/account" element={<AccountPage />} />
           <Route path="/settings" element={<AppearancePage />} />
           <Route path="/admin/users" element={<AdminUsersPage />} />

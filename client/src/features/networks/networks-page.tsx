@@ -1,17 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { copy } from '../../copy/zh-CN';
 import { api } from '../../lib/http';
 import { Badge, Button, Card, CardBody, Input, Skeleton } from '../../ui';
-import { NetworkMembers } from './network-members';
-import { NetworkSettings } from './network-settings';
 
 export function NetworksPage() {
   const queryClient = useQueryClient();
   const networks = useQuery({ queryKey: ['networks'], queryFn: api.networks });
   const [name, setName] = useState('');
   const [cidr, setCidr] = useState('10.42.0.0/24');
-  const [selected, setSelected] = useState<string | null>(null);
 
   const create = useMutation({
     mutationFn: () => api.createNetwork(name, cidr),
@@ -61,12 +59,12 @@ export function NetworksPage() {
                 <div className="flex shrink-0 items-center gap-[var(--u-2)]">
                   {network.secure_mode ? <Badge tone="primary">{copy.networks.secure}</Badge> : null}
                   <Badge>{network.member_count} {copy.networks.members}</Badge>
-                  <Button
-                    variant="ghost"
-                    onClick={() => setSelected(selected === network.network_id ? null : network.network_id)}
+                  <Link
+                    to={'/networks/' + network.network_id}
+                    className="text-phi-sm underline underline-offset-4"
                   >
-                    {copy.networks.manageMembers}
-                  </Button>
+                    {copy.networks.detailManage}
+                  </Link>
                 </div>
               </div>
             ))}
@@ -94,13 +92,6 @@ export function NetworksPage() {
         </Card>
       </div>
       
-      {selected ? <NetworkMembers networkID={selected} onClose={() => setSelected(null)} /> : null}
-      {selected ? (
-        <NetworkSettings
-          networkID={selected}
-          displayName={rows.find((network) => network.network_id === selected)?.display_name ?? ''}
-        />
-      ) : null}
     </div>
   );
 }
