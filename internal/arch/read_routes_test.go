@@ -13,6 +13,13 @@ var publicReadRoutes = []string{
 	"/api/v1/auth/oidc/config",
 	"/api/v1/auth/oidc/login",
 	"/api/v1/auth/oidc/callback",
+	// The original console aliases: all three answer without a session on purpose.
+	// check_login_status is the poll that decides between login page and console,
+	// captcha is drawn on the login page, and GET logout only clears a cookie that
+	// may already be gone.
+	"/api/v1/auth/check_login_status",
+	"/api/v1/auth/captcha",
+	"/api/v1/auth/logout",
 }
 
 // TestReadRoutesRequireASession is the read side of F-170 and F-176: a GET route

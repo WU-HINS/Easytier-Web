@@ -2,7 +2,7 @@
 
 这份表来自**源码对照**，不是回忆：上游 `easytier-src/easytier-web/src/restful/` 的每个 `.route(...)` 与我们 `internal/httpapi/router.go` 的 `HandleFunc(...)` 逐条比对（去掉路径参数命名差异后取差集）。
 
-## 1. 缺口（上游有、我们没有）：23 条 → 已补 18，剩 5
+## 1. 缺口（上游有、我们没有）：23 条 → 已补 23，剩 0
 
 | # | 方法 | 路径 | 上游 handler | 作用 |
 |---|---|---|---|---|
@@ -77,7 +77,7 @@
 4. 簇 D、F：跟随 E 一起做，internal 变体直接复用同一 handler。
 
 
-## 1b. 已补的 18 条（r216 六条 + r217 两条 + r218 五条 + r219 五条）
+## 1b. 已补的 23 条（r216 六 + r217 两 + r218 五 + r219 五 + r220 五）
 
 | 路由 | 做法 | 用例 |
 |---|---|---|
@@ -99,6 +99,11 @@
 | `GET /api/v1/sessions` | 会话快照（普通用户看自己的，管理员看全部） | TestSessionListingIsScopedAndAdminOnly |
 | `GET /api/internal/sessions` | 同上，仅管理员 | 同上（普通用户 403） |
 | `DELETE /api/internal/users/{u}/sessions/{m}` | DisconnectDevice | 路由生效，管理员专用 |
+| `GET /api/internal/users/{u}/machines/{m}/networks/info` | 复用 legacyview，管理员专用 | 路由 + 复用既有适配层 |
+| `PUT /api/internal/users/{u}/machines/{m}/networks` | 同上，启动实例 | 同上 |
+| `DELETE /api/internal/users/{u}/machines/{m}/networks/{i}` | 同上，停止实例 | 同上 |
+| `POST /api/internal/users/{u}/machines/{m}/proxy-rpc` | 按方法名映射到客户端服务的方法序号，转发 protojson 负载 | 映射表 + 未知方法 400 |
+| `GET /api/v1/networks/gateway-info` | 返回 enabled / peer_url / relay_data | 无网关时 enabled=false |
 
 ## 1c. 复核方式
 

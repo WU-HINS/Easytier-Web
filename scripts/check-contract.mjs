@@ -186,6 +186,11 @@ const noClientCallIsExpected = new Map([
   ['GET sessions', 'original console session list; our page reads machine status instead'],
   ['GET api/internal/sessions', 'admin only session list from the original console'],
   ['DELETE api/internal/users/:param/sessions/:param', 'admin only kick from the original console'],
+  ['GET api/internal/users/:param/machines/:param/networks/info', 'internal device view, admin only; our page uses the member list'],
+  ['PUT api/internal/users/:param/machines/:param/networks', 'internal device view, admin only; starts one instance'],
+  ['DELETE api/internal/users/:param/machines/:param/networks/:param', 'internal device view, admin only; stops one instance'],
+  ['POST api/internal/users/:param/machines/:param/proxy-rpc', 'internal RPC proxy from the original console'],
+  ['GET networks/gateway-info', 'original console gateway summary; our page reads the network itself'],
 ]);
 const unused = [...serverRoutes].filter((route) => !used.has(route)).sort();
 const unexplained = unused.filter((route) => !noClientCallIsExpected.has(route));

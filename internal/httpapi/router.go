@@ -145,6 +145,12 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("GET /api/v1/sessions", s.requireUser(s.handleListSessions))
 	s.mux.HandleFunc("GET /api/internal/sessions", s.requireAdmin(s.handleListSessionsInternal))
 	s.mux.HandleFunc("DELETE /api/internal/users/{userID}/sessions/{machineID}", s.requireAdmin(s.handleDisconnectSessionInternal))
+	// The internal device view: same adapters, user named in the path.
+	s.mux.HandleFunc("GET /api/internal/users/{userID}/machines/{machineID}/networks/info", s.requireAdmin(s.handleInternalCollectInfo))
+	s.mux.HandleFunc("PUT /api/internal/users/{userID}/machines/{machineID}/networks", s.requireAdmin(s.handleInternalRunInstance))
+	s.mux.HandleFunc("DELETE /api/internal/users/{userID}/machines/{machineID}/networks/{instanceID}", s.requireAdmin(s.handleInternalDeleteInstance))
+	s.mux.HandleFunc("POST /api/internal/users/{userID}/machines/{machineID}/proxy-rpc", s.requireAdmin(s.handleInternalProxyRPC))
+	s.mux.HandleFunc("GET /api/v1/networks/gateway-info", s.requireUser(s.handleGatewayInfo))
 	s.mux.HandleFunc("PUT /api/v1/auth/password", s.requireUser(s.handleChangePasswordCompat))
 	s.mux.HandleFunc("GET /api/v1/blocked-devices", s.requireUser(s.handleListBlockedDevicesCompat))
 	s.mux.HandleFunc("DELETE /api/v1/blocked-devices/{machineID}", s.requireUser(s.handleUnblockDeviceCompat))
