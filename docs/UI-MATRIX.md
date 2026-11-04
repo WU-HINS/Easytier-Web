@@ -7,7 +7,7 @@
 
 | 能力 | 原版 | 我们 | 结论 |
 |---|---|---|---|
-| ACL 规则构建器 | AclPolicyTab.vue（494 行）：规则表、增删改、action allow/deny、protocol、source/target、单端口/端口范围、默认动作、启用开关、排序提示、空态与校验 | 只有 JSON 文本框 | 缺 |
+| ACL 规则构建器 | AclPolicyTab.vue（494 行）：规则表、增删改、action、protocol、source/target、端口、默认动作、启用开关 | **已实现**：默认动作、规则卡片（名称/动作/启用/源/目标/协议端口）、上传下载顺序、删除、JSON 视图切换 | 已对齐 |
 | 设备接入引导 | DeviceList/MainPage：enroll token、命令复制、说明 | 无 | 缺 |
 | 设备列表增强 | DeviceList：搜索、别名、封禁/解封、删除、实例数、位置、公网 IP、刷新/重试 | 有别名/删除；缺搜索、实例数、位置、公网 IP | 缺 |
 | 设备详情 | DeviceDetails：central_networks、hostname、last_report、location、public_ip、status、version | 有页头 + 所属网络；缺 location/public_ip/last_report | 部分 |
