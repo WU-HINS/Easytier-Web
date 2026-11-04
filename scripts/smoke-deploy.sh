@@ -172,7 +172,7 @@ RESTART_STATUS=$(curl -s "$BASE/api/v1/setup")
 step "setup status after restart" "$RESTART_STATUS"
 
 # The UDP transport landed in r145; prove the datagram socket is bound too.
-if grep -qE "extra udp listener on .*:" "$EXTRA_PORT$" "$WORK/server.log"; then
+if grep -qE "extra udp listener on .*:$EXTRA_PORT" "$WORK/server.log"; then
   step "extra udp listener open" "$EXTRA_PORT"
 else
   echo "FAIL: the extra UDP listener did not announce itself on port $EXTRA_PORT"
