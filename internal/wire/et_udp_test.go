@@ -29,7 +29,9 @@ func TestEasyTierUDPSessionHandshake(t *testing.T) {
 
 	connID := uint32(0x2cdf052b)
 	magic := []byte{0x6e, 0x00, 0xd8, 0x91, 0x00, 0x2d, 0xe8, 0x20}
-	if _, err := conn.Write(buildDatagram(connID, 1, magic)); err != nil {
+	// The padding byte is not reserved in practice: 2.6.4 fills it with 0x69, and a
+	// parser that insisted on zero dropped every heartbeat it sent.
+	if _, err := conn.Write(buildDatagramPadded(connID, 1, 0x69, magic)); err != nil {
 		t.Fatalf("write syn: %v", err)
 	}
 
@@ -57,7 +59,7 @@ func TestEasyTierUDPSessionHandshake(t *testing.T) {
 	}
 
 	want := &wire.Packet{FromPeer: 1, ToPeer: 1, Payload: []byte("hello")}
-	if _, err := conn.Write(buildDatagram(connID, 3, want.Encode())); err != nil {
+	if _, err := conn.Write(buildDatagramPadded(connID, 3, 0x61, want.Encode())); err != nil {
 		t.Fatalf("write data: %v", err)
 	}
 	got, err := tunnel.Recv(ctx)
@@ -93,9 +95,15 @@ func TestEasyTierUDPSessionHandshake(t *testing.T) {
 
 // buildDatagram writes the eight byte session header the upstream client uses.
 func buildDatagram(connID uint32, msgType uint8, body []byte) []byte {
+	return buildDatagramPadded(connID, msgType, 0, body)
+}
+
+// buildDatagramPadded sets the padding byte, which real clients do not zero.
+func buildDatagramPadded(connID uint32, msgType uint8, padding uint8, body []byte) []byte {
 	out := make([]byte, 8+len(body))
 	binary.LittleEndian.PutUint32(out[0:4], connID)
 	out[4] = msgType
+	out[5] = padding
 	binary.LittleEndian.PutUint16(out[6:8], uint16(len(body)))
 	copy(out[8:], body)
 	return out

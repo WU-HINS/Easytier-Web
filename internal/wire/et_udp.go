@@ -39,7 +39,10 @@ func parseEasyTierDatagram(data []byte) (easyTierDatagram, error) {
 		return easyTierDatagram{}, errNotEasyTierDatagram
 	}
 	msgType := data[4]
-	if msgType < etUDPSyn || msgType > etUDPFin || data[5] != 0 {
+	// The byte after the message type is padding and the clients do fill it: 2.6.4
+	// sends 0x69 and 0x61 there, which a padding==0 check rejected outright, so
+	// every heartbeat was dropped and the session idled out.
+	if msgType < etUDPSyn || msgType > etUDPFin {
 		return easyTierDatagram{}, errNotEasyTierDatagram
 	}
 	length := int(binary.LittleEndian.Uint16(data[6:8]))
