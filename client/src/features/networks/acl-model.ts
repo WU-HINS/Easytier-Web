@@ -41,8 +41,17 @@ export function parsePolicy(raw: string): AclPolicy {
     const rules = Array.isArray(parsed.rules) ? parsed.rules : [];
     // Rules written before ids were random can share one. React keys and the
     // edit handlers both assume uniqueness, so duplicates get a suffix here.
+    // Policies saved by the first version of this editor used "any" and "cidr",
+    // which the compiler rejects; rename them on the way in so opening the tab
+    // repairs the policy the next time it is saved.
+    const renamed = rules.map((rule) => ({
+      ...rule,
+      sources: renameSelectors(rule.sources),
+      destinations: renameSelectors(rule.destinations),
+    }));
+
     const seen = new Set<string>();
-    const unique = rules.map((rule) => {
+    const unique = renamed.map((rule) => {
       let id = rule.id || "rule";
       let suffix = 2;
       while (seen.has(id)) {
@@ -65,23 +74,27 @@ export function policyToJson(policy: AclPolicy): string {
   return JSON.stringify(policy, null, 2);
 }
 
-/** selectorsToText renders a selector list as "any" or a comma separated CIDR list. */
+/**
+ * selectorsToText renders a selector list as "any" or a comma separated CIDR
+ * list. The compiler only knows all / member / group / subnet, so "any" and the
+ * subnet form are what this editor writes.
+ */
 export function selectorsToText(selectors?: AclSelector[]): string {
   const list = selectors ?? [];
   if (list.length === 0) return 'any';
-  if (list.some((entry) => entry.type === 'any')) return 'any';
+  if (list.some((entry) => entry.type === 'all')) return 'any';
   const cidrs = list.flatMap((entry) => entry.cidrs ?? []);
   return cidrs.join(', ');
 }
 
 export function textToSelectors(text: string): AclSelector[] {
   const trimmed = text.trim();
-  if (!trimmed || trimmed.toLowerCase() === 'any') return [{ type: 'any' }];
+  if (!trimmed || trimmed.toLowerCase() === 'any') return [{ type: 'all' }];
   const cidrs = trimmed
     .split(',')
     .map((entry) => entry.trim())
     .filter((entry) => entry !== '');
-  return [{ type: 'cidr', cidrs }];
+  return [{ type: 'subnet', cidrs }];
 }
 
 /** protocolsToText renders protocols as "tcp:80,443; udp:53" or "any". */
@@ -128,8 +141,18 @@ export function newRule(): AclRule {
     name: '规则',
     enabled: true,
     action: 'allow',
-    sources: [{ type: 'any' }],
-    destinations: [{ type: 'any' }],
+    sources: [{ type: 'all' }],
+    destinations: [{ type: 'all' }],
     protocols: [{ protocol: 'any' }],
   };
+}
+
+/** renameSelectors maps the old vocabulary onto the one the compiler accepts. */
+function renameSelectors(selectors?: AclSelector[]): AclSelector[] | undefined {
+  if (!selectors) return selectors;
+  return selectors.map((entry) => {
+    if (entry.type === 'any') return { ...entry, type: 'all' };
+    if (entry.type === 'cidr') return { ...entry, type: 'subnet' };
+    return entry;
+  });
 }
