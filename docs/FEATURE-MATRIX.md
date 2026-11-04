@@ -2,7 +2,7 @@
 
 这份表来自**源码对照**，不是回忆：上游 `easytier-src/easytier-web/src/restful/` 的每个 `.route(...)` 与我们 `internal/httpapi/router.go` 的 `HandleFunc(...)` 逐条比对（去掉路径参数命名差异后取差集）。
 
-## 1. 缺口（上游有、我们没有）：23 条 → 已补 6，剩 17
+## 1. 缺口（上游有、我们没有）：23 条 → 已补 8，剩 15
 
 | # | 方法 | 路径 | 上游 handler | 作用 |
 |---|---|---|---|---|
@@ -77,7 +77,7 @@
 4. 簇 D、F：跟随 E 一起做，internal 变体直接复用同一 handler。
 
 
-## 1b. 已补的 6 条（r216）
+## 1b. 已补的 8 条（r216 六条 + r217 两条）
 
 | 路由 | 做法 | 用例 |
 |---|---|---|
@@ -87,6 +87,8 @@
 | `PUT /api/v1/auth/password` | 转调改密处理器（字段名用 current_password） | 同上（匿名 401、登录后 204、新密码可登录） |
 | `GET /api/v1/blocked-devices` | 转调 `/machines/blocked` | 契约检查已登记理由 |
 | `DELETE /api/v1/blocked-devices/{id}` | 同上 | 同上 |
+| `POST /api/v1/generate-config` | 新增 `internal/configtext`：配置 → TOML | TestConfigRoundTripsThroughToml |
+| `POST /api/v1/parse-config` | 同上反向；错误按上游习惯放在 200 的 error 字段里 | 同上（含坏 TOML 仍返回 200 + error） |
 
 ## 1c. 复核方式
 

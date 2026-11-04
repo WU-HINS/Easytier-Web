@@ -174,6 +174,8 @@ const noClientCallIsExpected = new Map([
   ['GET auth/captcha', 'original console path, answered with enabled=false'],
   ['GET blocked-devices', 'original console path; our client reads machines/blocked'],
   ['DELETE blocked-devices/:param', 'original console path; our client deletes machines/blocked/:id'],
+  ['POST generate-config', 'original console config editor; no page uses it yet (docs/FEATURE-MATRIX.md)'],
+  ['POST parse-config', 'original console config editor; no page uses it yet'],
 ]);
 const unused = [...serverRoutes].filter((route) => !used.has(route)).sort();
 const unexplained = unused.filter((route) => !noClientCallIsExpected.has(route));

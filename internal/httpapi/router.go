@@ -131,6 +131,8 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("GET /api/v1/auth/logout", s.handleLogoutCompat)
 	s.mux.HandleFunc("GET /api/v1/auth/check_login_status", s.handleCheckLoginStatus)
 	s.mux.HandleFunc("GET /api/v1/auth/captcha", s.handleCaptcha)
+	s.mux.HandleFunc("POST /api/v1/generate-config", s.requireUser(s.handleGenerateConfigLite))
+	s.mux.HandleFunc("POST /api/v1/parse-config", s.requireUser(s.handleParseConfigLite))
 	s.mux.HandleFunc("PUT /api/v1/auth/password", s.requireUser(s.handleChangePasswordCompat))
 	s.mux.HandleFunc("GET /api/v1/blocked-devices", s.requireUser(s.handleListBlockedDevicesCompat))
 	s.mux.HandleFunc("DELETE /api/v1/blocked-devices/{machineID}", s.requireUser(s.handleUnblockDeviceCompat))
