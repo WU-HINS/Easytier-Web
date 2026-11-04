@@ -310,6 +310,7 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r190 | `ai-censorship/review-20261101-r190.md` | 地址映射：能测的那一半也测了（0 项） |
 | r191 | `ai-censorship/review-20261101-r191.md` | 把边界写回章程（0 项） |
 | r192 | `ai-censorship/review-20261101-r192.md` | OIDC 只保留绑定模式（0 项） |
+| r193 | `ai-censorship/review-20261101-r193.md` | 三通道真的同时接上，只推了一条（3 项） |
 
-台账：`ai-censorship/ledger.md`（262 项：254 FIXED / 8 ACCEPTED / 0 MONITOR / 0 OPEN）。
+台账：`ai-censorship/ledger.md`（263 项：255 FIXED / 8 ACCEPTED / 0 MONITOR / 0 OPEN）。
 门禁脚本：`scripts/gate.sh`（25 项必跑 + 1 项按需；设 `EASYTIER_RACE=1` 可加数据竞争检测；设 `EASYTIER_FULL_GATE=1` 额外跑引用证据扫描）。
