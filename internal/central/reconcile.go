@@ -59,9 +59,11 @@ type Reconciler struct {
 
 // Report summarises one reconcile pass.
 type Report struct {
-	Pushed  int
-	Skipped int
-	Failed  int
+	Pushed int
+	// Enrolled counts memberships the whitelist created on this pass.
+	Enrolled int
+	Skipped  int
+	Failed   int
 	// CompileErrors counts networks whose intent could not be compiled. One
 	// broken network must not stop the others (or other tenants) from syncing.
 	CompileErrors int
@@ -139,13 +141,21 @@ func (r *Reconciler) ReconcileUser(ctx context.Context, userID int64) (Report, e
 	for _, device := range devices {
 		byID[device.MachineID] = device
 	}
+	report := Report{}
+	// A whitelisted device joins by itself: without this, "quick cluster join"
+	// would still need an admin to add every member by hand.
+	enrolled, err := r.enrollWhitelisted(ctx, userID, networks, byID)
+	if err != nil {
+		return report, err
+	}
+	report.Enrolled = enrolled
+
 	quota := 0
 	if r.MaxInstancesPerUser != nil {
 		quota = r.MaxInstancesPerUser(ctx, userID)
 	}
 	enforceQuota := quota > 0
 	budget := quota
-	report := Report{}
 	// expected[device] holds the instance ids the console wants running; every
 	// id the console could ever have created for this tenant is tracked so we
 	// never stop an instance that came from the device's own configuration.

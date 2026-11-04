@@ -313,6 +313,7 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r193 | `ai-censorship/review-20261101-r193.md` | 三通道真的同时接上，只推了一条（3 项） |
 | r194 | `ai-censorship/review-20261101-r194.md` | 网络高级设置与"节点优先"的合并规则（2 项） |
 | r195 | `ai-censorship/review-20261101-r195.md` | 实例接收限速落地（先确认协议里有这个字段）（1 项） |
+| r196 | `ai-censorship/review-20261101-r196.md` | 网络白名单：命中即并网，且只并一次（1 项） |
 
-台账：`ai-censorship/ledger.md`（266 项：258 FIXED / 8 ACCEPTED / 0 MONITOR / 0 OPEN）。
+台账：`ai-censorship/ledger.md`（267 项：259 FIXED / 8 ACCEPTED / 0 MONITOR / 0 OPEN）。
 门禁脚本：`scripts/gate.sh`（25 项必跑 + 1 项按需；设 `EASYTIER_RACE=1` 可加数据竞争检测；设 `EASYTIER_FULL_GATE=1` 额外跑引用证据扫描）。

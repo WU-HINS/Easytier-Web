@@ -76,6 +76,9 @@ type Overrides struct {
 	InstanceRecvBpsLimit *uint64 `json:"instance_recv_bps_limit,omitempty"`
 	EnableExitNode       *bool   `json:"enable_exit_node,omitempty"`
 	DisableEncryption    *bool   `json:"disable_encryption,omitempty"`
+	// Whitelist is an admission rule rather than a config field: a device whose
+	// machine id is listed (or "*") joins the network by itself during reconcile.
+	Whitelist []string `json:"whitelist,omitempty"`
 }
 
 // MergeOverrides layers two override blobs. The network supplies the defaults
