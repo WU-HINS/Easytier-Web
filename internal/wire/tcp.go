@@ -33,6 +33,9 @@ func newTCPTunnel(conn net.Conn) *tcpTunnel {
 	}
 }
 
+// TransportName lets the session registry keep one tunnel per transport.
+func (t *tcpTunnel) TransportName() string { return "tcp" }
+
 func (t *tcpTunnel) RemoteAddr() string { return t.remote }
 func (t *tcpTunnel) LocalAddr() string  { return t.local }
 

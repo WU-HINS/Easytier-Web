@@ -47,7 +47,7 @@ func TestRegisterClosesTheTunnelItReplaces(t *testing.T) {
 		t.Fatalf("the new tunnel was closed by its own registration")
 	}
 	manager.mu.RLock()
-	current := manager.sessions[sessionKey(7, "m-1")]
+	current := manager.sessions[sessionKey(7, "m-1", "")]
 	manager.mu.RUnlock()
 	if current != second {
 		t.Fatal("the registry no longer points at the newest session")

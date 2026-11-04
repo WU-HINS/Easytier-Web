@@ -55,6 +55,9 @@ type udpTunnel struct {
 // so it can turn on request deduplication.
 func (t *udpTunnel) IsDatagram() bool { return true }
 
+// TransportName lets the session registry keep one tunnel per transport.
+func (t *udpTunnel) TransportName() string { return "udp" }
+
 func (t *udpTunnel) RemoteAddr() string { return t.remote.String() }
 func (t *udpTunnel) LocalAddr() string  { return t.local }
 
@@ -356,6 +359,8 @@ func DialUDP(ctx context.Context, addr string) (Tunnel, error) {
 }
 
 func (t *udpClientTunnel) IsDatagram() bool { return true }
+
+func (t *udpClientTunnel) TransportName() string { return "udp" }
 
 func (t *udpClientTunnel) RemoteAddr() string { return t.remote }
 func (t *udpClientTunnel) LocalAddr() string  { return t.local }

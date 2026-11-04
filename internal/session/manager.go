@@ -62,6 +62,8 @@ type Session struct {
 	MachineID string
 	UserID    int64
 	ClientURL string
+	// Transport is "tcp", "ws" or "udp"; it is set once at registration.
+	Transport string
 	StartedAt time.Time
 
 	mux *rpc.Mux
@@ -113,8 +115,26 @@ func NewManager(db *bal.Store, authz Authenticator, policy Policy) (*Manager, er
 	}, nil
 }
 
-func sessionKey(userID int64, machineID string) string {
-	return fmt.Sprintf("%d/%s", userID, machineID)
+// sessionKey carries the transport: one device may hold a tcp, a ws and a udp
+// tunnel at the same time, and they must not evict each other (round 180).
+// transportRank orders the transports a device may hold at once. The console
+// pushes one configuration per device, so the registry has to pick a single
+// tunnel: tcp first (lowest latency, no upgrade), then ws, then udp.
+
+func transportRank(transport string) int {
+	switch transport {
+	case "tcp":
+		return 3
+	case "ws":
+		return 2
+	case "udp":
+		return 1
+	default:
+		return 0
+	}
+}
+func sessionKey(userID int64, machineID, transport string) string {
+	return fmt.Sprintf("%d/%s/%s", userID, machineID, transport)
 }
 
 // Serve runs one accepted tunnel until it closes. It blocks, so callers run it
@@ -129,6 +149,7 @@ func (m *Manager) Serve(ctx context.Context, tunnel wire.Tunnel) error {
 func (m *Manager) ServeAs(ctx context.Context, tunnel wire.Tunnel, expectedUsername string) error {
 	session := &Session{
 		ClientURL: tunnel.RemoteAddr(),
+		Transport: wire.TransportOf(tunnel),
 		StartedAt: m.now(),
 	}
 	registry := rpc.NewRegistry()
@@ -277,7 +298,7 @@ func (m *Manager) register(session *Session) {
 	var replaced *Session
 	m.mu.Lock()
 	session.mu.Lock()
-	key := sessionKey(session.UserID, session.MachineID)
+	key := sessionKey(session.UserID, session.MachineID, session.Transport)
 	session.mu.Unlock()
 	if existing, ok := m.sessions[key]; ok && existing != session {
 		replaced = existing
@@ -294,7 +315,7 @@ func (m *Manager) register(session *Session) {
 
 func (m *Manager) forget(session *Session) {
 	session.mu.Lock()
-	key := sessionKey(session.UserID, session.MachineID)
+	key := sessionKey(session.UserID, session.MachineID, session.Transport)
 	session.mu.Unlock()
 	if session.UserID == 0 && session.MachineID == "" {
 		return
@@ -310,8 +331,16 @@ func (m *Manager) forget(session *Session) {
 func (m *Manager) ByMachine(userID int64, machineID string) (*Session, bool) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	session, ok := m.sessions[sessionKey(userID, machineID)]
-	return session, ok
+	var best *Session
+	for _, session := range m.sessions {
+		if session.UserID != userID || session.MachineID != machineID {
+			continue
+		}
+		if best == nil || transportRank(session.Transport) > transportRank(best.Transport) {
+			best = session
+		}
+	}
+	return best, best != nil
 }
 
 // Call forwards one RPC into a connected device. This is the primitive behind

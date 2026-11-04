@@ -18,6 +18,15 @@ type Tunnel interface {
 	Close() error
 }
 
+// TransportOf names the transport behind a tunnel. A device may hold several
+// tunnels at once (web socket, tcp, udp), and the registry keys on this.
+func TransportOf(t Tunnel) string {
+	if named, ok := t.(interface{ TransportName() string }); ok {
+		return named.TransportName()
+	}
+	return "tunnel"
+}
+
 // Listener accepts control-plane connections.
 type Listener interface {
 	Accept(ctx context.Context) (Tunnel, error)

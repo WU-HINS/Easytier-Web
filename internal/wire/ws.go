@@ -29,6 +29,9 @@ type wsTunnel struct {
 	readMu  sync.Mutex
 }
 
+// TransportName lets the session registry keep one tunnel per transport.
+func (t *wsTunnel) TransportName() string { return "ws" }
+
 func (t *wsTunnel) RemoteAddr() string { return t.remote }
 func (t *wsTunnel) LocalAddr() string  { return t.local }
 
