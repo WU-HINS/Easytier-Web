@@ -10,6 +10,7 @@ export function NetworksPage() {
   const networks = useQuery({ queryKey: ['networks'], queryFn: api.networks });
   const [name, setName] = useState('');
   const [cidr, setCidr] = useState('10.42.0.0/24');
+  const [query, setQuery] = useState('');
 
   const create = useMutation({
     mutationFn: () => api.createNetwork(name, cidr),
@@ -26,6 +27,19 @@ export function NetworksPage() {
   };
 
   const rows = networks.data ?? [];
+  // The original console filters as you type and sorts by display name; both are
+  // local to the page because the list is small and the server has no query.
+  const needle = query.trim().toLocaleLowerCase();
+  const visible = rows
+    .filter((network) => {
+      if (!needle) return true;
+      return (
+        network.display_name.toLocaleLowerCase().includes(needle) ||
+        network.network_name.toLocaleLowerCase().includes(needle)
+      );
+    })
+    .slice()
+    .sort((a, b) => a.display_name.localeCompare(b.display_name));
 
   return (
     <div className="space-y-[var(--gap-section)]">
@@ -39,6 +53,20 @@ export function NetworksPage() {
       <div className="phi-split gap-[var(--gap-card)]">
         <Card>
           <CardBody className="p-0">
+          <div className="flex flex-wrap items-center justify-between gap-[var(--u-3)] px-[var(--pad-card)] py-[var(--u-4)]">
+            <label className="min-w-0 flex-1">
+              <span className="sr-only">{copy.networks.search}</span>
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={copy.networks.search}
+                aria-label={copy.networks.search}
+              />
+            </label>
+            <span className="shrink-0 text-phi-sm text-muted-foreground">
+              {visible.length} {copy.networks.count}
+            </span>
+          </div>
             {networks.isLoading ? (
               <div className="space-y-[var(--u-3)] p-[var(--pad-card)]">
                 <Skeleton className="h-[var(--u-10)]" />
@@ -48,7 +76,15 @@ export function NetworksPage() {
             {!networks.isLoading && rows.length === 0 ? (
               <p className="p-[var(--pad-card)] text-phi-sm text-muted-foreground">{copy.networks.empty}</p>
             ) : null}
-            {rows.map((network) => (
+            {!networks.isLoading && rows.length > 0 && visible.length === 0 ? (
+              <div className="space-y-[var(--u-2)] p-[var(--pad-card)]">
+                <p className="text-phi-sm text-muted-foreground">{copy.networks.searchEmpty}</p>
+                <Button variant="ghost" onClick={() => setQuery("")}>
+                  {copy.networks.searchClear}
+                </Button>
+              </div>
+            ) : null}
+            {visible.map((network) => (
               <div key={network.network_id} className="flex items-center justify-between gap-[var(--u-4)] border-b border-border px-[var(--pad-card)] py-[var(--u-5)] last:border-0">
                 <div className="min-w-0">
                   <p className="truncate text-phi-base font-medium">{network.display_name}</p>

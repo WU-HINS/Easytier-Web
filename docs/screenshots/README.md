@@ -9,7 +9,8 @@
 | `02-dashboard.png` | / | 概览 |
 | `03-devices.png` | /devices | 设备 |
 | `03-devices.png` | /devices | 设备列表（每行一个「详情」链接） |
-| `04-networks.png` | /networks | 网络列表（每行一个「管理」链接） |
+| `04-networks.png` | /networks | 网络列表（搜索框 + 计数 + 每行「管理」） |
+| `04a-networks-filtered.png` | /networks（搜索后） | 搜索命中只剩一条，计数随之变化 |
 | `05-network-members.png` | /networks/{id} · 成员 | 子页面·成员页签 |
 | `05a-network-acl.png` | /networks/{id} · 访问控制 | 子页面·访问控制页签（ACL JSON 编辑器） |
 | `05b-network-credentials.png` | /networks/{id} · 凭据 | 子页面·凭据页签（签发/吊销，密钥只显示一次） |
