@@ -354,6 +354,10 @@ func (m *Manager) ByMachine(userID int64, machineID string) (*Session, bool) {
 // 2.4.x through 2.7.x. The first entry is our native one: it is tried first and
 // the winner is remembered per session.
 var serviceKeyVariants = []rpc.ServiceKey{
+	// The generated descriptors name the service twice, exactly like the client
+	// does for WebServerService: proto_name == service_name (seen in the 2.7.0
+	// client trace). That spelling is tried first because it is the real one.
+	{ProtoName: "WebClientService", ServiceName: "WebClientService"},
 	{ProtoName: "api.manage", ServiceName: "WebClientService"},
 	{ProtoName: "", ServiceName: "WebClientService"},
 	{ProtoName: "api_manage", ServiceName: "WebClientService"},

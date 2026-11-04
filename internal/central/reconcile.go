@@ -22,7 +22,10 @@ import (
 )
 
 // WebClientKey is the service devices expose for console-driven configuration.
-var WebClientKey = rpc.ServiceKey{ProtoName: "api.manage", ServiceName: "WebClientService"}
+// The generated descriptor names the service twice (proto_name == service_name):
+// the 2.7.0 client trace shows that shape for WebServerService, and it registers
+// its own service the same way. Anything else answers InvalidService.
+var WebClientKey = rpc.ServiceKey{ProtoName: "WebClientService", ServiceName: "WebClientService"}
 
 // Method indexes inside api.manage.WebClientService (declaration order).
 const (

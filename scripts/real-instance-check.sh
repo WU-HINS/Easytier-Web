@@ -13,13 +13,17 @@ cd "$(dirname "$0")/.."
 # Read the environment before assigning anything: assigning to an already exported
 # variable rewrites the exported value too, which silently discarded ET_BIN and
 # turned a runnable check into "no client found".
-FROM_ENV=$(printenv ET_BIN || true)
-ET_BIN=easytier-core
-if [ -n "$FROM_ENV" ]; then ET_BIN="$FROM_ENV"; fi
-if ! command -v "$ET_BIN" >/dev/null 2>&1; then
-  echo "real instance check: no EasyTier client found (ET_BIN=$ET_BIN)" >&2
-  echo "  this check needs the upstream binary; the console on its own proves nothing" >&2
-  exit 2
+# Two ways to point this at real clients:
+#   ET_BIN=/path/to/easytier-core               one binary
+#   ET_CLIENTS="2.4.0:/path/a 2.7.0:/path/b"    a version matrix
+MATRIX=$(printenv ET_CLIENTS || true)
+SINGLE=$(printenv ET_BIN || true)
+if [ -z "$MATRIX" ]; then
+  if [ -n "$SINGLE" ]; then
+    MATRIX="client:$SINGLE"
+  else
+    MATRIX="client:easytier-core"
+  fi
 fi
 
 WORK=$(mktemp -d)
@@ -74,12 +78,13 @@ echo "== start the real client against the control plane =="
 CLIENT_PID=$!
 
 echo "== wait for the device to report itself =="
+# Older clients ignore --machine-id and pick their own, so the check must not key
+# on a specific id: it waits for any device, then reads the id back.
 SEEN=
+MACHINE_ID=
 for _ in $(seq 1 150); do
-  MACHINES=$(curl -sf -b "$COOKIE" "$BASE/api/v1/machines" 2>/dev/null || true)
-  case "$MACHINES" in
-    *11111111-2222-3333-4444-555555555501*) SEEN=1; break ;;
-  esac
+  MACHINE_ID=$(curl -sf -b "$COOKIE" "$BASE/api/v1/machines" 2>/dev/null | python3 -c "import json,sys;d=json.load(sys.stdin);print(d["machines"][0]["machine_id"] if d.get("machines") else "")" 2>/dev/null || true)
+  if [ -n "$MACHINE_ID" ]; then SEEN=1; break; fi
   sleep 0.2
 done
 if [ -z "$SEEN" ]; then cat "$WORK/client.log"; fail "the console never saw the real client"; fi
@@ -89,7 +94,7 @@ JOINED=
 for _ in $(seq 1 150); do
   MEMBERS=$(curl -sf -b "$COOKIE" "$BASE/api/v1/networks/$NETWORK_ID/members" 2>/dev/null || true)
   case "$MEMBERS" in
-    *11111111-2222-3333-4444-555555555501*) JOINED=1; break ;;
+    *"$MACHINE_ID"*) JOINED=1; break ;;
   esac
   sleep 0.2
 done
