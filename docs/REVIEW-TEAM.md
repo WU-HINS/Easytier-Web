@@ -98,6 +98,7 @@ EASYTIER_TEST_PG_DSN=... ./scripts/gate.sh     # 追加 PostgreSQL
 | backup cold start | `./scripts/check-backup-cold-start.sh`（开启备份的冷启动必须成功并留下快照） |
 | shared database | `./scripts/check-shared-database.sh`（两个实例共库时必须播报降级模式） |
 | editor invariants | `node scripts/check-editor-invariants.mjs`（保存后推进基线、空 patch 不发、无改动禁用保存） |
+| real clients | `./scripts/real-instance-matrix.sh`（官方 2.4.0 / 2.5.0 / 2.6.4 / 2.7.0 逐个接入：注册、并网、下发；按需，需要下载的发行包） |
 | postgres tests | 设置了 `EASYTIER_TEST_PG_DSN` 才运行，否则显式 SKIP |
 | postgres deploy | 同一 DSN 下把完整部署冒烟再在 PostgreSQL 上跑一遍（重置 schema） |
 | postgres api | 同一 DSN 下把整个 REST 用例套件在 PostgreSQL 的私有 schema 里再跑一遍 |

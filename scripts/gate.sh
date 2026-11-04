@@ -102,6 +102,14 @@ elif [ -n "$EASYTIER_TEST_PG_DSN" ]; then
     summary="$summary
   SKIP  cited tests (set EASYTIER_FULL_GATE=1)"
   fi
+  # Real EasyTier clients are the only proof the control plane speaks the upstream
+  # protocol. Opt-in because it needs downloaded release binaries:
+  #   ET_CLIENTS="2.4.0:/path/a 2.7.0:/path/b" EASYTIER_REAL_CLIENTS=1 ./scripts/gate.sh
+  if [ -n "$EASYTIER_REAL_CLIENTS" ]; then
+    run "real clients"    ./scripts/real-instance-matrix.sh
+  else
+    printf '== %-28s SKIP (set EASYTIER_REAL_CLIENTS=1 with ET_CLIENTS)%s' "real clients" "$NL"
+  fi
 else
   printf '== %-28s SKIP (set EASYTIER_TEST_PG_DSN to enable)\n' "postgres tests"
   summary="$summary\n  SKIP  postgres tests (no DSN)"

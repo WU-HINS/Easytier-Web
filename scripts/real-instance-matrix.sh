@@ -33,6 +33,8 @@ for entry in $CLIENTS; do
     echo "  $version: FAIL" >&2
     failed=$((failed + 1))
   fi
+  # Give the previous throwaway console a moment to release its random port.
+  sleep 2
 done
 
 if [ "$ran" -eq 0 ]; then

@@ -179,7 +179,7 @@
 
 对应用例：`TestSecurityHeaders`、`TestHSTSOnlyOnSecureTransport`、`TestApiResponsesAreNeverCached`。
 
-## 6. 门禁（25 项，第 22 项按需）
+## 6. 门禁（26 项，第 22、26 项按需）
 
 一次全量跑：`./scripts/gate.sh`；加 `EASYTIER_RACE=1` 追加数据竞争检测。
 
@@ -210,6 +210,7 @@
 | 23 | backup cold start | 开启备份的冷启动必须成功，并在改动 schema 前留下快照 |
 | 24 | shared database | 两个实例共库时必须播报降级模式 |
 | 25 | editor invariants | 成员编辑器必须保留：保存后推进基线、空 patch 不发、无改动禁用保存 |
+| 26 | real clients | 真实 EasyTier 客户端矩阵（按需：`EASYTIER_REAL_CLIENTS=1` 且 `ET_CLIENTS` 指定版本与路径） |
 
 ## 7. 版本发布流程
 

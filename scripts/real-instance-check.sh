@@ -29,10 +29,15 @@ fi
 WORK=$(mktemp -d)
 CONSOLE_PID=
 CLIENT_PID=
+KEEP=$(printenv EASYTIER_KEEP_WORK || true)
 cleanup() {
   if [ -n "$CLIENT_PID" ]; then kill "$CLIENT_PID" 2>/dev/null; fi
   if [ -n "$CONSOLE_PID" ]; then kill "$CONSOLE_PID" 2>/dev/null; fi
-  rm -rf "$WORK"
+  if [ -n "$KEEP" ]; then
+    echo "real instance check: kept $WORK" >&2
+  else
+    rm -rf "$WORK"
+  fi
 }
 trap cleanup EXIT INT TERM
 
@@ -83,24 +88,37 @@ echo "== wait for the device to report itself =="
 SEEN=
 MACHINE_ID=
 for _ in $(seq 1 150); do
-  MACHINE_ID=$(curl -sf -b "$COOKIE" "$BASE/api/v1/machines" 2>/dev/null | python3 -c "import json,sys;d=json.load(sys.stdin);print(d["machines"][0]["machine_id"] if d.get("machines") else "")" 2>/dev/null || true)
+  # The python code goes in single quotes: wrapping json keys in double quotes
+  # inside a double quoted shell string silently broke this probe.
+  MACHINE_ID=$(curl -sf -b "$COOKIE" "$BASE/api/v1/machines" 2>/dev/null | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d["machines"][0]["machine_id"] if d.get("machines") else "")' 2>/dev/null || true)
   if [ -n "$MACHINE_ID" ]; then SEEN=1; break; fi
   sleep 0.2
 done
 if [ -z "$SEEN" ]; then cat "$WORK/client.log"; fail "the console never saw the real client"; fi
 
 echo "== wait for the whitelist to enrol it =="
+# Older clients pick their own machine id and can come back under a new one after a
+# reconnect, so the id is re-read every pass instead of frozen once.
 JOINED=
-for _ in $(seq 1 150); do
+for _ in $(seq 1 200); do
+  MACHINE_ID=$(curl -sf -b "$COOKIE" "$BASE/api/v1/machines" 2>/dev/null | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d["machines"][0]["machine_id"] if d.get("machines") else "")' 2>/dev/null || true)
   MEMBERS=$(curl -sf -b "$COOKIE" "$BASE/api/v1/networks/$NETWORK_ID/members" 2>/dev/null || true)
   case "$MEMBERS" in
-    *"$MACHINE_ID"*) JOINED=1; break ;;
+    *"$MACHINE_ID"*) if [ -n "$MACHINE_ID" ]; then JOINED=1; break; fi ;;
   esac
-  sleep 0.2
+  sleep 0.25
 done
 [ -n "$JOINED" ] || fail "the whitelisted real client was never enrolled"
 
-if ! grep -q "pushed=" "$WORK/console.log"; then
+# The push happens inside the same reconcile pass that enrols the device, and its
+# log line is written only after the call returns, so waiting for the member is
+# not the same as waiting for the push.
+PUSHED=
+for _ in $(seq 1 120); do
+  if grep -q "pushed=" "$WORK/console.log"; then PUSHED=1; break; fi
+  sleep 0.25
+done
+if [ -z "$PUSHED" ]; then
   fail "the console never reported a push; see $WORK/console.log"
 fi
 
