@@ -338,7 +338,9 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r218 | `ai-censorship/review-20261101-r218.md` | 簇 E 第一批：把"设备视图"挡在适配层外（1 项） |
 | r219 | `ai-censorship/review-20261101-r219.md` | 设备视图的写入路径与会话可见性（缺口 10 → 5）（1 项） |
 | r220 | `ai-censorship/review-20261101-r220.md` | 对照表归零：42 条原版路由，缺失 0（1 项） |
+| r221 | `ai-censorship/review-20261101-r221.md` | 网络改成单独子页面，与原版对齐（1 项） |
 
+台账：`ai-censorship/ledger.md`（288 项：277 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（288 项：277 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（287 项：276 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（286 项：275 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
