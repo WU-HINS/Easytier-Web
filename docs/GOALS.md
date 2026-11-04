@@ -331,7 +331,9 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r211 | `ai-censorship/review-20261101-r211.md` | 换成无 tun 模式：实例终于跑起来了（2 项） |
 | r212 | `ai-censorship/review-20261101-r212.md` | 用公开节点做对照实验，问题收窄到"推送的 peer_urls"（0 项） |
 | r213 | `ai-censorship/review-20261101-r213.md` | 两台受管实例第一次真正连上了（1 项） |
+| r214 | `ai-censorship/review-20261101-r214.md` | 数据面卡在 /dev/net/tun，不是卡在代码（0 项） |
 
+台账：`ai-censorship/ledger.md`（282 项：271 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（282 项：271 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（281 项：270 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（281 项：270 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
