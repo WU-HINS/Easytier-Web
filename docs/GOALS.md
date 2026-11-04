@@ -319,6 +319,7 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r199 | `ai-censorship/review-20261101-r199.md` | 把"没验证过"变成一条可执行的检查（1 项） |
 | r200 | `ai-censorship/review-20261101-r200.md` | 下载真机二进制，跑出来的第一个结论是"连不上"（1 项） |
 | r201 | `ai-censorship/review-20261101-r201.md` | 真机二进制跑通了一半：设备能上线，配置还推不过去（0 项） |
+| r202 | `ai-censorship/review-20261101-r202.md` | 下发被拒：排除了六种键组合和一个 peer 假设（1 项） |
 
-台账：`ai-censorship/ledger.md`（271 项：261 FIXED / 8 ACCEPTED / 1 MONITOR / 0 OPEN）。
+台账：`ai-censorship/ledger.md`（272 项：261 FIXED / 8 ACCEPTED / 1 MONITOR / 1 OPEN）。
 门禁脚本：`scripts/gate.sh`（25 项必跑 + 1 项按需；另见 `scripts/real-instance-check.sh` 需要真实 ET 客户端）。

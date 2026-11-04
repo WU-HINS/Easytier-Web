@@ -63,7 +63,8 @@ type Session struct {
 	UserID    int64
 	ClientURL string
 	// protoName caches the spelling of the device service this peer accepted.
-	protoName string
+	protoName   string
+	serviceName string
 	// Transport is "tcp", "ws" or "udp"; it is set once at registration.
 	Transport string
 	StartedAt time.Time
@@ -347,10 +348,31 @@ func (m *Manager) ByMachine(userID int64, machineID string) (*Session, bool) {
 
 // Call forwards one RPC into a connected device. This is the primitive behind
 // the console's proxy-rpc endpoint.
-// protoNameVariants lists how the same service is addressed across client
-// versions: the generated descriptors moved between file names, and the client
-// compares the whole key, so one spelling cannot serve 2.4.x through 2.7.x.
-var protoNameVariants = []string{"api.manage", "api_manage", ""}
+// serviceKeyVariants lists how the same device service is addressed across client
+// versions. The client compares the whole key (domain, proto, service), and the
+// generated descriptors moved between releases, so a single spelling cannot serve
+// 2.4.x through 2.7.x. The first entry is our native one: it is tried first and
+// the winner is remembered per session.
+var serviceKeyVariants = []rpc.ServiceKey{
+	{ProtoName: "api.manage", ServiceName: "WebClientService"},
+	{ProtoName: "", ServiceName: "WebClientService"},
+	{ProtoName: "api_manage", ServiceName: "WebClientService"},
+	{ProtoName: "", ServiceName: "api.manage.WebClientService"},
+	{ProtoName: "api.manage", ServiceName: "api.manage.WebClientService"},
+	{ProtoName: "api_manage", ServiceName: "api_manage.WebClientService"},
+}
+
+// matchingVariant returns the candidate that shares the service name of key, so a
+// caller other than the device push keeps its own service.
+func matchingVariant(key rpc.ServiceKey) []rpc.ServiceKey {
+	out := make([]rpc.ServiceKey, 0, len(serviceKeyVariants))
+	for _, variant := range serviceKeyVariants {
+		if strings.HasSuffix(variant.ServiceName, "."+key.ServiceName) || variant.ServiceName == key.ServiceName {
+			out = append(out, variant)
+		}
+	}
+	return out
+}
 
 // wantsAnotherProtoName reports whether the peer refused the service key.
 func wantsAnotherProtoName(err error) bool {
@@ -367,9 +389,13 @@ func (m *Manager) Call(ctx context.Context, userID int64, machineID string, key 
 	}
 	session.mu.Lock()
 	preferred := session.protoName
+	preferredService := session.serviceName
 	session.mu.Unlock()
 	if preferred != "" {
 		key.ProtoName = preferred
+	}
+	if preferredService != "" {
+		key.ServiceName = preferredService
 	}
 	out, err := session.mux.Call(ctx, key, method, req)
 	if !wantsAnotherProtoName(err) {
@@ -377,24 +403,23 @@ func (m *Manager) Call(ctx context.Context, userID int64, machineID string, key 
 	}
 	// The peer knows the service but not under this proto name: try the other
 	// spellings once and remember the one it accepted.
-	var lastErr error = err
-	for _, variant := range protoNameVariants {
-		if variant == key.ProtoName {
+	lastErr := err
+	for _, candidate := range matchingVariant(key) {
+		if candidate == key {
 			continue
 		}
-		candidate := key
-		candidate.ProtoName = variant
 		out, err = session.mux.Call(ctx, candidate, method, req)
 		if err == nil {
 			session.mu.Lock()
-			session.protoName = variant
+			session.protoName = candidate.ProtoName
+			session.serviceName = candidate.ServiceName
 			session.mu.Unlock()
 			return out, nil
 		}
+		lastErr = err
 		if !wantsAnotherProtoName(err) {
 			return nil, err
 		}
-		lastErr = err
 	}
 	return nil, lastErr
 }

@@ -74,6 +74,10 @@ type Mux struct {
 	opts   Options
 
 	nextTID atomic.Int64
+	// peerID is the sender id the remote uses. Replies and requests have to
+	// carry it: the official client routes a packet addressed to peer 0 to a
+	// domain that holds no services, and answers InvalidService.
+	peerID atomic.Int64
 
 	pendingMu sync.Mutex
 	pending   map[int64]chan *common.RpcResponse
@@ -165,6 +169,9 @@ func (m *Mux) Run(ctx context.Context) error {
 		if rpcPacket.FromPeer == 0 && rpcPacket.ToPeer == 0 {
 			rpcPacket.FromPeer = pkt.FromPeer
 			rpcPacket.ToPeer = pkt.ToPeer
+		}
+		if pkt.FromPeer != 0 {
+			m.peerID.Store(int64(pkt.FromPeer))
 		}
 		if m.opts.OnFrame != nil {
 			m.opts.OnFrame("in", rpcPacket)
@@ -480,6 +487,11 @@ func (m *Mux) Call(ctx context.Context, key ServiceKey, methodIndex uint32, req 
 			IsRequest:     true,
 			TotalPieces:   total,
 			PieceIdx:      uint32(idx),
+		}
+		// Address the peer we heard from. A request to peer 0 lands in the default
+		// domain on the official client, which holds no services at all.
+		if peer := m.peerID.Load(); peer > 0 {
+			packet.ToPeer = uint32(peer)
 		}
 		if idx == 0 {
 			packet.Descriptor_ = desc
