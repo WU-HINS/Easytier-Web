@@ -5,6 +5,8 @@ import { copy } from '../../copy/zh-CN';
 import { api } from '../../lib/http';
 import { Badge, Card, CardBody, Skeleton } from '../../ui';
 import { NetworkMembers } from './network-members';
+import { NetworkAclPanel } from './network-acl-panel';
+import { NetworkCredentialsPanel } from './network-credentials-panel';
 import { NetworkSettings } from './network-settings';
 
 /**
@@ -14,7 +16,7 @@ import { NetworkSettings } from './network-settings';
  */
 export function NetworkDetailPage() {
   const { networkID = '' } = useParams();
-  const [tab, setTab] = useState<'members' | 'settings'>('members');
+  const [tab, setTab] = useState<'members' | 'acl' | 'credentials' | 'settings'>('members');
   // The header needs the subnet, which only the single-network endpoint returns,
   // so the page reads that and keeps the list around for the member count.
   const detail = useQuery({ queryKey: ['network', networkID], queryFn: () => api.network(networkID), enabled: networkID !== '' });
@@ -61,6 +63,8 @@ export function NetworkDetailPage() {
 
   const tabs = [
     { key: 'members' as const, label: copy.networks.detailTabMembers },
+    { key: 'acl' as const, label: copy.networks.detailTabAcl },
+    { key: 'credentials' as const, label: copy.networks.detailTabCredentials },
     { key: 'settings' as const, label: copy.networks.detailTabSettings },
   ];
 
@@ -106,6 +110,8 @@ export function NetworkDetailPage() {
       </div>
 
       {tab === 'members' ? <NetworkMembers networkID={network.network_id} onClose={() => setTab('settings')} /> : null}
+      {tab === 'acl' ? <NetworkAclPanel networkID={network.network_id} /> : null}
+      {tab === 'credentials' ? <NetworkCredentialsPanel networkID={network.network_id} /> : null}
       {tab === 'settings' ? <NetworkSettings networkID={network.network_id} displayName={network.display_name} /> : null}
     </div>
   );

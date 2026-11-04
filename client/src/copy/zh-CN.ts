@@ -101,6 +101,8 @@ export const copy = {
     advancedFailed: '保存失败',
     detailBack: '返回网络列表',
     detailTabMembers: '成员',
+    detailTabAcl: '访问控制',
+    detailTabCredentials: '凭据',
     detailTabSettings: '设置',
     detailMissing: '这个网络不存在，或你无权访问。',
     detailManage: '管理',
