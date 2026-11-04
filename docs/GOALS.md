@@ -328,7 +328,9 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r208 | `ai-censorship/review-20261101-r208.md` | 一个 padding 字节，卡住整个 2.6.4（1 项） |
 | r209 | `ai-censorship/review-20261101-r209.md` | ws 的两格：不是路径，是响应（0 项） |
 | r210 | `ai-censorship/review-20261101-r210.md` | ws 的两格：是 URL 约定，不是协议（0 项） |
+| r211 | `ai-censorship/review-20261101-r211.md` | 换成无 tun 模式：实例终于跑起来了（2 项） |
 
+台账：`ai-censorship/ledger.md`（281 项：270 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（279 项：269 FIXED / 9 ACCEPTED / 1 MONITOR / 0 OPEN）。
 台账：`ai-censorship/ledger.md`（279 项：268 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（279 项：268 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
