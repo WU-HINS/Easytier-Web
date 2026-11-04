@@ -47,3 +47,14 @@ members / acl / credentials / settings。我们现在是同样的结构：
 `/devices/{id}` 显示页头（名称 / machine id / 在线 / 版本 / 接入地址 / 最后在线）与「所属网络」列表
 （网络名、虚拟 IP、运行中标记，并可跳到网络子页面）。
 浏览器实测：URL 变为 `/devices/{id}`、页头与网络行都渲染、刷新后仍可打开、0 console error。
+## 一次跑完全部断言
+
+截图与断言现在由脚本产出，不再靠临时命令：
+
+    PLAYWRIGHT_CORE=/path/to/playwright-core/index.mjs node scripts/ui-tour.mjs [base-url] [截图目录]
+
+脚本会逐项断言（登录、概览四张卡与轮询开关、接入命令、设备搜索与实例列、网络搜索、创建向导的四种方法、
+四个页签、ACL 策略可编译、临时凭据命令、封禁页、改密页、语言切换），任何一项失败即退出码非 0，并同时刷新本文列的截图。
+
+说明：`scripts/ui-tour.mjs` 依赖 `playwright-core` 与本机 chromium，**不在 gate 里**（gate 需要无浏览器环境可跑），
+与 `real clients` 一样按需执行。
