@@ -5,9 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"log"
 	"net"
-	"os"
 	"sync"
 	"time"
 )
@@ -201,15 +199,11 @@ func (l *udpListener) read() {
 			return
 		}
 		if session, ok := parseEasyTierDatagram(buffer[:read]); ok == nil {
-			if debugUDP() {
-				log.Printf("wire: et datagram type=%d len=%d body=%d", session.msgType, len(buffer[:read]), len(session.body))
-			}
+
 			l.handleEasyTier(session, remote)
 			continue
 		}
-		if debugUDP() && read >= 8 {
-			log.Printf("wire: rejected datagram len=%d head=%x", read, buffer[:8])
-		}
+
 		packet, err := parseDatagramFrame(buffer, read)
 		if errors.Is(err, errSkipDatagram) {
 			// One rule, one implementation: the dialing side uses the same
@@ -508,7 +502,3 @@ func (t *udpClientTunnel) Close() error {
 	}
 	return err
 }
-
-// debugUDP turns on per-datagram logging while chasing a client that never gets
-// past the handshake.
-func debugUDP() bool { return os.Getenv("EASYTIER_UDP_DEBUG") != "" }
