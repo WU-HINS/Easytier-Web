@@ -45,6 +45,11 @@ type udpTunnel struct {
 	lastSeenMu sync.Mutex
 	lastSeen   time.Time
 
+	// easyTier is set when the peer opened the session with the upstream header
+	// instead of our length prefixed frame; connID is the id it chose.
+	easyTier bool
+	connID   uint32
+
 	// onClose detaches the tunnel from the listener map. Without it a tunnel
 	// closed by the session layer stayed in the map, and every later datagram
 	// from that address was dropped into a dead tunnel (round 146).
@@ -88,6 +93,15 @@ func (t *udpTunnel) Send(ctx context.Context, p *Packet) error {
 	body := p.Encode()
 	if len(body) > UDPMTUBytes {
 		return fmt.Errorf("%w: %d > %d", ErrOversizePacket, len(body), UDPMTUBytes)
+	}
+	if t.easyTier {
+		frame := encodeEasyTierDatagram(t.connID, etUDPData, body)
+		t.writeMu.Lock()
+		defer t.writeMu.Unlock()
+		if _, err := t.conn.WriteToUDP(frame, t.remote); err != nil {
+			return fmt.Errorf("wire: udp write: %w", err)
+		}
+		return nil
 	}
 	frame := make([]byte, TCPFrameHeaderSize+len(body))
 	binary.LittleEndian.PutUint32(frame[0:4], uint32(len(body)))
@@ -142,6 +156,9 @@ type udpListener struct {
 	mu      sync.Mutex
 	tunnels map[string]*udpTunnel
 	limit   int
+
+	// writeMu serialises replies so a Sack cannot interleave with a Data frame.
+	writeMu sync.Mutex
 }
 
 // ListenUDP binds a datagram endpoint that speaks the framed control protocol.
@@ -181,6 +198,10 @@ func (l *udpListener) read() {
 			}
 			return
 		}
+		if session, ok := parseEasyTierDatagram(buffer[:read]); ok == nil {
+			l.handleEasyTier(session, remote)
+			continue
+		}
 		packet, err := parseDatagramFrame(buffer, read)
 		if errors.Is(err, errSkipDatagram) {
 			// One rule, one implementation: the dialing side uses the same
@@ -191,11 +212,41 @@ func (l *udpListener) read() {
 			l.errs <- err
 			return
 		}
-		l.deliver(packet, remote)
+		l.deliver(packet, remote, nil)
 	}
 }
 
-func (l *udpListener) deliver(packet *Packet, remote *net.UDPAddr) {
+// handleEasyTier answers the upstream session handshake and feeds Data frames to
+// the tunnel. Without the Sack echo the client resends the same Syn forever.
+func (l *udpListener) handleEasyTier(session easyTierDatagram, remote *net.UDPAddr) {
+	switch session.msgType {
+	case etUDPSyn:
+		reply := encodeEasyTierDatagram(session.connID, etUDPSack, session.body)
+		_ = l.writeTo(reply, remote)
+		// The handshake alone is enough to accept the peer: a client that sends the
+		// Syn and nothing else still has to become a session, otherwise the caller
+		// waits for a Data frame that may never come.
+		l.deliver(nil, remote, &session)
+	case etUDPFin:
+		l.forget(remote.String())
+	case etUDPData:
+		packet, err := DecodePacket(session.body)
+		if err != nil {
+			// A malformed body must not take the listener down.
+			return
+		}
+		l.deliver(packet, remote, &session)
+	}
+}
+
+// writeTo sends a datagram back to one peer.
+func (l *udpListener) writeTo(data []byte, remote *net.UDPAddr) error {
+	l.writeMu.Lock()
+	defer l.writeMu.Unlock()
+	_, err := l.conn.WriteToUDP(data, remote)
+	return err
+}
+func (l *udpListener) deliver(packet *Packet, remote *net.UDPAddr, session *easyTierDatagram) {
 	key := remote.String()
 	l.mu.Lock()
 	tunnel, known := l.tunnels[key]
@@ -218,6 +269,10 @@ func (l *udpListener) deliver(packet *Packet, remote *net.UDPAddr) {
 			closed:   make(chan struct{}),
 			lastSeen: time.Now(),
 		}
+		if session != nil {
+			tunnel.easyTier = true
+			tunnel.connID = session.connID
+		}
 		created := tunnel
 		tunnel.onClose = func() { l.detach(key, created) }
 		l.tunnels[key] = tunnel
@@ -233,6 +288,9 @@ func (l *udpListener) deliver(packet *Packet, remote *net.UDPAddr) {
 			l.forget(key)
 			return
 		}
+	}
+	if packet == nil {
+		return
 	}
 	tunnel.deliver(packet)
 }

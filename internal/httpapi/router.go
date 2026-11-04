@@ -113,6 +113,10 @@ func New(cfg Config) (*Server, error) {
 	}
 	if cfg.WebDir != "" {
 		s.mountClient()
+	} else {
+		// Without a client to serve, the root still belongs to devices that dial it:
+		// the 2.4.0 and 2.5.0 releases connect to ws://host:port/ with no path.
+		s.mux.HandleFunc("GET /", s.handleDeviceWSRoot)
 	}
 	return s, nil
 }
@@ -195,6 +199,10 @@ func (s *Server) mountClient() {
 	dir := s.cfg.WebDir
 	files := http.FileServer(http.Dir(dir))
 	s.mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		if isWebSocketUpgrade(r) && (r.URL.Path == "/" || r.URL.Path == "/ws") {
+			s.handleDeviceWSRoot(w, r)
+			return
+		}
 		if strings.HasPrefix(r.URL.Path, "/api/") {
 			// The SPA fallback must never answer API calls.
 			writeError(w, http.StatusNotFound, "not found")

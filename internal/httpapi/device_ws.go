@@ -26,6 +26,32 @@ func (s *Server) handleDeviceWS(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "missing username in upload path")
 		return
 	}
+	s.serveDeviceChannel(w, r, username)
+}
+
+// handleDeviceWSRoot serves the same channel for clients that predate the /@up
+// path: the 2.4.0 and 2.5.0 releases dial ws://host:port/ and carry the token in
+// their first heartbeat, so the path cannot name the user. The upgrade is the
+// only thing that distinguishes them from a browser asking for the page.
+func (s *Server) handleDeviceWSRoot(w http.ResponseWriter, r *http.Request) {
+	if !isWebSocketUpgrade(r) {
+		http.NotFound(w, r)
+		return
+	}
+	s.serveDeviceChannel(w, r, "")
+}
+
+// isWebSocketUpgrade reports whether the request asks to become a websocket.
+func isWebSocketUpgrade(r *http.Request) bool {
+	for _, value := range r.Header.Values("Upgrade") {
+		if strings.EqualFold(strings.TrimSpace(value), "websocket") {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Server) serveDeviceChannel(w http.ResponseWriter, r *http.Request, username string) {
 	// Bound concurrent device channels so a flood of half open sockets cannot
 	// pin unbounded goroutines.
 	select {
