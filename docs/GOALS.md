@@ -353,8 +353,10 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r233 | `ai-censorship/review-20261101-r233.md` | ACL 统计：从"做不到"变成"通路打通"（2 项） |
 | r234 | `ai-censorship/review-20261101-r234.md` | 一个 P1：ACL 构建器写出的策略编译不过（1 项） |
 | r235 | `ai-censorship/review-20261101-r235.md` | 把六段临时脚本收成一个可复跑的回归（1 项） |
+| r236 | `ai-censorship/review-20261101-r236.md` | 一次 gate 红，但不是回归（1 项） |
 | r237 | `ai-censorship/review-20261101-r237.md` | 把网络配置还原成人类能读的样子（1 项） |
 
+台账：`ai-censorship/ledger.md`（307 项：295 FIXED / 9 ACCEPTED / 1 MONITOR / 2 OPEN）。
 台账：`ai-censorship/ledger.md`（307 项：295 FIXED / 9 ACCEPTED / 1 MONITOR / 2 OPEN）。
 台账：`ai-censorship/ledger.md`（306 项：294 FIXED / 9 ACCEPTED / 1 MONITOR / 2 OPEN）。
 台账：`ai-censorship/ledger.md`（305 项：294 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
