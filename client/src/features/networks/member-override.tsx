@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { copy } from '../../copy/zh-CN';
 import { api } from '../../lib/http';
 import { Button } from '../../ui';
+import { MemberTomlPanel } from './member-toml-panel';
 
 /**
  * Per member override blob. The endpoint existed from the start but nothing in
@@ -93,6 +94,7 @@ export function MemberOverride({ networkID, deviceID }: { networkID: string; dev
         <span className="text-phi-sm text-muted-foreground">{copy.networks.overrideHint}</span>
       </div>
       {error ? <p role="alert" className="text-phi-sm text-destructive">{error}</p> : null}
+      <MemberTomlPanel networkID={networkID} deviceID={deviceID} />
       {config.isError ? (
         <p role="alert" className="text-phi-sm text-destructive">{(config.error as Error).message}</p>
       ) : null}

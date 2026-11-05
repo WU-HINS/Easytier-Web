@@ -198,6 +198,7 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("GET /api/v1/networks/{networkID}/advanced", s.requireUser(s.handleGetNetworkAdvanced))
 	s.mux.HandleFunc("PUT /api/v1/networks/{networkID}/advanced", s.requireUser(s.handlePutNetworkAdvanced))
 	s.mux.HandleFunc("GET /api/v1/networks/{networkID}/members/{deviceID}/config", s.requireUser(s.handleGetMemberConfig))
+	s.mux.HandleFunc("GET /api/v1/networks/{networkID}/members/{deviceID}/toml", s.requireUser(s.handleGetMemberToml))
 	s.mux.HandleFunc("PUT /api/v1/networks/{networkID}/members/{deviceID}/config", s.requireUser(s.handlePutMemberConfig))
 	s.mux.HandleFunc("GET /api/v1/networks/{networkID}/credentials", s.requireUser(s.handleListCredentials))
 	s.mux.HandleFunc("POST /api/v1/networks/{networkID}/credentials", s.requireUser(s.handleCreateCredential))

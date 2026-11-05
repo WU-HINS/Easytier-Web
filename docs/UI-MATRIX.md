@@ -38,3 +38,6 @@
 6. Dashboard 增强（自动刷新、实例计数、在线成员、view all）
 7. 超越项：键盘可达性、空态一致性、e2e 断言固化为脚本
 8. 收口：check-ui / 令牌 / 契约 全绿 + gate PASS + 截图更新
+
+> 补充（r237）：网络配置补了「生效配置（TOML）」面板，
+> 由编译器结果渲染（`GET /networks/{id}/members/{device}/toml`），可读可编辑，保存前经 parse-config 转成成员 Overrides。

@@ -8,6 +8,7 @@ import (
 
 	"github.com/easytier/easytier-console/internal/auth"
 	"github.com/easytier/easytier-console/internal/central"
+	"github.com/easytier/easytier-console/internal/configtext"
 	"github.com/easytier/easytier-console/internal/db/bal"
 )
 
@@ -207,3 +208,29 @@ func (s *Server) handleRevokeCredential(w http.ResponseWriter, r *http.Request, 
 }
 
 var _ = json.Marshal
+
+// handleGetMemberToml renders what the compiler will push to one member as TOML.
+// The console shows this so an operator can read the effective configuration
+// instead of inferring it from the panel state.
+func (s *Server) handleGetMemberToml(w http.ResponseWriter, r *http.Request, user bal.User) {
+	networkID := r.PathValue("networkID")
+	deviceID := r.PathValue("deviceID")
+	plan, err := s.compilePlan(r.Context(), user.ID, networkID)
+	if err != nil {
+		writeJSON(w, http.StatusOK, map[string]any{"error": err.Error()})
+		return
+	}
+	for _, member := range plan.Members {
+		if member.DeviceID != deviceID {
+			continue
+		}
+		text, err := configtext.FromNetworkConfig(member.Config).Dump()
+		if err != nil {
+			writeJSON(w, http.StatusOK, map[string]any{"error": err.Error()})
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]any{"toml_config": text})
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"error": "this network has no compiled config for that member"})
+}

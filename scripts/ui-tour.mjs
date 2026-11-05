@@ -128,6 +128,13 @@ await page.getByRole('tab', { name: '成员', exact: true }).click();
 await page.waitForTimeout(500);
 await shot('05-network-members');
 
+// The member override area shows the effective config as TOML.
+await page.getByRole('button', { name: '高级配置' }).first().click();
+await page.waitForTimeout(1000);
+const toml = await page.getByLabel('生效配置（TOML）').inputValue();
+check('member toml shows the effective config', toml.includes('instance_name') && toml.includes('[[peer]]'), toml.split(String.fromCharCode(10))[0]);
+await shot('25-member-toml');
+
 await page.getByRole('tab', { name: '访问控制', exact: true }).click();
 await page.waitForTimeout(500);
 check('acl tab shows the default action selector', (await page.getByLabel('默认动作').count()) === 1);

@@ -235,6 +235,17 @@ export const api = {
     request<AclStatsResponse>(
       `/machines/${machineID}/networks/info/${instanceID}/acl-stats`,
     ),
+  // The effective configuration of one member, rendered as TOML by the server so
+  // the console shows what will be pushed rather than what the panel thinks.
+  memberToml: (networkID: string, deviceID: string) =>
+    request<{ toml_config?: string; error?: string }>(
+      `/networks/${networkID}/members/${deviceID}/toml`,
+    ),
+  parseConfig: (toml: string) =>
+    request<{ config?: unknown; error?: string }>("/parse-config", {
+      method: "POST",
+      body: JSON.stringify({ toml_config: toml }),
+    }),
   networkMembers: (networkID: string) =>
     request<NetworkMembers>('/networks/' + networkID + '/members'),
   network: (networkID: string) => request<NetworkDetail>('/networks/' + networkID),
