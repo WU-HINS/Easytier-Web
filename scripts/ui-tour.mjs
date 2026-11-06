@@ -131,7 +131,7 @@ if ((await page.getByRole('button', { name: '实例', exact: true }).count()) > 
   await page.getByRole('button', { name: '实例', exact: true }).first().click();
   await page.waitForTimeout(1200);
   const detail = await page.locator('body').innerText();
-  check('instance detail lists peers and routes', detail.includes('实例详情') && detail.includes('对端') && detail.includes('路由'));
+  check('instance detail lists peers, routes and acl', detail.includes('实例详情') && detail.includes('对端') && detail.includes('路由') && detail.includes('ACL 统计'));
   await shot('27-instance-detail');
   await page.getByRole('button', { name: '实例', exact: true }).first().click();
   await page.waitForTimeout(400);
@@ -143,6 +143,10 @@ await page.waitForTimeout(1000);
 const toml = await page.getByLabel('生效配置（TOML）').inputValue();
 check('member toml shows the effective config', toml.includes('instance_name') && toml.includes('[[peer]]'), toml.split(String.fromCharCode(10))[0]);
 await shot('25-member-toml');
+const downloadPromise = page.waitForEvent('download', { timeout: 8000 }).catch(() => null);
+await page.getByRole('button', { name: '导出配置' }).click();
+const download = await downloadPromise;
+check('member toml can be exported', Boolean(download && download.suggestedFilename().endsWith('.toml')), download ? download.suggestedFilename() : 'none');
 
 await page.getByRole('tab', { name: '访问控制', exact: true }).click();
 await page.waitForTimeout(500);

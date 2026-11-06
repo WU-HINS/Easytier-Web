@@ -109,6 +109,8 @@ export const copy = {
     unblock: '解除阻止',
   },
   networks: {
+    exportConfig: '导出配置',
+    exportDone: '已导出',
     instanceDetail: '实例详情',
     instanceStopped: '未运行',
     peersTitle: '对端',

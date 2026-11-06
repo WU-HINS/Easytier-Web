@@ -82,6 +82,22 @@ export function MemberTomlPanel({ networkID, deviceID }: { networkID: string; de
                 {copied ? copy.networks.tomlCopied : copy.networks.tomlCopy}
               </Button>
               {message ? <span className="text-phi-sm text-muted-foreground">{message}</span> : null}
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  const blob = new Blob([current], { type: "text/plain;charset=utf-8" });
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement("a");
+                  link.href = url;
+                  link.download = (deviceID || "member") + ".toml";
+                  link.click();
+                  URL.revokeObjectURL(url);
+                  setMessage(copy.networks.exportDone);
+                }}
+              >
+                {copy.networks.exportConfig}
+              </Button>
             </div>
           </>
         ) : null}

@@ -16,9 +16,14 @@ export function AclStatsPanel({ machineID, instanceID }: { machineID: string; in
   if (stats.isLoading) return <Skeleton className="h-[var(--u-10)]" />;
   if (stats.isError) {
     return (
-      <p role="alert" className="text-phi-sm text-destructive">
-        {(stats.error as Error).message}
-      </p>
+      <Card>
+        <CardBody className="space-y-[var(--u-3)]">
+          <h3 className="text-phi-base font-semibold">{copy.networks.aclStats}</h3>
+          <p role="alert" className="text-phi-sm text-destructive">
+            {(stats.error as Error).message}
+          </p>
+        </CardBody>
+      </Card>
     );
   }
 

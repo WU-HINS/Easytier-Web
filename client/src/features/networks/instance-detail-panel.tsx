@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { copy } from '../../copy/zh-CN';
 import { api, type InstancePeerConn } from '../../lib/http';
 import { Badge, Card, CardBody, Skeleton } from '../../ui';
+import { AclStatsPanel } from './acl-stats-panel';
 
 const mb = (bytes?: number) => ((bytes ?? 0) / 1024 / 1024).toFixed(1) + ' MB';
 const ms = (micro?: number) => ((micro ?? 0) / 1000).toFixed(1) + ' ms';
@@ -127,6 +128,7 @@ export function InstanceDetailPanel({ machineID, instanceID }: { machineID: stri
             </div>
           )}
         </div>
+        <AclStatsPanel machineID={machineID} instanceID={instanceID} />
       </CardBody>
     </Card>
   );
