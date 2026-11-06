@@ -13,7 +13,7 @@
 | F-006 | r1→r2 | R-E 渗透 | P1 | 登录无速率限制 | FIXED | `TestLoginIsThrottled`（10 次后 429） |
 | F-007 | r1 | R-B 部署 | P2 | README 未说明未初始化行为 | FIXED | README「首次部署」段 + `scripts/smoke-deploy.sh` |
 | F-008 | r1→r4 | R-A 美观 | P2 | 窄屏表格未做卡片降级 | FIXED | 用户管理页 + 设备页均已卡片化 |
-| F-009 | r1 | R-E 渗透 | P2 | proxy-rpc 缺方法白名单 | ACCEPTED | 仅限自有设备 |
+| F-009 | r1 | R-E 渗透 | P2 | proxy-rpc 缺方法白名单 | FIXED | 已加白名单：`internal/httpapi/proxy_allowlist.go` 只放行只读方法（ListPeer/ListRoute/ShowNodeInfo/GetAclStats/GetStats/ListCredentials/GetLoggerConfig 等），其余一律 403。三条测试：写方法必须被拒（含 RunNetworkInstance/GenerateCredential/RevokeCredential/SetLoggerConfig/UpdateDnsRecord）、读方法必须放行、**白名单里的每一项都必须在 methodindex 中存在**（防止写出永远转发不了的条目）。真机实测：三条写方法 403 not on the proxy allowlist，ListPeer 通过闸门后返回 404（无设备） |
 | F-010 | r1 | R-C 碰撞 | P2 | IdP 时钟偏移文案不利排障 | ACCEPTED | — |
 | F-011 | r2 | R-F 越权 | P1 | 配额按网络统计，多建网络可倍数绕过 | FIXED | `TestQuotaIsPerUserNotPerNetwork`（第二网络 409） |
 | F-012 | r2 | R-E 渗透 | P1 | 无条件信任 X-Forwarded-For，可绕过登录限流 | FIXED | `TestForwardedHeaderIsNotTrustedByDefault`（轮换 XFF 仍 429） |

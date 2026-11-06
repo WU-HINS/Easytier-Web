@@ -361,7 +361,9 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r241 | `ai-censorship/review-20261101-r241.md` | 日志级别：一次命名错误伪装成"做不到"（0 项） |
 | r242 | `ai-censorship/review-20261101-r242.md` | 把界面断言塞进 CI，顺便抓出三个真问题（1 项） |
 | r243 | `ai-censorship/review-20261101-r243.md` | storm 用例：不是超时太短，是两个假设不成立（0 项） |
+| r244 | `ai-censorship/review-20261101-r244.md` | proxy-rpc：把"能代理一切"改成"只能读"（0 项） |
 
+台账：`ai-censorship/ledger.md`（312 项：302 FIXED / 8 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（312 项：301 FIXED / 9 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（312 项：300 FIXED / 9 ACCEPTED / 1 MONITOR / 2 OPEN）。
 台账：`ai-censorship/ledger.md`（311 项：299 FIXED / 9 ACCEPTED / 1 MONITOR / 2 OPEN）。

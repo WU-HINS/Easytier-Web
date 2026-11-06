@@ -606,6 +606,12 @@ func (s *Server) handleProxyRPC(w http.ResponseWriter, r *http.Request, user bal
 	if err := decodeJSON(w, r, &payload); err != nil {
 		return
 	}
+	// Only reads are forwarded: the proxy can reach calls that change a device,
+	// and those have their own endpoints.
+	if !proxyMethodAllowed(payload.ServiceName, payload.MethodName) {
+		writeError(w, http.StatusForbidden, fmt.Sprintf("rpc %s/%s is not on the proxy allowlist", payload.ServiceName, payload.MethodName))
+		return
+	}
 	service, method, ok := resolveMethod(payload.ServiceName, payload.MethodName)
 	if !ok {
 		writeError(w, http.StatusBadRequest, fmt.Sprintf("unknown rpc %s/%s", payload.ServiceName, payload.MethodName))
