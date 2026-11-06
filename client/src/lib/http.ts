@@ -237,6 +237,12 @@ export const api = {
     ),
   // The effective configuration of one member, rendered as TOML by the server so
   // the console shows what will be pushed rather than what the panel thinks.
+  // Rotation answers with the new secret once: it is not part of the listing.
+  rotateNetworkSecret: (networkID: string) =>
+    request<{ network_secret: string; rotated_at: string }>(
+      `/networks/${networkID}/rotate-secret`,
+      { method: "POST" },
+    ),
   memberToml: (networkID: string, deviceID: string) =>
     request<{ toml_config?: string; error?: string }>(
       `/networks/${networkID}/members/${deviceID}/toml`,

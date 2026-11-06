@@ -355,7 +355,9 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r235 | `ai-censorship/review-20261101-r235.md` | 把六段临时脚本收成一个可复跑的回归（1 项） |
 | r236 | `ai-censorship/review-20261101-r236.md` | 一次 gate 红，但不是回归（1 项） |
 | r237 | `ai-censorship/review-20261101-r237.md` | 把网络配置还原成人类能读的样子（1 项） |
+| r238 | `ai-censorship/review-20261101-r238.md` | 网络密钥可以重新随机了（1 项） |
 
+台账：`ai-censorship/ledger.md`（308 项：296 FIXED / 9 ACCEPTED / 1 MONITOR / 2 OPEN）。
 台账：`ai-censorship/ledger.md`（307 项：295 FIXED / 9 ACCEPTED / 1 MONITOR / 2 OPEN）。
 台账：`ai-censorship/ledger.md`（307 项：295 FIXED / 9 ACCEPTED / 1 MONITOR / 2 OPEN）。
 台账：`ai-censorship/ledger.md`（306 项：294 FIXED / 9 ACCEPTED / 1 MONITOR / 2 OPEN）。

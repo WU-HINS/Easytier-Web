@@ -4,6 +4,7 @@ import { copy } from '../../copy/zh-CN';
 import { api } from '../../lib/http';
 import { Button, Card, CardBody, Input } from '../../ui';
 import { NetworkAdvanced } from './network-advanced';
+import { NetworkSecretPanel } from './network-secret-panel';
 
 /**
  * The settings tab: the network's own name and the inherited defaults. The ACL
@@ -48,6 +49,7 @@ export function NetworkSettings({ networkID, displayName }: { networkID: string;
 					) : null}
 				</CardBody>
 			</Card>
+			<NetworkSecretPanel networkID={networkID} />
 			<NetworkAdvanced networkID={networkID} />
 		</div>
 	);

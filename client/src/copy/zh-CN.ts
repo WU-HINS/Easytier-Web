@@ -202,6 +202,11 @@ export const copy = {
     advanced: '高级配置',
   },
   networkSettings: {
+    secretTitle: '网络密钥',
+    secretHint: '所有成员都用它加入网络。重新生成会立即替换整个网络的密钥：本控制台管理的设备会在下次下发时拿到新的，手动加入的设备需要用新密钥重连。',
+    secretRotate: '重新生成密钥',
+    secretConfirm: '确定要重新生成网络密钥吗？手动加入的设备会立刻断开。',
+    secretRotated: '新密钥（只显示这一次）',
     aclDefaultAction: '默认动作',
     aclAllow: '允许',
     aclDeny: '拒绝',

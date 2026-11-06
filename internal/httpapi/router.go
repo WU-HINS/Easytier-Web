@@ -191,6 +191,7 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("POST /api/v1/account/password", s.requireUser(s.handleChangePassword))
 	s.mux.HandleFunc("POST /api/v1/networks/{networkID}/members", s.requireUser(s.handleAddMember))
 	s.mux.HandleFunc("PATCH /api/v1/networks/{networkID}", s.requireUser(s.handleUpdateNetwork))
+	s.mux.HandleFunc("POST /api/v1/networks/{networkID}/rotate-secret", s.requireUser(s.handleRotateNetworkSecret))
 	s.mux.HandleFunc("PATCH /api/v1/networks/{networkID}/members/{deviceID}", s.requireUser(s.handleUpdateMember))
 	s.mux.HandleFunc("DELETE /api/v1/networks/{networkID}/members/{deviceID}", s.requireUser(s.handleRemoveMember))
 	s.mux.HandleFunc("GET /api/v1/networks/{networkID}/acl-policy", s.requireUser(s.handleGetACLPolicy))

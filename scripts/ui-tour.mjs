@@ -162,6 +162,12 @@ await shot('05b-network-credentials');
 await page.getByRole('tab', { name: '设置', exact: true }).click();
 await page.waitForTimeout(500);
 check('settings tab shows the advanced panel', (await text()).includes('高级设置'));
+page.on('dialog', (dialog) => dialog.accept());
+check('settings tab offers a secret rotation', (await page.getByText('网络密钥').count()) > 0);
+await page.getByRole('button', { name: '重新生成密钥' }).click();
+await page.waitForTimeout(1500);
+const rotated = (await page.locator('code').allInnerTexts()).find((entry) => entry.length >= 30) || '';
+check('rotation returns a fresh secret', rotated.length >= 30, rotated ? rotated.slice(0, 8) + '…' : 'none');
 await shot('05c-network-settings');
 
 // --- shell: language, blocked devices, password ------------------------------
