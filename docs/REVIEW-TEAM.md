@@ -100,6 +100,7 @@ EASYTIER_TEST_PG_DSN=... ./scripts/gate.sh     # 追加 PostgreSQL
 | editor invariants | `node scripts/check-editor-invariants.mjs`（保存后推进基线、空 patch 不发、无改动禁用保存） |
 | real clients | `./scripts/real-instance-matrix.sh`（官方 2.4.0 / 2.5.0 / 2.6.4 / 2.7.0 逐个接入：注册、并网、下发；按需，需要下载的发行包） |
 | overlay smoke | `./scripts/overlay-smoke.sh`（两台受管实例互相可见；数据面缺 tun 时以退出码 3 记为 SKIP；按需） |
+| data plane | 先跑 `scripts/tun-check.sh`：缺驱动/设备节点/CAP_NET_ADMIN 时打印具体原因并 SKIP（绝不当作通过）；有能力时才继续 overlay smoke |
 | postgres tests | 设置了 `EASYTIER_TEST_PG_DSN` 才运行，否则显式 SKIP |
 | postgres deploy | 同一 DSN 下把完整部署冒烟再在 PostgreSQL 上跑一遍（重置 schema） |
 | postgres api | 同一 DSN 下把整个 REST 用例套件在 PostgreSQL 的私有 schema 里再跑一遍 |

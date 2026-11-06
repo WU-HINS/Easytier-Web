@@ -1,5 +1,7 @@
 package httpapi
 
+import "strings"
+
 // The generic proxy-rpc endpoint forwards any method the method index knows, and
 // that index includes calls that change a device: starting or deleting a network
 // instance, issuing credentials, rewriting DNS records. A tenant can only reach
@@ -51,10 +53,24 @@ var proxyReadOnlyMethods = map[string]map[string]bool{
 }
 
 // proxyMethodAllowed reports whether the generic proxy may forward this call.
+//
+// Callers spell the method either way - the upstream console posts list_route,
+// the method index stores ListRoute - so both sides are normalised before the
+// lookup. Comparing only one spelling would refuse real calls.
 func proxyMethodAllowed(service, method string) bool {
 	methods, ok := proxyReadOnlyMethods[service]
 	if !ok {
 		return false
 	}
-	return methods[method]
+	wanted := normaliseMethodName(method)
+	for allowed := range methods {
+		if normaliseMethodName(allowed) == wanted {
+			return true
+		}
+	}
+	return false
+}
+
+func normaliseMethodName(method string) string {
+	return strings.ToLower(strings.ReplaceAll(method, "_", ""))
 }

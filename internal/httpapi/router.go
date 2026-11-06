@@ -125,6 +125,8 @@ func New(cfg Config) (*Server, error) {
 }
 
 func (s *Server) routes() {
+	// The scrape endpoint sits next to healthz: both answer without a session.
+	s.mux.HandleFunc("GET /metrics", s.handleMetrics)
 	s.mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]any{"status": "ok", "sessions": s.cfg.Sessions.Count()})
 	})
@@ -224,7 +226,9 @@ func (s *Server) Handler() http.Handler {
 				return
 			}
 		}
-		s.mux.ServeHTTP(w, r)
+		// The counters wrap the mux so every answer, including a 4xx from a handler,
+		// lands in the failure ratio.
+		s.countRequests(s.mux).ServeHTTP(w, r)
 	}))
 }
 

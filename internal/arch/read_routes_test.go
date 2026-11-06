@@ -20,6 +20,10 @@ var publicReadRoutes = []string{
 	"/api/v1/auth/check_login_status",
 	"/api/v1/auth/captcha",
 	"/api/v1/auth/logout",
+	// The scrape endpoint answers without a session on purpose: it carries only
+	// aggregate counters, never an identifier, and a Prometheus server cannot hold
+	// a console cookie. Set EASYTIER_METRICS_TOKEN to require a bearer token.
+	"/metrics",
 }
 
 // TestReadRoutesRequireASession is the read side of F-170 and F-176: a GET route

@@ -194,3 +194,10 @@ Noise 安全模式、Webhook 外部鉴权、GeoIP 尚未实现（UDP 传输已�
 docker pull ghcr.io/wu-hins/easytier-web:latest   # 发版镜像
 docker pull ghcr.io/wu-hins/easytier-web:CI       # 每次 push 的构建
 ```
+
+### 指标
+
+控制台在 `GET /metrics` 暴露 Prometheus 文本格式的计数器（仅聚合值，不含任何租户/网络/设备标识）：
+reconcile 的 pushed / skipped / failed / compile_errors / stopped、HTTP 请求与失败数，以及 `easytier_push_failure_ratio`。
+
+设置 `EASYTIER_METRICS_TOKEN` 后该端点要求 `Authorization: Bearer <token>`；不设置则匿名可读。

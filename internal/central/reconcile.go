@@ -16,6 +16,7 @@ import (
 
 	"github.com/easytier/easytier-console/internal/db/bal"
 	"github.com/easytier/easytier-console/internal/logging"
+	"github.com/easytier/easytier-console/internal/metrics"
 	manage "github.com/easytier/easytier-console/internal/pb/api/manage"
 	"github.com/easytier/easytier-console/internal/pb/common"
 	"github.com/easytier/easytier-console/internal/rpc"
@@ -121,6 +122,15 @@ func (r *Reconciler) ReconcileAll(ctx context.Context) (Report, error) {
 		total.Skipped += report.Skipped
 		total.Failed += report.Failed
 	}
+	// The same numbers the log line carries, kept where a scrape can read them.
+	metrics.Registry.Record(metrics.Sample{
+		Pushed:        total.Pushed,
+		Skipped:       total.Skipped,
+		Failed:        total.Failed,
+		CompileErrors: total.CompileErrors,
+		Stopped:       total.Stopped,
+	})
+
 	// One line per pass with all three counters: "nothing pushed" alone cannot
 	// distinguish "already in sync" from "every push failed".
 	if total.Pushed+total.Skipped+total.Failed > 0 && r.Logf != nil && total.Pushed+total.Failed > 0 {

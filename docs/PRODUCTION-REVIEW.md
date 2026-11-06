@@ -74,7 +74,7 @@
 | 2 | ui-tour 进 CI（r242 已关闭） | **已满足** | `.github/workflows/ci.yml` 新增 `ui-tour` job；空库本地模拟实跑 23 条全绿 |
 | 3 | F-307（r243 已关闭） | **已满足** | 8 个 CPU 打满时 ×10 仍绿；race ×10 绿 |
 | 4 | `proxy-rpc` 方法白名单（F-009，r244 已关闭） | **已满足** | 只读白名单 + 三条测试；真机三条写方法 403 |
-| 5 | 指标端点或至少关键计数器 | 建议 | 能回答"当前下发失败率" |
+| 5 | 指标端点（F-314，r245 已关闭） | **已满足** | `GET /metrics` 暴露 reconcile 计数与 `easytier_push_failure_ratio`，可选 Bearer |
 
 ## 一句话
 

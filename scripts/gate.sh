@@ -113,6 +113,30 @@ elif [ -n "$EASYTIER_TEST_PG_DSN" ]; then
   # The overlay smoke builds a two node network through the console. Exit 3 means
   # peering worked but the payload step needs a tun device: a skip, not a pass and
   # not a failure.
+  # Ask the machine first instead of letting the payload step fail: the reason a
+  # data-plane run cannot happen (no driver, no node, no CAP_NET_ADMIN) is worth
+  # more than a timeout, and it has to be a SKIP rather than a pass.
+  if ./scripts/tun-check.sh > /tmp/tun-check.log 2>&1; then tun_status=0; else tun_status=$?; fi
+  if [ "$tun_status" -eq 3 ]; then
+    reason=$(head -n 1 /tmp/tun-check.log)
+    printf '== %-28s SKIP%s' "data plane" "$NL"
+    echo "    "$reason
+    summary="$summary
+  SKIP  data plane ($reason)"
+    EASYTIER_OVERLAY_SMOKE=""
+  elif [ "$tun_status" -ne 0 ]; then
+    printf '== %-28s FAIL%s' "data plane" "$NL"
+    echo "    tun-check exited "$tun_status
+    summary="$summary
+  FAIL  data plane"
+    FAILED=1
+  else
+    printf '== %-28s PASS%s' "data plane" "$NL"
+    echo "    a tun interface can be created"
+    summary="$summary
+  PASS  data plane (tun available)"
+  fi
+
   if [ -n "$EASYTIER_OVERLAY_SMOKE" ]; then
     if ./scripts/overlay-smoke.sh > /tmp/overlay-smoke.log 2>&1; then overlay_status=0; else overlay_status=$?; fi
     if [ "$overlay_status" -eq 0 ]; then

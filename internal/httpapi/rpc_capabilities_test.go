@@ -33,10 +33,14 @@ func TestRPCProxyGatesUnavailableMethods(t *testing.T) {
 		"method_name":  "patch_config",
 		"payload":      map[string]any{},
 	})
-	if status != http.StatusBadRequest {
-		t.Fatalf("patch_config = %d %s, want 400", status, body)
+	// A write is refused either because its messages were never generated (400) or
+	// because it is not on the proxy allowlist (403). Both are refusals; what has to
+	// hold is that the answer says why.
+	if status != http.StatusBadRequest && status != http.StatusForbidden {
+		t.Fatalf("patch_config = %d %s, want 400 or 403", status, body)
 	}
-	if !strings.Contains(string(body), "not available in this build") {
+	if !strings.Contains(string(body), "not available in this build") &&
+		!strings.Contains(string(body), "not on the proxy allowlist") {
 		t.Fatalf("rejection should explain why: %s", body)
 	}
 

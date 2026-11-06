@@ -45,6 +45,15 @@ jobs:
         run: go build ./...
       - name: go test (PostgreSQL configured, nothing may skip)
         run: go test -count=1 ./...
+      - name: tun capability (informational)
+        # The data-plane checks need a tun device and CAP_NET_ADMIN. Report which
+        # one is missing instead of letting a later step time out.
+        run: |
+          if ./scripts/tun-check.sh; then
+            echo "tun available: data plane checks can run on this runner"
+          else
+            echo "::warning::data plane checks will skip: $(./scripts/tun-check.sh || true)"
+          fi
       - name: client install
         working-directory: client
         run: npm ci --no-audit --no-fund
