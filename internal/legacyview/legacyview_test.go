@@ -31,6 +31,12 @@ func (s *stubCaller) Call(_ context.Context, _ int64, _ string, key rpc.ServiceK
 	return s.body, s.err
 }
 
+// CallRaw exists so the stub satisfies the interface; the logger tests use their
+// own caller because they care about the bytes.
+func (s *stubCaller) CallRaw(context.Context, int64, string, rpc.ServiceKey, uint32, []byte) ([]byte, error) {
+	return nil, nil
+}
+
 const instanceID = "11111111-2222-3333-4444-555555555555"
 
 // TestAdapterUsesTheClientServiceMethods covers the device-first endpoints: each

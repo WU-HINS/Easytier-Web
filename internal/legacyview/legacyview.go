@@ -24,6 +24,9 @@ import (
 // Caller reaches a connected device. session.Manager satisfies it.
 type Caller interface {
 	Call(ctx context.Context, userID int64, machineID string, key rpc.ServiceKey, method uint32, req proto.Message) ([]byte, error)
+	// CallRaw sends an encoded request. The logger service has no generated Go
+	// types in this repository, so its payload is built from the .proto field numbers.
+	CallRaw(ctx context.Context, userID int64, machineID string, key rpc.ServiceKey, method uint32, raw []byte) ([]byte, error)
 }
 
 // Service answers the device-first endpoints.

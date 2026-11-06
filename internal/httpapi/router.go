@@ -140,6 +140,8 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("GET /api/v1/machines/{machineID}/networks/info", s.requireUser(s.handleLegacyCollectInfo))
 	s.mux.HandleFunc("GET /api/v1/machines/{machineID}/networks/info/{instanceID}", s.requireUser(s.handleLegacyCollectInfo))
 	s.mux.HandleFunc("GET /api/v1/machines/{machineID}/networks/info/{instanceID}/acl-stats", s.requireUser(s.handleLegacyAclStats))
+	s.mux.HandleFunc("GET /api/v1/machines/{machineID}/logger-level", s.requireUser(s.handleGetLoggerLevel))
+	s.mux.HandleFunc("PUT /api/v1/machines/{machineID}/logger-level", s.requireUser(s.handlePutLoggerLevel))
 	s.mux.HandleFunc("POST /api/v1/machines/{machineID}/networks/metas", s.requireUser(s.handleLegacyMetas))
 	s.mux.HandleFunc("GET /api/v1/machines/{machineID}/networks/config/{instanceID}", s.requireUser(s.handleLegacyGetConfig))
 	s.mux.HandleFunc("DELETE /api/v1/machines/{machineID}/networks/{instanceID}", s.requireUser(s.handleLegacyDeleteInstance))

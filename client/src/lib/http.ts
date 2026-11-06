@@ -264,6 +264,14 @@ export const api = {
     request<{ info?: Record<string, InstanceRunningInfo> }>(
       `/machines/${machineID}/networks/info/${instanceID}`,
     ),
+  // The log level belongs to the device process, not to one instance.
+  loggerLevel: (machineID: string) =>
+    request<{ level: string; value: number }>(`/machines/${machineID}/logger-level`),
+  setLoggerLevel: (machineID: string, level: string) =>
+    request<{ level: string; value: number }>(`/machines/${machineID}/logger-level`, {
+      method: "PUT",
+      body: JSON.stringify({ level }),
+    }),
   aclStats: (machineID: string, instanceID: string) =>
     request<AclStatsResponse>(
       `/machines/${machineID}/networks/info/${instanceID}/acl-stats`,

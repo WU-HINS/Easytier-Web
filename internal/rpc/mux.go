@@ -450,6 +450,13 @@ func (m *Mux) Call(ctx context.Context, key ServiceKey, methodIndex uint32, req 
 	if err != nil {
 		return nil, fmt.Errorf("rpc: encode request: %w", err)
 	}
+	return m.CallRaw(ctx, key, methodIndex, raw)
+}
+
+// CallRaw sends an already encoded request. Services whose proto has no generated
+// Go types in this repository (the logger is one) can still be reached this way;
+// the caller is responsible for the field numbers matching the .proto file.
+func (m *Mux) CallRaw(ctx context.Context, key ServiceKey, methodIndex uint32, raw []byte) ([]byte, error) {
 	envelope, err := proto.Marshal(&common.RpcRequest{Request: raw})
 	if err != nil {
 		return nil, fmt.Errorf("rpc: encode RpcRequest: %w", err)

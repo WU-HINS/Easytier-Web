@@ -132,6 +132,7 @@ if ((await page.getByRole('button', { name: '实例', exact: true }).count()) > 
   await page.waitForTimeout(1200);
   const detail = await page.locator('body').innerText();
   check('instance detail lists peers, routes and acl', detail.includes('实例详情') && detail.includes('对端') && detail.includes('路由') && detail.includes('ACL 统计'));
+check('instance detail exposes the device log level', detail.includes('日志级别'));
   await shot('27-instance-detail');
   await page.getByRole('button', { name: '实例', exact: true }).first().click();
   await page.waitForTimeout(400);

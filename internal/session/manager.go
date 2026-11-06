@@ -386,6 +386,26 @@ func wantsAnotherProtoName(err error) bool {
 	return strings.Contains(err.Error(), "InvalidService")
 }
 
+// CallRaw is Call for services whose proto has no generated Go types here: the
+// caller supplies the encoded request instead of a message.
+func (m *Manager) CallRaw(ctx context.Context, userID int64, machineID string, key rpc.ServiceKey, method uint32, raw []byte) ([]byte, error) {
+	session, ok := m.ByMachine(userID, machineID)
+	if !ok {
+		return nil, bal.ErrNotFound
+	}
+	session.mu.Lock()
+	preferred := session.protoName
+	preferredService := session.serviceName
+	session.mu.Unlock()
+	if preferred != "" {
+		key.ProtoName = preferred
+	}
+	if preferredService != "" {
+		key.ServiceName = preferredService
+	}
+	return session.mux.CallRaw(ctx, key, method, raw)
+}
+
 func (m *Manager) Call(ctx context.Context, userID int64, machineID string, key rpc.ServiceKey, method uint32, req proto.Message) ([]byte, error) {
 	session, ok := m.ByMachine(userID, machineID)
 	if !ok {

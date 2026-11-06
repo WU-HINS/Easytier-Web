@@ -109,6 +109,9 @@ export const copy = {
     unblock: '解除阻止',
   },
   networks: {
+    loggerTitle: '日志级别',
+    loggerHint: '作用于整台设备的进程，不是单个实例。改完立即生效。',
+    loggerSaved: '已更新日志级别',
     exportConfig: '导出配置',
     exportDone: '已导出',
     instanceDetail: '实例详情',
