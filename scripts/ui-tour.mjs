@@ -127,6 +127,15 @@ check('network page has four tabs', tabs.length === 4, tabs.join('/'));
 await page.getByRole('tab', { name: '成员', exact: true }).click();
 await page.waitForTimeout(500);
 await shot('05-network-members');
+if ((await page.getByRole('button', { name: '实例', exact: true }).count()) > 0) {
+  await page.getByRole('button', { name: '实例', exact: true }).first().click();
+  await page.waitForTimeout(1200);
+  const detail = await page.locator('body').innerText();
+  check('instance detail lists peers and routes', detail.includes('实例详情') && detail.includes('对端') && detail.includes('路由'));
+  await shot('27-instance-detail');
+  await page.getByRole('button', { name: '实例', exact: true }).first().click();
+  await page.waitForTimeout(400);
+}
 
 // The member override area shows the effective config as TOML.
 await page.getByRole('button', { name: '高级配置' }).first().click();

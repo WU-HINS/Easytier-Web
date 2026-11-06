@@ -61,6 +61,33 @@ export interface AclStatsResponse {
   global?: Record<string, number>;
 }
 
+export interface InstancePeerConn {
+  tunnel?: { tunnelType?: string; remoteAddr?: { host?: string } };
+  stats?: { rxBytes?: number; txBytes?: number; latencyUs?: number };
+  lossRate?: number;
+  isClosed?: boolean;
+}
+
+export interface InstancePeer {
+  peerId?: number;
+  conns?: InstancePeerConn[];
+}
+
+export interface InstanceRoute {
+  peerId?: number;
+  hostname?: string;
+  cost?: number;
+  pathLatency?: number;
+  nextHopPeerId?: number;
+}
+
+export interface InstanceRunningInfo {
+  running?: boolean;
+  errorMsg?: string;
+  peers?: InstancePeer[];
+  routes?: InstanceRoute[];
+}
+
 export interface AclRuleStat {
   rule?: { id?: string; name?: string };
   stat?: { packet_count?: number; byte_count?: number };
@@ -231,6 +258,12 @@ export const api = {
   revokeCredential: (networkID: string, credentialID: string) =>
     request<void>('/networks/' + networkID + '/credentials/' + credentialID, { method: 'DELETE' }),
   // ACL counters live on the device, one call per running instance.
+  // What the device reports for one running instance: peers, their connections and
+  // the route table. The response is keyed by instance id.
+  instanceInfo: (machineID: string, instanceID: string) =>
+    request<{ info?: Record<string, InstanceRunningInfo> }>(
+      `/machines/${machineID}/networks/info/${instanceID}`,
+    ),
   aclStats: (machineID: string, instanceID: string) =>
     request<AclStatsResponse>(
       `/machines/${machineID}/networks/info/${instanceID}/acl-stats`,

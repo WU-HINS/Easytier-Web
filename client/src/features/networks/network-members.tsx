@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { InstanceDetailPanel } from './instance-detail-panel';
 import { AclStatsPanel } from './acl-stats-panel';
 import { copy } from '../../copy/zh-CN';
 import { api, type NetworkMember } from '../../lib/http';
@@ -17,6 +18,7 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
   const [pick, setPick] = useState('');
   const [advanced, setAdvanced] = useState<string | null>(null);
   const [statsFor, setStatsFor] = useState<string | null>(null);
+  const [instanceFor, setInstanceFor] = useState<string | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
 
   const members = useQuery({
@@ -134,6 +136,15 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
                 >
                   {copy.networks.advanced}
                 </Button>
+                {member.instance_id ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setInstanceFor(instanceFor === member.device_id ? null : member.device_id)}
+                  >
+                    {copy.networks.instance}
+                  </Button>
+                ) : null}
                 {member.running && member.instance_id ? (
                   <Button
                     type="button"
@@ -169,6 +180,9 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
               ) : null}
               {statsFor === member.device_id && member.instance_id ? (
                 <AclStatsPanel machineID={member.device_id} instanceID={member.instance_id} />
+              ) : null}
+              {instanceFor === member.device_id && member.instance_id ? (
+                <InstanceDetailPanel machineID={member.device_id} instanceID={member.instance_id} />
               ) : null}
             </div>
           ))}
