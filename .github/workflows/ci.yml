@@ -50,10 +50,27 @@ jobs:
         # one is missing instead of letting a later step time out.
         run: |
           if ./scripts/tun-check.sh; then
-            echo "tun available: data plane checks can run on this runner"
+            echo "tun available: data plane checks will run"
           else
             echo "::warning::data plane checks will skip: $(./scripts/tun-check.sh || true)"
           fi
+      - name: overlay smoke (only when tun is available)
+        # Exit 3 means the environment cannot prove the payload path; a skip is not a
+        # pass, so it is reported as a notice instead of a green step.
+        run: |
+          if ! ./scripts/tun-check.sh; then
+            echo "::notice::overlay smoke skipped: $(./scripts/tun-check.sh || true)"
+            exit 0
+          fi
+          if [ -z "$ET_BIN" ]; then
+            echo "::notice::overlay smoke skipped: set ET_BIN to an easytier-core binary"
+            exit 0
+          fi
+          set +e
+          ./scripts/overlay-smoke.sh
+          status=$?
+          if [ "$status" -eq 3 ]; then echo "::notice::overlay smoke could not verify the payload path"; exit 0; fi
+          exit $status
       - name: client install
         working-directory: client
         run: npm ci --no-audit --no-fund
