@@ -58,3 +58,5 @@ members / acl / credentials / settings。我们现在是同样的结构：
 
 说明：`scripts/ui-tour.mjs` 依赖 `playwright-core` 与本机 chromium，**不在 gate 里**（gate 需要无浏览器环境可跑），
 与 `real clients` 一样按需执行。
+
+ui-tour 现在也在 CI 里跑：空库起控制台 → 自建网络 → 断言 → 删除。

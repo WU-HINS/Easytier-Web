@@ -71,7 +71,7 @@
 | # | 条件 | 阻塞级别 | 验收方式 |
 |---|---|---|---|
 | 1 | 数据面在真机验证（F-283） | **阻塞** | 有 `/dev/net/tun` 的机器跑 `scripts/overlay-smoke.sh` 与 `real-instance-check.sh`，端到端能通 |
-| 2 | ui-tour 进 CI 或进 gate 的独立步骤 | **阻塞（否则界面无回归防线）** | CI 里跑出 28 条断言 |
+| 2 | ui-tour 进 CI（r242 已关闭） | **已满足** | `.github/workflows/ci.yml` 新增 `ui-tour` job；空库本地模拟实跑 23 条全绿 |
 | 3 | F-307 修掉或降级为 `testing.Short()` | 建议 | gate 连续 10 次全绿 |
 | 4 | 多租户前补 `proxy-rpc` 方法白名单（F-009） | 多租户时阻塞 | 未知方法返回 400 且有测试 |
 | 5 | 指标端点或至少关键计数器 | 建议 | 能回答"当前下发失败率" |

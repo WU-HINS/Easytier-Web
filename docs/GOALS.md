@@ -359,7 +359,9 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r239 | `ai-censorship/review-20261101-r239.md` | 实例详情：把设备自己看到的东西显示出来（1 项） |
 | r240 | `ai-censorship/review-20261101-r240.md` | ACL 并入实例详情；日志级别卡在生成代码上（2 项） |
 | r241 | `ai-censorship/review-20261101-r241.md` | 日志级别：一次命名错误伪装成"做不到"（0 项） |
+| r242 | `ai-censorship/review-20261101-r242.md` | 把界面断言塞进 CI，顺便抓出三个真问题（1 项） |
 
+台账：`ai-censorship/ledger.md`（312 项：300 FIXED / 9 ACCEPTED / 1 MONITOR / 2 OPEN）。
 台账：`ai-censorship/ledger.md`（311 项：299 FIXED / 9 ACCEPTED / 1 MONITOR / 2 OPEN）。
 台账：`ai-censorship/ledger.md`（311 项：298 FIXED / 9 ACCEPTED / 1 MONITOR / 3 OPEN）。
 台账：`ai-censorship/ledger.md`（309 项：297 FIXED / 9 ACCEPTED / 1 MONITOR / 2 OPEN）。

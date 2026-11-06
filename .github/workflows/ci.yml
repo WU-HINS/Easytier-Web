@@ -61,3 +61,45 @@ jobs:
           node scripts/check-contract.mjs
           node scripts/check-ui.mjs
           node scripts/check-editor-invariants.mjs
+
+  ui-tour:
+    # The console is a browser application; without this job nothing checks that the
+    # pages render, that the ACL policy still compiles, or that the routes exist.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: client install and build
+        working-directory: client
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+      - name: playwright browser
+        run: |
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+      - name: tour every screen
+        run: |
+          set -euo pipefail
+          go build -o /tmp/easytier-webd ./cmd/easytier-webd
+          EASYTIER_SETUP_TOKEN=ci-token EASYTIER_DB_DRIVER=sqlite EASYTIER_DB_DSN=/tmp/tour.db EASYTIER_DB_BACKUP=0 \
+            /tmp/easytier-webd --http 127.0.0.1:28201 --config-server 127.0.0.1:28202 --web-dir ./client/dist &
+          for _ in $(seq 1 100); do curl -sf http://127.0.0.1:28201/healthz && break; sleep 0.3; done
+          curl -fsS -X POST http://127.0.0.1:28201/api/v1/setup \
+            -H "X-Setup-Token: ci-token" -H "Content-Type: application/json" \
+            -d '{"username":"root-owner","password":"Real-Client-Pass-1"}'
+          node scripts/ui-tour.mjs http://127.0.0.1:28201 docs/screenshots
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-tour-screenshots
+          path: docs/screenshots
+          retention-days: 7
