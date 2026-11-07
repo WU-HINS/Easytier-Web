@@ -364,7 +364,9 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r244 | `ai-censorship/review-20261101-r244.md` | proxy-rpc：把"能代理一切"改成"只能读"（0 项） |
 | r245 | `ai-censorship/review-20261101-r245.md` | 指标端点；以及一个新抓到的负载敏感用例（2 项） |
 | r246 | `ai-censorship/review-20261101-r246.md` | F-315：让 udp 步骤重试，但不许它吞掉失败（0 项） |
+| r247 | `ai-censorship/review-20261101-r247.md` | 给 CI runner 配上 tun（1 项） |
 
+台账：`ai-censorship/ledger.md`（315 项：305 FIXED / 8 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（314 项：304 FIXED / 8 ACCEPTED / 1 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（314 项：303 FIXED / 8 ACCEPTED / 1 MONITOR / 2 OPEN）。
 台账：`ai-censorship/ledger.md`（312 项：302 FIXED / 8 ACCEPTED / 1 MONITOR / 1 OPEN）。

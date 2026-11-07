@@ -70,7 +70,7 @@
 
 | # | 条件 | 阻塞级别 | 验收方式 |
 |---|---|---|---|
-| 1 | 数据面在真机验证（F-283） | **仍阻塞（环境）** | 本机 `scripts/tun-check.sh` 判定"驱动在、缺 CAP_NET_ADMIN（TUNSETIFF: EPERM）"；有 tun 的机器上 gate 与 CI 会自动跑 overlay smoke |
+| 1 | 数据面验证（F-283） | **CI 已配 tun；本沙箱仍不可** | `.github/workflows/ci.yml` 的 `data-plane` job：拉官方客户端 → `scripts/ci-tun-setup.sh` 建节点并授予 cap_net_admin → `scripts/overlay-smoke.sh`；本沙箱无 sudo，provision 判定 exit 3 |
 | 2 | ui-tour 进 CI（r242 已关闭） | **已满足** | `.github/workflows/ci.yml` 新增 `ui-tour` job；空库本地模拟实跑 23 条全绿 |
 | 3 | F-307（r243 已关闭） | **已满足** | 8 个 CPU 打满时 ×10 仍绿；race ×10 绿 |
 | 4 | `proxy-rpc` 方法白名单（F-009，r244 已关闭） | **已满足** | 只读白名单 + 三条测试；真机三条写方法 403 |

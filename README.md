@@ -201,3 +201,12 @@ docker pull ghcr.io/wu-hins/easytier-web:CI       # 每次 push 的构建
 reconcile 的 pushed / skipped / failed / compile_errors / stopped、HTTP 请求与失败数，以及 `easytier_push_failure_ratio`。
 
 设置 `EASYTIER_METRICS_TOKEN` 后该端点要求 `Authorization: Bearer <token>`；不设置则匿名可读。
+
+### CI 里的数据面
+
+GitHub 托管的 runner 是虚拟机：tun 驱动通常在，但设备节点缺失、运行用户没有 CAP_NET_ADMIN。
+`scripts/ci-tun-setup.sh` 负责补齐：创建 `/dev/net/tun`，并给 python3 与 `ET_BIN` 加上 cap_net_admin 能力，
+最后用 `scripts/tun-check.sh` 以内核的判定为准确认成功（失败退出 3）。
+
+工作流 `.github/workflows/ci.yml` 的 `data-plane` job 会先拉取官方客户端，再执行这套流程与 `overlay-smoke.sh`。
+注意：给解释器加能力只适用于一次性的 CI 虚拟机，不要复制到共享机器上。

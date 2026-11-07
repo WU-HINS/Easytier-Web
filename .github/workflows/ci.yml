@@ -54,23 +54,6 @@ jobs:
           else
             echo "::warning::data plane checks will skip: $(./scripts/tun-check.sh || true)"
           fi
-      - name: overlay smoke (only when tun is available)
-        # Exit 3 means the environment cannot prove the payload path; a skip is not a
-        # pass, so it is reported as a notice instead of a green step.
-        run: |
-          if ! ./scripts/tun-check.sh; then
-            echo "::notice::overlay smoke skipped: $(./scripts/tun-check.sh || true)"
-            exit 0
-          fi
-          if [ -z "$ET_BIN" ]; then
-            echo "::notice::overlay smoke skipped: set ET_BIN to an easytier-core binary"
-            exit 0
-          fi
-          set +e
-          ./scripts/overlay-smoke.sh
-          status=$?
-          if [ "$status" -eq 3 ]; then echo "::notice::overlay smoke could not verify the payload path"; exit 0; fi
-          exit $status
       - name: client install
         working-directory: client
         run: npm ci --no-audit --no-fund
@@ -129,3 +112,68 @@ jobs:
           name: ui-tour-screenshots
           path: docs/screenshots
           retention-days: 7
+
+  data-plane:
+    # The only job that proves packets cross the overlay. It needs two things the
+    # default runner lacks: a tun device with CAP_NET_ADMIN, and the official
+    # client. scripts/ci-tun-setup.sh handles the first; the second is fetched
+    # from the pinned release below.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: fetch the official client
+        id: fetch
+        run: |
+          set -uo pipefail
+          VERSION=v2.7.0
+          URL="https://github.com/EasyTier/EasyTier/releases/download/$VERSION/easytier-linux-x86_64-$VERSION.zip"
+          mkdir -p /tmp/et
+          if ! curl -fsSL "$URL" -o /tmp/et/et.zip; then
+            echo "::error::cannot download $URL; the data plane cannot be verified"
+            exit 1
+          fi
+          unzip -q -o /tmp/et/et.zip -d /tmp/et
+          BIN=$(find /tmp/et -name easytier-core -type f | head -n 1)
+          if [ -z "$BIN" ]; then
+            echo "::error::the release archive has no easytier-core"
+            exit 1
+          fi
+          echo "bin=$BIN" >> "$GITHUB_OUTPUT"
+          echo "found $BIN"
+      - name: provision tun
+        env:
+          ET_BIN: ${{ steps.fetch.outputs.bin }}
+        run: |
+          set -uo pipefail
+          if ! ./scripts/ci-tun-setup.sh; then
+            echo "::error::this runner cannot provide a tun device; the data plane would go unverified"
+            exit 1
+          fi
+      - name: overlay smoke
+        env:
+          ET_BIN: ${{ steps.fetch.outputs.bin }}
+          ET_PEERS: tcp://v4v6.usvps.server.ddns.hinswu.top:21010
+        run: |
+          set -uo pipefail
+          export PATH="$(dirname "$ET_BIN"):$PATH"
+          set +e
+          ./scripts/overlay-smoke.sh > /tmp/overlay-smoke.log 2>&1
+          status=$?
+          set -e
+          tail -n 40 /tmp/overlay-smoke.log
+          if [ "$status" -eq 3 ]; then
+            echo "::error::the payload path could not be verified on this runner"
+            exit 1
+          fi
+          exit "$status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: overlay-smoke-log
+          path: /tmp/overlay-smoke.log
+          retention-days: 7
+          if-no-files-found: ignore
