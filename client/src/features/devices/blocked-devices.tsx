@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Button, Card, CardBody } from '../../ui';
+import { describeError } from '../../lib/errors';
 
 /**
  * Devices that were deleted with the "block" flag. The block list used to be a
@@ -51,7 +52,7 @@ export function BlockedDevices() {
           </div>
         ))}
         {unblock.isError ? (
-          <p role="alert" className="text-phi-sm text-destructive">{(unblock.error as Error).message}</p>
+          <p role="alert" className="text-phi-sm text-destructive">{describeError(unblock.error, copy)}</p>
         ) : null}
       </CardBody>
     </Card>

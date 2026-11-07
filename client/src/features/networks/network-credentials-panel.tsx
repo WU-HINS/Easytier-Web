@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { copy } from '../../copy/zh-CN';
 import { api, type NetworkCredential } from '../../lib/http';
 import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
+import { describeError } from '../../lib/errors';
 
 // expiryLabel renders 0 as permanent and anything else as a local timestamp.
 function expiryLabel(credential: NetworkCredential): string {
@@ -128,7 +129,7 @@ export function NetworkCredentialsPanel({ networkID }: { networkID: string }) {
         )}
         {issue.isError ? (
           <p role='alert' className="text-phi-sm text-destructive">
-            {(issue.error as Error).message}
+            {describeError(issue.error, copy)}
           </p>
         ) : null}
       </CardBody>

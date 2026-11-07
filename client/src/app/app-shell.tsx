@@ -102,7 +102,7 @@ export function AppShell() {
               <option value="en-US">{copy.shell.languageEn}</option>
             </select>
             <a
-              className="text-phi-sm text-muted-foreground underline underline-offset-4"
+              className="inline-flex items-center min-h-[var(--u-11)] text-phi-sm text-muted-foreground underline underline-offset-4"
               href="https://easytier.cn/"
               target="_blank"
               rel="noreferrer"

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { copy } from '../../copy/zh-CN';
 import { api } from '../../lib/http';
 import { Button, Card, Input } from '../../ui';
+import { describeError } from '../../lib/errors';
 
 /**
  * First-run wizard. It is the only screen reachable while the console is
@@ -48,7 +49,7 @@ export function SetupPage() {
       <div className="flex min-h-screen items-center justify-center">
         <Card className="p-[var(--pad-card)] text-center">
           <p role="alert" className="text-phi-base text-destructive">{copy.setup.statusFailed}</p>
-          <p className="mt-[var(--u-2)] text-phi-sm text-muted-foreground">{(status.error as Error).message}</p>
+          <p className="mt-[var(--u-2)] text-phi-sm text-muted-foreground">{describeError(status.error, copy)}</p>
           <Button className="mt-[var(--u-4)]" onClick={() => status.refetch()}>{copy.setup.retry}</Button>
         </Card>
       </div>

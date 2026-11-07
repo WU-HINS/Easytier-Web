@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react';
 import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Button, Card, CardBody, Input } from '../../ui';
+import { describeError } from '../../lib/errors';
 
 /**
  * Change the signed-in account's password. The server checks the current one and
@@ -58,7 +59,7 @@ export function PasswordPage() {
             </label>
             {localError ? <p role="alert" className="text-phi-sm text-destructive">{localError}</p> : null}
             {change.isError ? (
-              <p role="alert" className="text-phi-sm text-destructive">{(change.error as Error).message}</p>
+              <p role="alert" className="text-phi-sm text-destructive">{describeError(change.error, copy)}</p>
             ) : null}
             {change.isSuccess ? (
               <p className="text-phi-sm text-muted-foreground">{copy.account.passwordChanged}</p>

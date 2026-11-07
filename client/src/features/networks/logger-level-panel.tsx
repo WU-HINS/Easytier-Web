@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { copy } from '../../copy/zh-CN';
 import { api } from '../../lib/http';
 import { Skeleton } from '../../ui';
+import { describeError } from '../../lib/errors';
 
 const LEVELS = ['disabled', 'error', 'warning', 'info', 'debug', 'trace'];
 
@@ -23,7 +24,7 @@ export function LoggerLevelPanel({ machineID }: { machineID: string }) {
   if (level.isError) {
     return (
       <p role="alert" className="text-phi-sm text-destructive">
-        {(level.error as Error).message}
+        {describeError(level.error, copy)}
       </p>
     );
   }
@@ -46,7 +47,7 @@ export function LoggerLevelPanel({ machineID }: { machineID: string }) {
             </option>
           ))}
         </select>
-        {save.isError ? <span role="alert" className="text-phi-sm text-destructive">{(save.error as Error).message}</span> : null}
+        {save.isError ? <span role="alert" className="text-phi-sm text-destructive">{describeError(save.error, copy)}</span> : null}
         {save.isSuccess ? <span className="text-phi-sm text-muted-foreground">{copy.networks.loggerSaved}</span> : null}
       </div>
       <p className="text-phi-sm text-muted-foreground">{copy.networks.loggerHint}</p>

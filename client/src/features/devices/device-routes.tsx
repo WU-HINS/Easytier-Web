@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useCopy } from '../../copy/locale';
 import { api, formatIpv4, type Machine, type RouteEntry } from '../../lib/http';
 import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
+import { describeError } from '../../lib/errors';
 
 /**
  * Route table of one network instance on one device. The data comes from the
@@ -73,7 +74,7 @@ export function DeviceRoutes({ machine, onClose }: { machine: Machine; onClose: 
         <div className="mt-[var(--u-5)]">
           {routes.isLoading ? <Skeleton className="h-[var(--u-10)]" /> : null}
           {routes.isError ? (
-            <p role="alert" className="text-phi-sm text-destructive">{(routes.error as Error).message}</p>
+            <p role="alert" className="text-phi-sm text-destructive">{describeError(routes.error, copy)}</p>
           ) : null}
           {!routes.isLoading && !routes.isError && rows.length === 0 && instance ? (
             <p className="text-phi-sm text-muted-foreground">{copy.routes.empty}</p>

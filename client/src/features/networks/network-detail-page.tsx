@@ -8,6 +8,7 @@ import { NetworkMembers } from './network-members';
 import { NetworkAclPanel } from './network-acl-panel';
 import { NetworkCredentialsPanel } from './network-credentials-panel';
 import { NetworkSettings } from './network-settings';
+import { describeError } from '../../lib/errors';
 
 /**
  * One network as its own page, the way the first console organised it: the list
@@ -39,7 +40,7 @@ export function NetworkDetailPage() {
       <Card>
         <CardBody className="space-y-[var(--u-4)]">
           <p role="alert" className="text-phi-sm text-destructive">
-            {(detail.error as Error).message}
+            {describeError(detail.error, copy)}
           </p>
           <Link className="text-phi-sm underline underline-offset-4" to="/networks">
             {copy.networks.detailBack}

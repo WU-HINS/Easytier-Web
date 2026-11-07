@@ -4,6 +4,7 @@ import { copy } from '../../copy/zh-CN';
 import { api } from '../../lib/http';
 import { Button } from '../../ui';
 import { MemberTomlPanel } from './member-toml-panel';
+import { describeError } from '../../lib/errors';
 
 /**
  * Per member override blob. The endpoint existed from the start but nothing in
@@ -96,7 +97,7 @@ export function MemberOverride({ networkID, deviceID }: { networkID: string; dev
       {error ? <p role="alert" className="text-phi-sm text-destructive">{error}</p> : null}
       <MemberTomlPanel networkID={networkID} deviceID={deviceID} />
       {config.isError ? (
-        <p role="alert" className="text-phi-sm text-destructive">{(config.error as Error).message}</p>
+        <p role="alert" className="text-phi-sm text-destructive">{describeError(config.error, copy)}</p>
       ) : null}
     </div>
   );

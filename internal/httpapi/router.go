@@ -785,7 +785,7 @@ func (s *Server) handleCreateNetwork(w http.ResponseWriter, r *http.Request, use
 	}
 	settings := payload.Settings
 	if strings.TrimSpace(settings.DisplayName) == "" {
-		writeError(w, http.StatusBadRequest, "display_name is required")
+		writeFieldError(w, http.StatusBadRequest, fieldError{Code: codeFieldRequired, Field: "display_name", Msg: "display_name is required"})
 		return
 	}
 	secret := ""
@@ -824,7 +824,7 @@ func (s *Server) handleCreateNetwork(w http.ResponseWriter, r *http.Request, use
 		}
 	}
 	if err := validateNetworkIntent(network); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeValidationError(w, http.StatusBadRequest, err)
 		return
 	}
 	if err := s.cfg.Store.CreateNetwork(r.Context(), network); err != nil {
@@ -1069,6 +1069,30 @@ func writeJSON(w http.ResponseWriter, status int, payload any) {
 
 func writeError(w http.ResponseWriter, status int, message string) {
 	writeJSON(w, status, map[string]any{"message": message})
+}
+
+// writeFieldError answers a rejected field with everything the client needs to
+// phrase it locally: the code, the field, and the rejected value. The English
+// message stays for logs and API consumers.
+func writeFieldError(w http.ResponseWriter, status int, failure fieldError) {
+	body := map[string]any{"message": failure.Msg, "code": failure.Code}
+	if failure.Field != "" {
+		body["field"] = failure.Field
+	}
+	if failure.Value != "" {
+		body["value"] = failure.Value
+	}
+	writeJSON(w, status, body)
+}
+
+// writeValidationError picks the coded form when the error carries one.
+func writeValidationError(w http.ResponseWriter, status int, err error) {
+	var failure fieldError
+	if errors.As(err, &failure) {
+		writeFieldError(w, status, failure)
+		return
+	}
+	writeError(w, status, err.Error())
 }
 
 func writeErrorCode(w http.ResponseWriter, status int, code, message string) {

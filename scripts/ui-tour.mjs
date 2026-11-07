@@ -242,11 +242,32 @@ check('language switch reaches English', englishTitle === 'Overview', englishTit
 await page.goto(BASE + '/devices', { waitUntil: 'networkidle' });
 await page.waitForTimeout(600);
 const devicesEnglish = await page.getByLabel('Search devices').count();
+// A rejected form has to speak the language of the page.
+await page.locator('select[aria-label="Language"], select[aria-label="语言"]').first().selectOption('zh-CN');
+await page.goto(BASE + '/networks', { waitUntil: 'networkidle' });
+await page.waitForTimeout(400);
+await page.getByLabel('名称', { exact: true }).fill('UX 错误文案');
+await page.getByLabel('虚拟网段').fill('999.1.1.1/99');
+await page.getByRole('button', { name: '创建' }).click();
+await page.waitForTimeout(900);
+const rejection = await page.evaluate(() => { const el = document.querySelector('[role=alert]'); return el ? el.innerText : ''; });
+check('rejection is explained in Chinese', rejection.indexOf('虚拟网段') !== -1, rejection.slice(0, 60));
+check('rejection does not leak the column name', rejection.indexOf('virtual_cidr') === -1, rejection.slice(0, 60));
+
+// The only way into a network on a phone is this link; it has to be tappable.
+await page.setViewportSize({ width: 390, height: 844 });
+await page.reload({ waitUntil: 'networkidle' });
+await page.waitForTimeout(500);
+const targets = await page.evaluate(() => [...document.querySelectorAll('a, button')]
+  .map((el) => ({ text: (el.innerText || '').trim(), h: Math.round(el.getBoundingClientRect().height) }))
+  .filter((entry) => entry.text === '管理' || entry.text === '文档'));
+check('primary actions are tappable on a phone', targets.length > 0 && targets.every((entry) => entry.h >= 40), JSON.stringify(targets));
+await page.setViewportSize({ width: 1440, height: 900 });
 check('device page is translated too', devicesEnglish === 1, devicesEnglish ? 'Search devices' : 'still Chinese');
 await page.goto(BASE + '/', { waitUntil: 'networkidle' });
 await page.waitForTimeout(400);
 await shot('02a-dashboard-en');
-await page.getByLabel('Language').selectOption('zh-CN');
+await page.locator('select[aria-label="Language"], select[aria-label="语言"]').first().selectOption('zh-CN');
 await page.waitForTimeout(400);
 
 // Remove the network this run created so the next run starts from the same place.

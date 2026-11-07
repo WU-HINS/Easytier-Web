@@ -5,6 +5,7 @@ import { api } from '../../lib/http';
 import { Button, Card, CardBody, Input } from '../../ui';
 import { NetworkAdvanced } from './network-advanced';
 import { NetworkSecretPanel } from './network-secret-panel';
+import { describeError } from '../../lib/errors';
 
 /**
  * The settings tab: the network's own name and the inherited defaults. The ACL
@@ -46,7 +47,7 @@ export function NetworkSettings({ networkID, displayName }: { networkID: string;
 						</Button>
 					</div>
 					{rename.isError ? (
-						<p role="alert" className="text-phi-sm text-destructive">{(rename.error as Error).message}</p>
+						<p role="alert" className="text-phi-sm text-destructive">{describeError(rename.error, copy)}</p>
 					) : null}
 				</CardBody>
 			</Card>

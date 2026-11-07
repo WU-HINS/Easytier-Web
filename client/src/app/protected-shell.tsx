@@ -3,6 +3,7 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { ApiError, api } from '../lib/http';
 import { Skeleton } from '../ui';
 import { copy } from '../copy/zh-CN';
+import { describeError } from '../lib/errors';
 
 /**
  * Session guard. It asks the API who we are instead of trusting local state,
@@ -31,7 +32,7 @@ export function ProtectedShell() {
       <div className="flex min-h-screen items-center justify-center">
         <div className="panel p-[var(--gap-section)] text-center">
           <p className="text-phi-lg font-medium">{copy.shell.disconnected}</p>
-          <p className="mt-[var(--u-3)] text-phi-sm text-muted-foreground">{(query.error as Error).message}</p>
+          <p className="mt-[var(--u-3)] text-phi-sm text-muted-foreground">{describeError(query.error, copy)}</p>
         </div>
       </div>
     );

@@ -33,14 +33,14 @@ func (s *Server) handleUpdateNetwork(w http.ResponseWriter, r *http.Request, use
 	}
 	if payload.DisplayName != nil {
 		if strings.TrimSpace(*payload.DisplayName) == "" {
-			writeError(w, http.StatusBadRequest, "display_name must not be empty")
+			writeFieldError(w, http.StatusBadRequest, fieldError{Code: codeFieldRequired, Field: "display_name", Msg: "display_name must not be empty"})
 			return
 		}
 		network.DisplayName = *payload.DisplayName
 	}
 	if payload.NetworkName != nil {
 		if strings.TrimSpace(*payload.NetworkName) == "" {
-			writeError(w, http.StatusBadRequest, "network_name must not be empty")
+			writeFieldError(w, http.StatusBadRequest, fieldError{Code: codeFieldRequired, Field: "network_name", Msg: "network_name must not be empty"})
 			return
 		}
 		network.NetworkName = *payload.NetworkName
@@ -50,7 +50,7 @@ func (s *Server) handleUpdateNetwork(w http.ResponseWriter, r *http.Request, use
 		case "PublicServer", "Manual", "Standalone", "Gateway":
 			network.NetworkingMethod = *payload.NetworkingMethod
 		default:
-			writeError(w, http.StatusBadRequest, "unknown networking_method")
+			writeFieldError(w, http.StatusBadRequest, fieldError{Code: codeUnknownMethod, Field: "networking_method", Msg: "unknown networking_method"})
 			return
 		}
 	}
@@ -76,7 +76,7 @@ func (s *Server) handleUpdateNetwork(w http.ResponseWriter, r *http.Request, use
 		network.ACLPolicy = payload.ACLPolicy
 	}
 	if err := validateNetworkIntent(network); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeValidationError(w, http.StatusBadRequest, err)
 		return
 	}
 	network.UpdateTime = s.cfg.Now()

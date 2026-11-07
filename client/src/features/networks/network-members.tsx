@@ -6,6 +6,7 @@ import { api, type NetworkMember } from '../../lib/http';
 import { MemberEditor } from './member-editor';
 import { MemberOverride } from './member-override';
 import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
+import { describeError } from '../../lib/errors';
 
 /**
  * Member management for one network. Without this the console could create a
@@ -206,12 +207,12 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
         {candidates.length === 0 ? (
           <p className="mt-[var(--u-2)] text-phi-sm text-muted-foreground">{copy.networks.noCandidates}</p>
         ) : null}
-        {add.isError ? <p role="alert" className="mt-[var(--u-2)] text-phi-sm text-destructive">{(add.error as Error).message}</p> : null}
+        {add.isError ? <p role="alert" className="mt-[var(--u-2)] text-phi-sm text-destructive">{describeError(add.error, copy)}</p> : null}
         {remove.isError ? (
-          <p role="alert" className="mt-[var(--u-2)] text-phi-sm text-destructive">{(remove.error as Error).message}</p>
+          <p role="alert" className="mt-[var(--u-2)] text-phi-sm text-destructive">{describeError(remove.error, copy)}</p>
         ) : null}
         {destroy.isError ? (
-          <p role="alert" className="mt-[var(--u-2)] text-phi-sm text-destructive">{(destroy.error as Error).message}</p>
+          <p role="alert" className="mt-[var(--u-2)] text-phi-sm text-destructive">{describeError(destroy.error, copy)}</p>
         ) : null}
       </CardBody>
     </Card>

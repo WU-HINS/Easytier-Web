@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Card, CardBody, Skeleton } from '../../ui';
+import { describeError } from '../../lib/errors';
 
 /**
  * ACL counters for one running instance. The numbers live on the device, so this
@@ -21,7 +22,7 @@ export function AclStatsPanel({ machineID, instanceID }: { machineID: string; in
         <CardBody className="space-y-[var(--u-3)]">
           <h3 className="text-phi-base font-semibold">{copy.networks.aclStats}</h3>
           <p role="alert" className="text-phi-sm text-destructive">
-            {(stats.error as Error).message}
+            {describeError(stats.error, copy)}
           </p>
         </CardBody>
       </Card>

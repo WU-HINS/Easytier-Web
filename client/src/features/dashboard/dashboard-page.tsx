@@ -69,7 +69,7 @@ export function DashboardPage() {
                 <Badge tone='success'>{copy.devices.online}</Badge>
               </div>
             ))}
-            <Link className="inline-block text-phi-sm underline underline-offset-4" to='/devices'>
+            <Link className="inline-flex items-center min-h-[var(--u-11)] text-phi-sm underline underline-offset-4" to='/devices'>
               {copy.dashboard.viewAll}
             </Link>
           </CardBody>
@@ -93,7 +93,7 @@ export function DashboardPage() {
                 </Badge>
               </div>
             ))}
-            <Link className="inline-block text-phi-sm underline underline-offset-4" to='/networks'>
+            <Link className="inline-flex items-center min-h-[var(--u-11)] text-phi-sm underline underline-offset-4" to='/networks'>
               {copy.dashboard.viewAll}
             </Link>
           </CardBody>

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useCopy } from '../../copy/locale';
 import { api, type Machine } from '../../lib/http';
 import { Button, Input } from '../../ui';
+import { describeError } from '../../lib/errors';
 
 /**
  * Rename and delete for one device. Deleting also drops the device from every
@@ -52,7 +53,7 @@ export function DeviceActions({ machine }: { machine: Machine }) {
           {copy.devices.cancel}
         </Button>
         {rename.isError ? (
-          <span className="text-phi-sm text-destructive">{(rename.error as Error).message}</span>
+          <span className="text-phi-sm text-destructive">{describeError(rename.error, copy)}</span>
         ) : null}
       </div>
     );
@@ -74,7 +75,7 @@ export function DeviceActions({ machine }: { machine: Machine }) {
         {copy.devices.delete}
       </Button>
       {remove.isError ? (
-        <span className="text-phi-sm text-destructive">{(remove.error as Error).message}</span>
+        <span className="text-phi-sm text-destructive">{describeError(remove.error, copy)}</span>
       ) : null}
     </div>
   );

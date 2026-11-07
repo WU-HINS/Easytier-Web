@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Badge, Button, Card, CardBody, Input, Skeleton } from '../../ui';
+import { describeError } from '../../lib/errors';
 import {
   newRule,
   parsePolicy,
@@ -208,7 +209,7 @@ export function NetworkAclPanel({ networkID }: { networkID: string }) {
 
         {save.isError ? (
           <p role="alert" className="text-phi-sm text-destructive">
-            {(save.error as Error).message}
+            {describeError(save.error, copy)}
           </p>
         ) : null}
         {save.isSuccess ? <p className="text-phi-sm text-muted-foreground">{copy.networkSettings.saved}</p> : null}

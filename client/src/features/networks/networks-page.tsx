@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Badge, Button, Card, CardBody, Input, Skeleton } from '../../ui';
+import { describeError } from '../../lib/errors';
 
 export function NetworksPage() {
   const copy = useCopy();
@@ -113,7 +114,7 @@ export function NetworksPage() {
                   <Badge>{network.member_count} {copy.networks.members}</Badge>
                   <Link
                     to={'/networks/' + network.network_id}
-                    className="text-phi-sm underline underline-offset-4"
+                    className="inline-flex items-center min-h-[var(--u-11)] text-phi-sm underline underline-offset-4"
                   >
                     {copy.networks.detailManage}
                   </Link>
@@ -172,7 +173,7 @@ export function NetworksPage() {
                 {copy.networks.secureMode}
               </label>
               <p className="text-phi-sm text-muted-foreground">{copy.networks.createHint}</p>
-              {create.isError ? <p role="alert" className="text-phi-sm text-destructive">{(create.error as Error).message}</p> : null}
+              {create.isError ? <p role="alert" className="text-phi-sm text-destructive">{describeError(create.error, copy)}</p> : null}
               <Button type="submit" className="w-full" disabled={create.isPending}>
                 {copy.networks.submit}
               </Button>

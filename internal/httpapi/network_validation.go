@@ -9,24 +9,51 @@ import (
 	"github.com/easytier/easytier-console/internal/db/bal"
 )
 
+// fieldError carries what the UI needs to explain a rejection in its own words:
+// a stable code, the field that failed, and the value that was rejected. The
+// message stays for logs and API consumers; a Chinese page must not have to show
+// it, because "virtual_cidr" is not what the operator sees on screen.
+type fieldError struct {
+	Code  string
+	Field string
+	Value string
+	Msg   string
+}
+
+func (e fieldError) Error() string { return e.Msg }
+
+// fieldErrorCodes are the rejection codes the client maps to localised copy.
+const (
+	codeFieldRequired = "field_required"
+	codeInvalidCIDR   = "invalid_cidr"
+	codeIPv4Required  = "ipv4_required"
+	codeUnknownMethod = "unknown_networking_method"
+	codeInvalidURL    = "invalid_url"
+	codeInvalidPort   = "invalid_port"
+)
+
+func fieldRequired(field, msg string) error {
+	return fieldError{Code: codeFieldRequired, Field: field, Msg: msg}
+}
+
 // validateNetworkIntent rejects intents that the compile step cannot turn into a
 // configuration. Storing them is worse than rejecting them: compile failures
 // stop every push for the tenant and only show up as a log line.
 func validateNetworkIntent(network bal.Network) error {
 	if network.VirtualCIDR == nil || strings.TrimSpace(*network.VirtualCIDR) == "" {
-		return fmt.Errorf("virtual_cidr is required")
+		return fieldRequired("virtual_cidr", "virtual_cidr is required")
 	}
 	cidr := strings.TrimSpace(*network.VirtualCIDR)
 	ip, ipnet, err := net.ParseCIDR(cidr)
 	if err != nil {
-		return fmt.Errorf("virtual_cidr %q is not a valid CIDR", cidr)
+		return fieldError{Code: codeInvalidCIDR, Field: "virtual_cidr", Value: cidr, Msg: fmt.Sprintf("virtual_cidr %q is not a valid CIDR", cidr)}
 	}
 	if ip.To4() == nil || ipnet.IP.To4() == nil {
-		return fmt.Errorf("virtual_cidr must be IPv4, got %q", cidr)
+		return fieldError{Code: codeIPv4Required, Field: "virtual_cidr", Value: cidr, Msg: fmt.Sprintf("virtual_cidr must be IPv4, got %q", cidr)}
 	}
 	ones, bits := ipnet.Mask.Size()
 	if bits != 32 {
-		return fmt.Errorf("virtual_cidr must be IPv4, got %q", cidr)
+		return fieldError{Code: codeIPv4Required, Field: "virtual_cidr", Value: cidr, Msg: fmt.Sprintf("virtual_cidr must be IPv4, got %q", cidr)}
 	}
 	if ones < 8 || ones > 30 {
 		return fmt.Errorf("virtual_cidr prefix must be between /8 and /30, got /%d", ones)
@@ -67,7 +94,7 @@ func validateNetworkIntent(network bal.Network) error {
 		}
 		return nil
 	default:
-		return fmt.Errorf("unknown networking_method %q", network.NetworkingMethod)
+		return fieldError{Code: codeUnknownMethod, Field: "networking_method", Value: network.NetworkingMethod, Msg: fmt.Sprintf("unknown networking_method %q", network.NetworkingMethod)}
 	}
 }
 
@@ -76,7 +103,7 @@ func validateNetworkIntent(network bal.Network) error {
 func validateEndpointURL(raw string) error {
 	parsed, err := url.Parse(strings.TrimSpace(raw))
 	if err != nil {
-		return fmt.Errorf("%q is not a valid URL", raw)
+		return fieldError{Code: codeInvalidURL, Field: "peer_urls", Value: raw, Msg: fmt.Sprintf("%q is not a valid URL", raw)}
 	}
 	switch parsed.Scheme {
 	case "tcp", "udp", "ws", "wss", "http", "https":

@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Button, Input } from '../../ui';
+import { describeError } from '../../lib/errors';
 
 /**
  * Inline editor for the two per member fields the PATCH endpoint owns. The
@@ -79,7 +80,7 @@ export function MemberEditor({
       </label>
       {save.isError ? (
         <p role="alert" className="text-phi-sm text-destructive">
-          {(save.error as Error).message}
+          {describeError(save.error, copy)}
         </p>
       ) : null}
       {saved ? <p role="status" className="text-phi-sm text-muted-foreground">{copy.networks.memberEditSaved}</p> : null}

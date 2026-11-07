@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Button, Card, CardBody } from '../../ui';
+import { describeError } from '../../lib/errors';
 
 /**
  * Rotating the network secret replaces it for the whole network. The new value is
@@ -40,7 +41,7 @@ export function NetworkSecretPanel({ networkID }: { networkID: string }) {
           </Button>
           {rotate.isError ? (
             <span role="alert" className="text-phi-sm text-destructive">
-              {(rotate.error as Error).message}
+              {describeError(rotate.error, copy)}
             </span>
           ) : null}
         </div>

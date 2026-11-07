@@ -4,6 +4,7 @@ import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Badge, Card, CardBody, Skeleton } from '../../ui';
 import { DeviceActions } from './device-actions';
+import { describeError } from '../../lib/errors';
 
 function formatTime(value: string): string {
   if (!value) return '—';
@@ -41,7 +42,7 @@ export function DeviceDetailPage() {
       <Card>
         <CardBody className="space-y-[var(--u-4)]">
           <p role="alert" className="text-phi-sm text-destructive">
-            {(machines.error as Error).message}
+            {describeError(machines.error, copy)}
           </p>
           <Link className="text-phi-sm underline underline-offset-4" to="/devices">
             {copy.devices.detailBack}
