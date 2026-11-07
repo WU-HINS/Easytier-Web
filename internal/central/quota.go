@@ -78,10 +78,14 @@ func (r *Reconciler) EnforceQuota(ctx context.Context, userID int64, lister Inst
 		request := &manage.RetainNetworkInstanceRequest{InstIds: keep[machine]}
 		if _, err := r.Sessions.Call(ctx, userID, machine, WebClientKey, MethodRetainNetworkInstance, request); err != nil {
 			report.Failed++
-			r.Logf("quota: retain on %s failed: %v", machine, err)
+			if r.Logf != nil {
+				r.Logf("quota: retain on %s failed: %v", machine, err)
+			}
 			continue
 		}
-		r.Logf("quota: user %d trimmed to %d instance(s) on %s", userID, len(keep[machine]), machine)
+		if r.Logf != nil {
+			r.Logf("quota: user %d trimmed to %d instance(s) on %s", userID, len(keep[machine]), machine)
+		}
 	}
 	return report, nil
 }

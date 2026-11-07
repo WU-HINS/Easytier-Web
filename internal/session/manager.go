@@ -162,15 +162,7 @@ func (m *Manager) ServeAs(ctx context.Context, tunnel wire.Tunnel, expectedUsern
 	// Only a bound session may ask for features. The handler used to be reachable
 	// before the first heartbeat, which on the datagram transport turns a spoofed
 	// source address into a reflector (review team, round 150).
-	if err := registry.Register(WebServerKey, webServerGetFeature, func(ctx context.Context, body []byte) ([]byte, error) {
-		session.mu.Lock()
-		bound := session.bound
-		session.mu.Unlock()
-		if !bound {
-			return nil, errors.New("session: not bound yet")
-		}
-		return getFeatureHandler(ctx, body)
-	}); err != nil {
+	if err := registry.Register(WebServerKey, webServerGetFeature, session.boundOnly(getFeatureHandler)); err != nil {
 		return err
 	}
 	// Watch for a peer that keeps the socket open but stops talking (dead
@@ -218,6 +210,25 @@ func (m *Manager) ServeAs(ctx context.Context, tunnel wire.Tunnel, expectedUsern
 		}
 	}()
 	return session.mux.Run(runCtx)
+}
+
+// boundOnly gates a handler on the session having seen a valid heartbeat.
+//
+// The official client calls GetFeature before it says who it is; answering that
+// call would make the console a reflector for a spoofed source address on UDP.
+// The clients then fall back to the legacy tunnel, which is a load-bearing
+// behaviour: allowing the call early made 2.6.4 and 2.7.0 disappear (F-274).
+// This is the reason the fallback exists, expressed as code a test can hold.
+func (s *Session) boundOnly(handler rpc.Handler) rpc.Handler {
+	return func(ctx context.Context, body []byte) ([]byte, error) {
+		s.mu.Lock()
+		bound := s.bound
+		s.mu.Unlock()
+		if !bound {
+			return nil, errors.New("session: not bound yet")
+		}
+		return handler(ctx, body)
+	}
 }
 
 func getFeatureHandler(ctx context.Context, body []byte) ([]byte, error) {
