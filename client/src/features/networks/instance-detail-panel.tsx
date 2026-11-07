@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api, type InstancePeerConn } from '../../lib/http';
 import { Badge, Card, CardBody, Skeleton } from '../../ui';
 import { AclStatsPanel } from './acl-stats-panel';
@@ -20,6 +20,7 @@ function activeConn(conns?: InstancePeerConn[]): InstancePeerConn | undefined {
  * table. The numbers come from the device, not from the console's own view.
  */
 export function InstanceDetailPanel({ machineID, instanceID }: { machineID: string; instanceID: string }) {
+  const copy = useCopy();
   const info = useQuery({
     queryKey: ['instance-info', machineID, instanceID],
     queryFn: () => api.instanceInfo(machineID, instanceID),

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Button, Card, CardBody, Skeleton } from '../../ui';
 import { toMemberOverrides } from './toml-overrides';
@@ -11,6 +11,7 @@ import { toMemberOverrides } from './toml-overrides';
  * what the device will be told, not a reconstruction of the panel state.
  */
 export function MemberTomlPanel({ networkID, deviceID }: { networkID: string; deviceID: string }) {
+  const copy = useCopy();
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState<string | null>(null);
   const [message, setMessage] = useState('');

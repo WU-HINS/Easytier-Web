@@ -1,18 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Button, Card, CardBody, Input } from '../../ui';
 
 // The network level settings: one JSON blob, edited as the handful of fields the
 // compiler understands. Members inherit these and may override any of them, so
 // this panel is where a cluster is configured once instead of per device.
-const switches = [
-  { key: 'no_tun', label: copy.networks.advancedSwitchNoTun },
-  { key: 'disable_p2p', label: copy.networks.advancedSwitchDisableP2P },
-  { key: 'disable_ipv6', label: copy.networks.advancedSwitchDisableIPv6 },
-  { key: 'multi_thread', label: copy.networks.advancedSwitchMultiThread },
-];
 
 type Blob = Record<string, unknown>;
 
@@ -34,6 +28,14 @@ function splitList(raw: string): string[] {
 }
 
 export function NetworkAdvanced({ networkID }: { networkID: string }) {
+  const copy = useCopy();
+  // Labels come from the locale, so the table is built per render.
+const switches = [
+  { key: 'no_tun', label: copy.networks.advancedSwitchNoTun },
+  { key: 'disable_p2p', label: copy.networks.advancedSwitchDisableP2P },
+  { key: 'disable_ipv6', label: copy.networks.advancedSwitchDisableIPv6 },
+  { key: 'multi_thread', label: copy.networks.advancedSwitchMultiThread },
+];
   const queryClient = useQueryClient();
   const advanced = useQuery({ queryKey: ['advanced', networkID], queryFn: () => api.networkAdvanced(networkID) });
   const [mtu, setMtu] = useState('');

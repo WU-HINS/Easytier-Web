@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api, formatIpv4, type Machine, type RouteEntry } from '../../lib/http';
 import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
 
@@ -10,6 +10,7 @@ import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
  * online and its instance is running.
  */
 export function DeviceRoutes({ machine, onClose }: { machine: Machine; onClose: () => void }) {
+  const copy = useCopy();
   const instances = machine.running_network_instances ?? [];
   const [instance, setInstance] = useState(instances[0] ?? '');
 

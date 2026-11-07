@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api, type Machine } from '../../lib/http';
 import { Button, Input } from '../../ui';
 
@@ -9,6 +9,7 @@ import { Button, Input } from '../../ui';
  * network on the server side, so the confirmation says so explicitly.
  */
 export function DeviceActions({ machine }: { machine: Machine }) {
+  const copy = useCopy();
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [alias, setAlias] = useState(machine.alias ?? '');

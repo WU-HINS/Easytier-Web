@@ -368,7 +368,10 @@ OIDC 回调地址**由前端按当前 origin 生成**，并**强制 https**（�
 | r248 | `ai-censorship/review-20261101-r248.md` | 升级与回滚终于有证据了（1 项） |
 | r249 | `ai-censorship/review-20261101-r249.md` | 把"我看过没问题"换成可执行的证据（第一批）（0 项） |
 | r250 | `ai-censorship/review-20261101-r250.md` | ACCEPTED 清零（0 项） |
+| r251 | `ai-censorship/review-20261101-r251.md` | 英文补到 100%，并让"缺键"变成红灯（1 项） |
 
+台账：`ai-censorship/ledger.md`（317 项：316 FIXED / 0 ACCEPTED / 0 MONITOR / 1 OPEN）。
+台账：`ai-censorship/ledger.md`（317 项：316 FIXED / 0 ACCEPTED / 0 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（316 项：315 FIXED / 0 ACCEPTED / 0 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（316 项：310 FIXED / 5 ACCEPTED / 0 MONITOR / 1 OPEN）。
 台账：`ai-censorship/ledger.md`（316 项：306 FIXED / 8 ACCEPTED / 1 MONITOR / 1 OPEN）。

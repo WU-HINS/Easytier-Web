@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Button, Card, CardBody, Input } from '../../ui';
 
@@ -9,6 +9,7 @@ import { Button, Card, CardBody, Input } from '../../ui';
  * applies the configured password policy, so the form only guards the mismatch.
  */
 export function PasswordPage() {
+  const copy = useCopy();
   const [current, setCurrent] = useState('');
   const [next, setNext] = useState('');
   const [confirm, setConfirm] = useState('');

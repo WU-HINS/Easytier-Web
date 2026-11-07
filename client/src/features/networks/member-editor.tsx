@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Button, Input } from '../../ui';
 
@@ -25,6 +25,7 @@ export function MemberEditor({
   address?: string;
   onDone: () => void;
 }) {
+  const copy = useCopy();
   const queryClient = useQueryClient();
   // Compare against what the editor opened with, not against the current props:
   // a background refresh during editing would otherwise make untouched fields

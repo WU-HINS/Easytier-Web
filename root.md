@@ -217,6 +217,7 @@
 | 26 | real clients | 真实 EasyTier 客户端矩阵（按需：`EASYTIER_REAL_CLIENTS=1` 且 `ET_CLIENTS` 指定版本与路径） |
 | 27 | overlay smoke | 两台受管实例经公开节点互相可见；数据面需要 tun（按需：`EASYTIER_OVERLAY_SMOKE=1` 且 `ET_BIN`） |
 | 28 | data plane | 先跑 `scripts/tun-check.sh`：没有 tun 驱动/节点/CAP_NET_ADMIN 时打印**具体原因**并 SKIP（绝不当作通过），有能力时才继续 overlay smoke |
+| 29 | i18n coverage | 中文文案表里的每个键都必须有英文对应，缺键会让页面半中半英 |
 
 ## 7. 版本发布流程
 

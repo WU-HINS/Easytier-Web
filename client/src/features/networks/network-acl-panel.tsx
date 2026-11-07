@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Badge, Button, Card, CardBody, Input, Skeleton } from '../../ui';
 import {
@@ -21,6 +21,7 @@ import {
  * same shape, so switching views never loses a field.
  */
 export function NetworkAclPanel({ networkID }: { networkID: string }) {
+  const copy = useCopy();
   const queryClient = useQueryClient();
   const [policy, setPolicy] = useState<AclPolicy>({ default_action: 'allow', rules: [] });
   const [view, setView] = useState<'rules' | 'json'>('rules');

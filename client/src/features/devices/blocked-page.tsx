@@ -1,8 +1,9 @@
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { BlockedDevices } from './blocked-devices';
 
 /** Blocked devices on their own page, the way the first console listed them. */
 export function BlockedPage() {
+  const copy = useCopy();
   return (
     <div className="space-y-[var(--gap-section)]">
       <header>

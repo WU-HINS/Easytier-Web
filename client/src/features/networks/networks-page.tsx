@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Badge, Button, Card, CardBody, Input, Skeleton } from '../../ui';
 
 export function NetworksPage() {
+  const copy = useCopy();
   const queryClient = useQueryClient();
   const networks = useQuery({ queryKey: ['networks'], queryFn: api.networks });
   const [name, setName] = useState('');

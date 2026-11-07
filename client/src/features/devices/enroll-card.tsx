@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Button, Card, CardBody, Skeleton } from '../../ui';
 
@@ -10,6 +10,7 @@ import { Button, Card, CardBody, Skeleton } from '../../ui';
  * that is actually running.
  */
 export function EnrollCard() {
+  const copy = useCopy();
   const info = useQuery({ queryKey: ['console-info'], queryFn: api.consoleInfo, retry: false });
   const [copied, setCopied] = useState(false);
 

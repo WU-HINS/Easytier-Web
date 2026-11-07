@@ -1,6 +1,6 @@
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Badge, Card, CardBody, Skeleton } from '../../ui';
 import { DeviceActions } from './device-actions';
@@ -13,6 +13,7 @@ function formatTime(value: string): string {
 }
 
 export function DeviceDetailPage() {
+  const copy = useCopy();
   const params = useParams();
   const machineID = params.machineID || '';
   const machines = useQuery({ queryKey: ['machines'], queryFn: api.machines, refetchInterval: 5000 });

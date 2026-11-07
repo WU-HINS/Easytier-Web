@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Card, CardBody, Skeleton } from '../../ui';
 
@@ -8,6 +8,7 @@ import { Card, CardBody, Skeleton } from '../../ui';
  * panel is the only place in the console that reads past the config plane.
  */
 export function AclStatsPanel({ machineID, instanceID }: { machineID: string; instanceID: string }) {
+  const copy = useCopy();
   const stats = useQuery({
     queryKey: ['acl-stats', machineID, instanceID],
     queryFn: () => api.aclStats(machineID, instanceID),

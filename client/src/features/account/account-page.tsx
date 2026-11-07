@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api, isSecureOrigin, oidcCallbackURL } from '../../lib/http';
 import { Badge, Button, Card, CardBody } from '../../ui';
 import { PasswordCard } from './password-card';
@@ -10,6 +10,7 @@ import { PasswordCard } from './password-card';
  * the callback URL is produced here (never by the API) and must be https.
  */
 export function AccountPage() {
+  const copy = useCopy();
   const queryClient = useQueryClient();
   const oidc = useQuery({ queryKey: ['account-oidc'], queryFn: api.accountOidc });
   const config = useQuery({ queryKey: ['oidc-config'], queryFn: api.oidcConfig });

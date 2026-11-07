@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Badge, Card, CardBody, Skeleton } from '../../ui';
 import { NetworkMembers } from './network-members';
@@ -15,6 +15,7 @@ import { NetworkSettings } from './network-settings';
  * on a route also means a network can be linked to and reloaded.
  */
 export function NetworkDetailPage() {
+  const copy = useCopy();
   const { networkID = '' } = useParams();
   const [tab, setTab] = useState<'members' | 'acl' | 'credentials' | 'settings'>('members');
   // The header needs the subnet, which only the single-network endpoint returns,

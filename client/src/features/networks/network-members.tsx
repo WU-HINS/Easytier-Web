@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { InstanceDetailPanel } from './instance-detail-panel';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api, type NetworkMember } from '../../lib/http';
 import { MemberEditor } from './member-editor';
 import { MemberOverride } from './member-override';
@@ -13,6 +13,7 @@ import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
  * unusable from the browser.
  */
 export function NetworkMembers({ networkID, onClose }: { networkID: string; onClose?: () => void }) {
+  const copy = useCopy();
   const queryClient = useQueryClient();
   const [pick, setPick] = useState('');
   const [advanced, setAdvanced] = useState<string | null>(null);

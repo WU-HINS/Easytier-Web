@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api, type Machine } from '../../lib/http';
 import { Badge, Card, CardBody, Input, Skeleton } from '../../ui';
 import { EnrollCard } from './enroll-card';
@@ -21,6 +21,7 @@ function displayName(machine: Machine): string {
 }
 
 export function DevicesPage() {
+  const copy = useCopy();
   const machines = useQuery({ queryKey: ['machines'], queryFn: api.machines, refetchInterval: 5_000 });
   const [query, setQuery] = useState('');
   const rows = machines.data ?? [];

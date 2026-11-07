@@ -93,6 +93,7 @@ EASYTIER_TEST_PG_DSN=... ./scripts/gate.sh     # 追加 PostgreSQL
 | docs consistency | `node scripts/check-docs.mjs`（章程/门禁/台账/评审记录互相引用一致） |
 | readme commands | `node scripts/check-readme.mjs`（README 里的参数/路由/脚本/环境变量都存在） |
 | ui states | `node scripts/check-ui.mjs`（页面加载/错误分支、控件可访问名、fetch 只能走 lib/http.ts、禁止 dangerouslySetInnerHTML） |
+| i18n coverage | `scripts/check-i18n.mjs`：中文表里每个键都必须有英文，缺一个即失败 |
 | deploy smoke | `bash scripts/smoke-deploy.sh`（空库→初始化→登录→注册→头→WS） |
 | port conflict | `./scripts/check-port-conflict.sh`（端口被占用必须非零退出且不得声称 listening） |
 | backup cold start | `./scripts/check-backup-cold-start.sh`（开启备份的冷启动必须成功并留下快照） |

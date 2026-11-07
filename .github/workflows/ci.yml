@@ -68,6 +68,7 @@ jobs:
           node scripts/check-design-tokens.mjs
           node scripts/check-contrast.mjs
           node scripts/check-contract.mjs
+          node scripts/check-i18n.mjs
           node scripts/check-ui.mjs
           node scripts/check-editor-invariants.mjs
 

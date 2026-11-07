@@ -1,15 +1,16 @@
 import { useState, type FormEvent } from 'react';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { useTheme, type ThemeMode } from '../../lib/theme';
 import { Button, Card, CardBody, Input } from '../../ui';
 
+
+export function AppearancePage() {
+  const copy = useCopy();
 const modes: { value: ThemeMode; label: string }[] = [
   { value: 'auto', label: copy.appearance.auto },
   { value: 'light', label: copy.appearance.light },
   { value: 'dark', label: copy.appearance.dark },
 ];
-
-export function AppearancePage() {
   const { mode, setMode, background, setBackground } = useTheme();
   const [draft, setDraft] = useState(background ?? '');
   const [feedback, setFeedback] = useState<string | null>(null);

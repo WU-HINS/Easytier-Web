@@ -46,6 +46,7 @@ run "gate audit"       ./scripts/audit-gates.sh
 run "docs consistency"   node scripts/check-docs.mjs
 run "readme commands"    node scripts/check-readme.mjs
 run "ui states"         node scripts/check-ui.mjs
+run "i18n coverage"   node scripts/check-i18n.mjs
 run "deploy smoke"       bash scripts/smoke-deploy.sh
 run "port conflict"     ./scripts/check-port-conflict.sh
 run "backup cold start"  ./scripts/check-backup-cold-start.sh

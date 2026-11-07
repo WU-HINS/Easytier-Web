@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Button, Card, CardBody, Input } from '../../ui';
 import { NetworkAdvanced } from './network-advanced';
@@ -11,6 +11,7 @@ import { NetworkSecretPanel } from './network-secret-panel';
  * and the credentials live on their own tabs, the way the first console had it.
  */
 export function NetworkSettings({ networkID, displayName }: { networkID: string; displayName: string }) {
+  const copy = useCopy();
 	const queryClient = useQueryClient();
 	const [name, setName] = useState(displayName);
 

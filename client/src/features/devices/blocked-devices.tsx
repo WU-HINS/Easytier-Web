@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Button, Card, CardBody } from '../../ui';
 
@@ -8,6 +8,7 @@ import { Button, Card, CardBody } from '../../ui';
  * one way door: nothing listed it and nothing could lift it.
  */
 export function BlockedDevices() {
+  const copy = useCopy();
   const queryClient = useQueryClient();
   const blocked = useQuery({ queryKey: ['blocked-machines'], queryFn: api.blockedMachines });
   const unblock = useMutation({

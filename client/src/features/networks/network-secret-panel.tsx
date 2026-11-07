@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
 import { Button, Card, CardBody } from '../../ui';
 
@@ -10,6 +10,7 @@ import { Button, Card, CardBody } from '../../ui';
  * only reason to see it is to hand it to a device the console does not manage.
  */
 export function NetworkSecretPanel({ networkID }: { networkID: string }) {
+  const copy = useCopy();
   const [secret, setSecret] = useState('');
   const [copied, setCopied] = useState(false);
   const rotate = useMutation({
