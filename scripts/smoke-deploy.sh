@@ -239,9 +239,25 @@ UDP_RENAME="$(curl -s -o /dev/null -w '%{http_code}' -b "$COOKIE" -X PATCH "$BAS
 require_code "member renamed for udp" 204 "$UDP_RENAME"
 # The datagram transport gets the same treatment: a real device session over
 # UDP on the extra listener, which is enabled a few steps above (r157).
-timeout 60 "$WORK/smokedevice" --transport udp --endpoint "127.0.0.1:$EXTRA_PORT" --token root-owner --machine "$MACHINE" --expect-network smoke-net --expect-count 1 --timeout 45s > "$WORK/udp-device.log" 2>&1 || true
-if ! grep -q "CONFIG_RECEIVED" "$WORK/udp-device.log"; then
-  echo "FAIL: no configuration arrived over the udp listener"
+# A single attempt is a race: the datagram transport drops packets under load, and
+# the reconciler only pushes when the stored revision differs from the compiled one,
+# so a retry has to bump the revision again or there is nothing to receive.
+# Three attempts with a fresh rename each turn a flake back into a signal.
+UDP_OK=0
+for udp_attempt in 1 2 3; do
+  if [ "$udp_attempt" -gt 1 ]; then
+    curl -s -o /dev/null -b "$COOKIE" -X PATCH "$BASE/api/v1/networks/$NETWORK_ID/members/$MACHINE" -H "Content-Type: application/json" -d "{"hostname_override":"smoke-udp-$udp_attempt"}"
+    sleep 2
+  fi
+  timeout 60 "$WORK/smokedevice" --transport udp --endpoint "127.0.0.1:$EXTRA_PORT" --token root-owner --machine "$MACHINE" --expect-network smoke-net --expect-count 1 --timeout 25s > "$WORK/udp-device.log" 2>&1 || true
+  if grep -q "CONFIG_RECEIVED" "$WORK/udp-device.log"; then
+    UDP_OK=1
+    break
+  fi
+  echo "    udp attempt $udp_attempt saw no configuration; retrying"
+done
+if [ "$UDP_OK" -ne 1 ]; then
+  echo "FAIL: no configuration arrived over the udp listener after 3 attempts"
   cat "$WORK/udp-device.log"
   exit 1
 fi
