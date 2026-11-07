@@ -98,7 +98,10 @@ export function NetworkDetailPage() {
             key={entry.key}
             type="button"
             role="tab"
+            id={"tab-" + entry.key}
             aria-selected={tab === entry.key}
+            aria-controls={"panel-" + entry.key}
+            tabIndex={tab === entry.key ? 0 : -1}
             onClick={() => setTab(entry.key)}
             className={
               tab === entry.key
@@ -111,10 +114,19 @@ export function NetworkDetailPage() {
         ))}
       </div>
 
-      {tab === 'members' ? <NetworkMembers networkID={network.network_id} onClose={() => setTab('settings')} /> : null}
-      {tab === 'acl' ? <NetworkAclPanel networkID={network.network_id} /> : null}
-      {tab === 'credentials' ? <NetworkCredentialsPanel networkID={network.network_id} /> : null}
-      {tab === 'settings' ? <NetworkSettings networkID={network.network_id} displayName={network.display_name} /> : null}
+      {/* A panel per tab so a screen reader can follow the tab to its content. */}
+      <div role="tabpanel" id="panel-members" aria-labelledby="tab-members" hidden={tab !== 'members'}>
+        {tab === 'members' ? <NetworkMembers networkID={network.network_id} onClose={() => setTab('settings')} /> : null}
+      </div>
+      <div role="tabpanel" id="panel-acl" aria-labelledby="tab-acl" hidden={tab !== 'acl'}>
+        {tab === 'acl' ? <NetworkAclPanel networkID={network.network_id} /> : null}
+      </div>
+      <div role="tabpanel" id="panel-credentials" aria-labelledby="tab-credentials" hidden={tab !== 'credentials'}>
+        {tab === 'credentials' ? <NetworkCredentialsPanel networkID={network.network_id} /> : null}
+      </div>
+      <div role="tabpanel" id="panel-settings" aria-labelledby="tab-settings" hidden={tab !== 'settings'}>
+        {tab === 'settings' ? <NetworkSettings networkID={network.network_id} displayName={network.display_name} /> : null}
+      </div>
     </div>
   );
 }

@@ -7,7 +7,22 @@
     <script src="/boot.js"></script>
   </head>
   <body>
-    <div id="root"></div>
+    <!--
+      The bundle takes a moment on a slow link, and an empty body for that second
+      reads as a broken page. This shell is static: it paints with the HTML and is
+      replaced when React mounts. Deliberately plain values, because the design
+      tokens live in the bundle that has not arrived yet.
+    -->
+    <div id="root">
+      <div role="status" aria-live="polite" aria-label="加载中 Loading" style="display:flex;align-items:center;justify-content:center;gap:12px;min-height:60vh;font-family:system-ui,sans-serif;font-size:14px;color:#64748b">
+        <span aria-hidden="true" style="width:18px;height:18px;border:2px solid #cbd5e1;border-top-color:#0a76a9;border-radius:50%;animation:boot-spin 0.8s linear infinite"></span>
+        <span>加载中 · Loading</span>
+      </div>
+      <style>
+        @keyframes boot-spin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) { #root span[aria-hidden] { animation: none !important; } }
+      </style>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

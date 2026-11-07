@@ -189,7 +189,7 @@ const enUS: Record<string, unknown> = {
     search: 'Search networks',
     searchEmpty: 'No matching networks',
     searchClear: 'Clear search',
-    count: 'of',
+    count: 'networks',
     title: 'Networks',
     subtitle: 'Declarative intent, compiled and pushed to members',
     empty: 'No networks yet. Create one and add a device to start.',

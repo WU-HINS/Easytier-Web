@@ -69,7 +69,9 @@ export function LoginPage() {
       <section className="flex items-center justify-center p-[var(--gap-card)]">
         <div className="panel w-full max-w-[calc(var(--u-12)*6.2)] p-[var(--pad-card)]">
           <h1 className="text-phi-xl font-semibold tracking-tight">{registering ? copy.login.registerTitle : copy.login.title}</h1>
-          <p className="mt-[var(--u-2)] text-phi-sm text-muted-foreground">{registering ? copy.login.registerHint : copy.login.subtitle}</p>
+          {registering ? (
+            <p className="mt-[var(--u-2)] text-phi-sm text-muted-foreground">{copy.login.registerHint}</p>
+          ) : null}
 
           {registering ? (
             <form className="mt-[var(--u-8)] space-y-[var(--u-5)]" onSubmit={submitRegister}>

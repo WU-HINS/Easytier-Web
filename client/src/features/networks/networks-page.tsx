@@ -114,7 +114,7 @@ export function NetworksPage() {
                   <Badge>{network.member_count} {copy.networks.members}</Badge>
                   <Link
                     to={'/networks/' + network.network_id}
-                    className="inline-flex items-center min-h-[var(--u-11)] text-phi-sm underline underline-offset-4"
+                    className="inline-flex items-center justify-center min-h-[var(--u-11)] min-w-[var(--u-11)] text-phi-sm underline underline-offset-4"
                   >
                     {copy.networks.detailManage}
                   </Link>

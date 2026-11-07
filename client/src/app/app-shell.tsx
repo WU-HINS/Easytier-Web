@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Ban, KeyRound, LayoutDashboard, LogOut, Monitor, Network, Server, Settings, Sun, Moon, UserCog, Users } from 'lucide-react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useCopy, useLocale } from '../copy/locale';
 import { api } from '../lib/http';
 import { useTheme } from '../lib/theme';
@@ -25,7 +25,11 @@ const themeIcon = { light: Sun, dark: Moon, auto: Monitor } as const;
 
 export function AppShell() {
   const { mode, setMode } = useTheme();
-  const info = useQuery({ queryKey: ['console-info'], queryFn: api.consoleInfo });
+  // Asking for console-info on the login page always answers 401 and leaves an
+  // error in the console that looks like a defect. Only ask once signed in.
+  const location = useLocation();
+  const publicPage = location.pathname === '/login' || location.pathname === '/setup';
+  const info = useQuery({ queryKey: ['console-info'], queryFn: api.consoleInfo, enabled: !publicPage });
   const copy = useCopy();
   const { locale, setLocale } = useLocale();
   const navigation =
@@ -102,7 +106,7 @@ export function AppShell() {
               <option value="en-US">{copy.shell.languageEn}</option>
             </select>
             <a
-              className="inline-flex items-center min-h-[var(--u-11)] text-phi-sm text-muted-foreground underline underline-offset-4"
+              className="inline-flex items-center justify-center min-h-[var(--u-11)] min-w-[var(--u-11)] text-phi-sm text-muted-foreground underline underline-offset-4"
               href="https://easytier.cn/"
               target="_blank"
               rel="noreferrer"

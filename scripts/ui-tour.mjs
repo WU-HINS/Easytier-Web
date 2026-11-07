@@ -242,6 +242,33 @@ check('language switch reaches English', englishTitle === 'Overview', englishTit
 await page.goto(BASE + '/devices', { waitUntil: 'networkidle' });
 await page.waitForTimeout(600);
 const devicesEnglish = await page.getByLabel('Search devices').count();
+// The primary button has to stay readable. tailwind-merge used to drop the text
+// colour because the type scale shares the text- prefix, and the page still looked
+// plausible: dark text on a dark button at 3.56:1.
+const contrast = async (theme) => {
+  await page.evaluate((value) => window.localStorage.setItem('theme', value), theme);
+  await page.goto(BASE + '/networks', { waitUntil: 'networkidle' });
+  await page.waitForTimeout(500);
+  return page.evaluate(() => {
+    const nums = (value) => (value.match(/[0-9.]+/g) || []).map(Number);
+    const lum = (c) => {
+      const f = c.slice(0, 3).map((v) => { const s = v / 255; return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4); });
+      return 0.2126 * f[0] + 0.7152 * f[1] + 0.0722 * f[2];
+    };
+    const button = document.querySelector('button.bg-primary:not([disabled])');
+    if (!button) return null;
+    const style = getComputedStyle(button);
+    const l1 = lum(nums(style.color));
+    const l2 = lum(nums(style.backgroundColor));
+    const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    return { ratio: Math.round(ratio * 100) / 100, dark: document.documentElement.classList.contains('dark') };
+  });
+};
+const darkReading = await contrast('dark');
+check('primary button is readable in the dark theme', darkReading !== null && darkReading.dark && darkReading.ratio >= 4.5, JSON.stringify(darkReading));
+const lightReading = await contrast('light');
+check('primary button is readable in the light theme', lightReading !== null && !lightReading.dark && lightReading.ratio >= 4.5, JSON.stringify(lightReading));
+await page.evaluate(() => window.localStorage.removeItem('theme'));
 // A rejected form has to speak the language of the page.
 await page.locator('select[aria-label="Language"], select[aria-label="语言"]').first().selectOption('zh-CN');
 await page.goto(BASE + '/networks', { waitUntil: 'networkidle' });
@@ -259,9 +286,9 @@ await page.setViewportSize({ width: 390, height: 844 });
 await page.reload({ waitUntil: 'networkidle' });
 await page.waitForTimeout(500);
 const targets = await page.evaluate(() => [...document.querySelectorAll('a, button')]
-  .map((el) => ({ text: (el.innerText || '').trim(), h: Math.round(el.getBoundingClientRect().height) }))
+  .map((el) => { const r = el.getBoundingClientRect(); return { text: (el.innerText || '').trim(), w: Math.round(r.width), h: Math.round(r.height) }; })
   .filter((entry) => entry.text === '管理' || entry.text === '文档'));
-check('primary actions are tappable on a phone', targets.length > 0 && targets.every((entry) => entry.h >= 40), JSON.stringify(targets));
+check('primary actions are tappable on a phone', targets.length > 0 && targets.every((entry) => entry.h >= 40 && entry.w >= 40), JSON.stringify(targets));
 await page.setViewportSize({ width: 1440, height: 900 });
 check('device page is translated too', devicesEnglish === 1, devicesEnglish ? 'Search devices' : 'still Chinese');
 await page.goto(BASE + '/', { waitUntil: 'networkidle' });
