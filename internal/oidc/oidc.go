@@ -373,11 +373,17 @@ func (p *Provider) VerifyIDToken(ctx context.Context, token, expectedNonce strin
 		return Claims{}, fmt.Errorf("oidc: id_token audience %v does not include %q", audience, p.cfg.ClientID)
 	}
 	now := time.Now()
+	// Expired and not-yet-valid are the two symptoms of a clock that disagrees
+	// with the provider, and the bare "has expired" sent operators looking at the
+	// provider instead of this host (F-010). Both messages now carry the timestamps
+	// and the allowance so the skew is visible in the error itself.
 	if payload.Expiry == 0 || now.After(time.Unix(payload.Expiry, 0).Add(clockSkew)) {
-		return Claims{}, errors.New("oidc: id_token has expired")
+		return Claims{}, fmt.Errorf("oidc: id_token has expired (console clock %s, token expired %s, skew allowance %s); check the clock on this host and on the identity provider",
+			now.UTC().Format(time.RFC3339), time.Unix(payload.Expiry, 0).UTC().Format(time.RFC3339), clockSkew)
 	}
 	if payload.IssuedAt != 0 && time.Unix(payload.IssuedAt, 0).After(now.Add(clockSkew)) {
-		return Claims{}, errors.New("oidc: id_token is issued in the future")
+		return Claims{}, fmt.Errorf("oidc: id_token is issued in the future (console clock %s, token issued at %s, skew allowance %s); check the clock on this host and on the identity provider",
+			now.UTC().Format(time.RFC3339), time.Unix(payload.IssuedAt, 0).UTC().Format(time.RFC3339), clockSkew)
 	}
 	if expectedNonce != "" && payload.Nonce != expectedNonce {
 		return Claims{}, errors.New("oidc: id_token nonce mismatch")

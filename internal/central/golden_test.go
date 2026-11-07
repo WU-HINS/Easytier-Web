@@ -122,6 +122,30 @@ func normaliseWhitespace(text string) string {
 
 // TestCompiledConfigsMatchGolden pins the whole compiled configuration. Update
 // with UPDATE_GOLDEN=1 and review the diff before committing it.
+// F-076: a golden file that is not stored in canonical form makes every future
+// diff ambiguous - is this a semantic change or a reformat? Keeping the files
+// canonical means a diff is always semantic.
+func TestGoldenFilesAreCanonical(t *testing.T) {
+	root := filepath.Join("testdata", "golden")
+	entries, err := os.ReadDir(root)
+	if err != nil {
+		t.Fatalf("read golden dir: %v", err)
+	}
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		path := filepath.Join(root, entry.Name())
+		content, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatalf("read %s: %v", entry.Name(), err)
+		}
+		if normaliseWhitespace(string(content)) != string(content) {
+			t.Fatalf("%s is not stored in canonical form; run UPDATE_GOLDEN=1 and review the diff", entry.Name())
+		}
+	}
+}
+
 func TestCompiledConfigsMatchGolden(t *testing.T) {
 	root := filepath.Join("testdata", "golden")
 	if err := os.MkdirAll(root, 0o755); err != nil {

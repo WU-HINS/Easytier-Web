@@ -127,8 +127,14 @@ func TestExchangeRejectsExpiredToken(t *testing.T) {
 	verifier := "verifier-abcdefghijklmnopqrstuvwxyz-1234567890"
 	idp.Expect("nonce", oidc.PKCEChallenge(verifier))
 	idp.SetExpiry(-time.Hour)
-	if _, _, err := provider.Exchange(context.Background(), "good-code", verifier, "nonce"); err == nil {
+	_, _, err := provider.Exchange(context.Background(), "good-code", verifier, "nonce")
+	if err == nil {
 		t.Fatal("expected expiry failure")
+	}
+	// F-010: the message has to point at the clock, otherwise the operator
+	// reads it as a provider problem and looks in the wrong place.
+	if !strings.Contains(err.Error(), "clock") || !strings.Contains(err.Error(), "skew allowance") {
+		t.Fatalf("the expiry error does not mention the clock: %v", err)
 	}
 }
 
