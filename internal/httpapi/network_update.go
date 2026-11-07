@@ -76,7 +76,7 @@ func (s *Server) handleUpdateNetwork(w http.ResponseWriter, r *http.Request, use
 		network.ACLPolicy = payload.ACLPolicy
 	}
 	if err := validateNetworkIntent(network); err != nil {
-		writeValidationError(w, http.StatusBadRequest, err)
+		writeBadRequestError(w, err)
 		return
 	}
 	network.UpdateTime = s.cfg.Now()

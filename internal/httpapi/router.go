@@ -824,7 +824,7 @@ func (s *Server) handleCreateNetwork(w http.ResponseWriter, r *http.Request, use
 		}
 	}
 	if err := validateNetworkIntent(network); err != nil {
-		writeValidationError(w, http.StatusBadRequest, err)
+		writeBadRequestError(w, err)
 		return
 	}
 	if err := s.cfg.Store.CreateNetwork(r.Context(), network); err != nil {
@@ -1085,14 +1085,16 @@ func writeFieldError(w http.ResponseWriter, status int, failure fieldError) {
 	writeJSON(w, status, body)
 }
 
-// writeValidationError picks the coded form when the error carries one.
-func writeValidationError(w http.ResponseWriter, status int, err error) {
+// writeBadRequestError picks the coded form when the error carries one. The
+// status is a literal on purpose: the architecture test requires every writeError
+// call site to name its status so a reviewer can see it.
+func writeBadRequestError(w http.ResponseWriter, err error) {
 	var failure fieldError
 	if errors.As(err, &failure) {
-		writeFieldError(w, status, failure)
+		writeFieldError(w, http.StatusBadRequest, failure)
 		return
 	}
-	writeError(w, status, err.Error())
+	writeError(w, http.StatusBadRequest, err.Error())
 }
 
 func writeErrorCode(w http.ResponseWriter, status int, code, message string) {
