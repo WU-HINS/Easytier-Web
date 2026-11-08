@@ -417,6 +417,7 @@ const enUS: Record<string, unknown> = {
     retry: 'Retry',
     failed: 'Failed to load',
     routeLoading: 'Loading...',
+    loadFailed: 'The data could not be loaded; what follows may be out of date.',
   },
 };
 

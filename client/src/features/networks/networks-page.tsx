@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useCopy } from '../../copy/locale';
+import { QueryError } from '../../ui/query-error';
 import { api } from '../../lib/http';
 import { Badge, Button, Card, CardBody, Input, Skeleton } from '../../ui';
 import { describeError } from '../../lib/errors';
@@ -84,16 +85,19 @@ export function NetworksPage() {
               {visible.length} {copy.networks.count}
             </span>
           </div>
+            {networks.isError ? (
+              <QueryError onRetry={() => void networks.refetch()} />
+            ) : null}
             {networks.isLoading ? (
               <div className="space-y-[var(--u-3)] p-[var(--pad-card)]">
                 <Skeleton className="h-[var(--u-10)]" />
                 <Skeleton className="h-[var(--u-10)]" />
               </div>
             ) : null}
-            {!networks.isLoading && rows.length === 0 ? (
+            {!networks.isLoading && !networks.isError && rows.length === 0 ? (
               <p className="p-[var(--pad-card)] text-phi-sm text-muted-foreground">{copy.networks.empty}</p>
             ) : null}
-            {!networks.isLoading && rows.length > 0 && visible.length === 0 ? (
+            {!networks.isLoading && !networks.isError && rows.length > 0 && visible.length === 0 ? (
               <div className="space-y-[var(--u-2)] p-[var(--pad-card)]">
                 <p className="text-phi-sm text-muted-foreground">{copy.networks.searchEmpty}</p>
                 <Button variant="ghost" onClick={() => setQuery("")}>

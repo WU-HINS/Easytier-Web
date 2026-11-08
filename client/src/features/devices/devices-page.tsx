@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCopy } from '../../copy/locale';
+import { QueryError } from '../../ui/query-error';
 import { api, type Machine } from '../../lib/http';
 import { Badge, Card, CardBody, Input, Skeleton } from '../../ui';
 import { EnrollCard } from './enroll-card';
@@ -60,16 +61,19 @@ export function DevicesPage() {
               {visible.length} {copy.networks.count}
             </span>
           </div>
+          {machines.isError ? (
+            <QueryError onRetry={() => void machines.refetch()} />
+          ) : null}
           {machines.isLoading ? (
             <div className="space-y-[var(--u-3)] p-[var(--pad-card)]">
               <Skeleton className="h-[var(--u-10)]" />
               <Skeleton className="h-[var(--u-10)]" />
             </div>
           ) : null}
-          {!machines.isLoading && rows.length === 0 ? (
+          {!machines.isLoading && !machines.isError && rows.length === 0 ? (
             <p className="p-[var(--pad-card)] text-phi-sm text-muted-foreground">{copy.devices.empty}</p>
           ) : null}
-          {!machines.isLoading && rows.length > 0 && visible.length === 0 ? (
+          {!machines.isLoading && !machines.isError && rows.length > 0 && visible.length === 0 ? (
             <p className="p-[var(--pad-card)] text-phi-sm text-muted-foreground">{copy.devices.searchEmpty}</p>
           ) : null}
 

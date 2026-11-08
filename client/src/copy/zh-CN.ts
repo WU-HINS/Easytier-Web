@@ -402,5 +402,5 @@ export const copy = {
     hint: '可能链接已经失效，或者地址打错了。下面是你访问的路径：',
     back: '回到概览',
   },
-  common: { logout: '退出登录', theme: '主题', background: '背景图地址', save: '保存', loading: '加载中…', retry: '重试', failed: '加载失败', routeLoading: '加载中 · Loading' },
+  common: { logout: '退出登录', theme: '主题', background: '背景图地址', save: '保存', loading: '加载中…', retry: '重试', failed: '加载失败', routeLoading: '加载中 · Loading', loadFailed: '加载失败，下面显示的可能不是最新状态。' },
 } as const;

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { copy } from '../../copy/zh-CN';
 import { api, type AdminUser } from '../../lib/http';
 import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
+import { QueryError } from '../../ui/query-error';
 
 /**
  * Read-only user administration: the console never exposes password, credential
@@ -40,8 +41,11 @@ export function AdminUsersPage() {
       {error ? <p role="alert" className="text-phi-sm text-destructive">{error}</p> : null}
       <Card>
         <CardBody className="p-0">
+          {users.isError ? (
+            <QueryError onRetry={() => void users.refetch()} />
+          ) : null}
           {users.isLoading ? <div className="p-[var(--pad-card)]"><Skeleton className="h-[var(--u-12)]" /></div> : null}
-          {rows.length === 0 && !users.isLoading ? (
+          {rows.length === 0 && !users.isLoading && !users.isError ? (
             <p className="p-[var(--pad-card)] text-phi-sm text-muted-foreground">{copy.adminUsers.empty}</p>
           ) : null}
           {rows.length > 0 ? (
