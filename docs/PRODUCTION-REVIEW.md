@@ -40,7 +40,7 @@
 - gate 26 项：backend build/vet/tests、client build/bundle、design contrast/tokens、api contract、
   wire format、client origin/request、gate audit、docs consistency、readme commands、ui states、
   deploy smoke、port conflict、backup cold start、shared database、editor invariants、postgres ×4、real clients。
-- UI 断言：`scripts/ui-tour.mjs` **28 条**，本轮实跑全绿。
+- UI 断言：`scripts/ui-tour.mjs` **29 条**，r254 实跑全绿（条数随轮次增加：r242 为 23 条，r248 为 28 条；本文档所有 ui-tour 数字均指该轮次）。
 
 **条件 1**：ui-tour 需要浏览器，目前**不在 gate 里**，只在人工执行。六项界面能力与 ACL 编译守卫因此没有 CI 兜底。
 **条件 2**：F-307 —— `TestUDPSurvivesGarbageAndManyPeers` 用固定 10s 截止，并行负载下会红（单独跑 0.00s 通过）。
@@ -71,7 +71,7 @@
 | # | 条件 | 阻塞级别 | 验收方式 |
 |---|---|---|---|
 | 1 | 数据面验证（F-283） | **CI 已配 tun；本沙箱仍不可** | `.github/workflows/ci.yml` 的 `data-plane` job：拉官方客户端 → `scripts/ci-tun-setup.sh` 建节点并授予 cap_net_admin → `scripts/overlay-smoke.sh`；本沙箱无 sudo，provision 判定 exit 3 |
-| 2 | ui-tour 进 CI（r242 已关闭） | **已满足** | `.github/workflows/ci.yml` 新增 `ui-tour` job；空库本地模拟实跑 23 条全绿 |
+| 2 | ui-tour 进 CI（r242 已关闭） | **已满足** | `.github/workflows/ci.yml` 新增 `ui-tour` job；当时（r242）空库实跑 23 条全绿 |
 | 3 | F-307（r243 已关闭） | **已满足** | 8 个 CPU 打满时 ×10 仍绿；race ×10 绿 |
 | 4 | `proxy-rpc` 方法白名单（F-009，r244 已关闭） | **已满足** | 只读白名单 + 三条测试；真机三条写方法 403 |
 | 5 | 指标端点（F-314，r245 已关闭） | **已满足** | `GET /metrics` 暴露 reconcile 计数与 `easytier_push_failure_ratio`，可选 Bearer |
@@ -86,7 +86,7 @@
 | 条件 | 结论 | 证据 |
 |---|---|---|
 | 1 数据面 | 仍阻塞，但从"跑不了"变成"说清为什么跑不了" | `scripts/tun-check.sh` 在 gate 与 CI 先行判定，本机输出 EPERM 原因 |
-| 2 ui-tour 进 CI | 关闭 | `ui-tour` job；空库实跑 23 条全绿 |
+| 2 ui-tour 进 CI | 关闭 | `ui-tour` job；r242 时空库实跑 23 条全绿 |
 | 3 F-307 | 关闭 | 8 个 CPU 打满 ×10 仍绿；race ×10 绿 |
 | 4 proxy-rpc 白名单 | 关闭 | 只读白名单 + 3 条测试 + 真机 403 验证 |
 | 5 指标 | 关闭 | `GET /metrics`，含 `easytier_push_failure_ratio` |
@@ -117,7 +117,7 @@
 
 守卫：`scripts/check-errors.mjs` 进 gate 与 CI（组件不得直接渲染传输层英文）；ui-tour 增加三条 UX 断言（中文报错含界面字段名、不含列名、移动端主操作 ≥40px）。
 
-实测：ui-tour **27 条全绿**；gate **23 项 PASS**（本容器已无 PostgreSQL，postgres 相关项如实 SKIP）。
+实测：ui-tour **29 条全绿**；gate **PASS 22 / FAIL 0 / SKIP 1**（本容器已无 PostgreSQL，postgres 相关项如实 SKIP）。
 
 ## 交付说明：已验证 / 未验证（r254）
 
@@ -142,6 +142,9 @@
 | data plane / overlay smoke | **SKIP** | 本机无 tun（TUNSETIFF: EPERM） | 有 `/dev/net/tun` 的主机：`EASYTIER_OVERLAY_SMOKE=1 ET_BIN=... ./scripts/gate.sh` |
 | CI 的 data-plane job | **从未执行** | 工作流已配 tun，但还没有一次运行 | 看 CI 该 job 的首次结果 |
 | F-283 数据面语义 | **OPEN** | 同上；另外「停掉 console 后设备 fail-open 还是 fail-closed」没有答案 | 真机两台：跑 overlay smoke + 手工停 console 观察 |
+| 真机移动端 / 真读屏器 | **未验证** | 本机只有 Linux 无头 Chromium，无真机、无 VoiceOver/NVDA | 用户手机（含 iOS Safari）走一遍四页签；任一读屏器听一次页签切换与表单报错 |
+| 前端调用面扫描的两类盲区 | **未验证** | `scripts/check-contract.mjs` 未修：模板字符串模板导航与行尾内联注释的假调用都判不出红 | 以 `scripts/audit-gates.sh` 的红证方式覆盖，或在交付中把"无未调用路由"限定为非模板串、非行尾注释的写法 |
+| 长时间运行稳定性 | **未验证** | `./scripts/soak.sh 1000` 在本机可跑（纯 Go e2e，不需 tun）但本轮没跑；门禁只跑默认轮次 | 机器空闲时跑一次 `EASYTIER_SOAK_ROUNDS=1000 ./scripts/soak.sh`，另在有其他负载时再跑一次 |
 
 ### 明示但不阻塞
 
@@ -159,3 +162,11 @@
 > 本次可上报的"可验收交付"**不含**：(a) PostgreSQL 生产路径——本环境无 PostgreSQL，gate 该项为 SKIP，未经真库验证；(b) 真 tun 数据面——F-283 仍 OPEN，CI data-plane job **从未执行**，网络控制台的核心硬指标尚无一次真机闭环；因此本交付仅适用于**单租户、自有设备、可接受「数据面待验证」**的场景，不满足对外多租户服务；(c) F-323 弱网首屏为 **ACCEPTED** 风险（400ms/50KB/s 下 1500ms 前无内容），非修复；(d) 前端调用与后端路由的一致性结论只对**非模板字符串、非行尾内联注释**的写法成立——`check-contract.mjs` 的两处扫描器漏洞仍未修，该守卫当前证明力弱于其命名。
 >
 > 一句话：**范围说清楚了，我放行；"已验证"这三个字不许跨过上面四道边界。**
+
+### 评审限定语（R-A / R-D / R-E 要求原样并入，r254）
+
+> **R-A（前端）**：本交付的前端部分基于 Linux 无头 Chromium（1440×900 与 390×844 视口）+ CDP 限速验证：触控尺寸、焦点顺序、ARIA 属性、深浅主题对比度均已实测；但未在真机移动端（含 iOS Safari）与真实读屏器上验证，实际播报效果与真机手感不在本交付的证明范围内。
+
+> **R-E（安全）**：本次交付**不含 PostgreSQL 路径与数据面验证**：postgres 相关 4 项为声明式 SKIP（本机无 PG），数据面与 F-283 的 fail-open/fail-closed 语义在无 tun 环境无法取得证据，F-323 为已接受的弱网首屏限制；另 `scripts/check-contract.mjs` 存在两类已知漏检（模板串导航、行尾内联注释假调用）未修，故"无未调用路由"这一断言对该两类不成立。
+
+> **R-D（并发）**：本交付的验证边界：不含 PostgreSQL 路径（gate 中 postgres tests SKIP，3 条 PG 引用用例为声明式跳过）；不含真 tun 数据面与 overlay 通过性（data plane / overlay smoke SKIP，CI 的 data-plane job 从未执行），F-283「停掉 console 后设备 fail-open 还是 fail-closed」**无答案**；不含超过门禁默认轮次的长时运行稳定性证据；不含真机移动端。弱网首屏 F-323 为 ACCEPTED（有实测数字，非 FIXED）；前端导航式调用扫描仍有一处已知漏洞未修（R-C，r254）。**以上各项均为"未验证"，不得表述为"通过"。**

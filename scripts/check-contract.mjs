@@ -42,13 +42,30 @@ for (const file of walk(join(root, 'internal', 'httpapi'), (f) => f.endsWith('.g
 // could be silenced by commenting in a fake call, because the scanners read raw
 // source (review team, round 150). Drop whole comment lines before scanning.
 function codeLines(source) {
-  return source
-    .split(String.fromCharCode(10))
-    .filter((line) => {
-      const trimmed = line.trim();
-      return !trimmed.startsWith('//') && !trimmed.startsWith('/*') && !trimmed.startsWith('*');
-    })
-    .join(String.fromCharCode(10));
+  // Comments must go before scanning. Dropping whole-line comments is not enough: a
+  // trailing "// request<unknown>('/ghost')" would be read as a real call and hide a
+  // route nobody reaches. The string-literal walk below is deliberate - a regex
+  // cannot tell a comment from a URL inside quotes.
+  const kept = [];
+  for (const line of source.split(String.fromCharCode(10))) {
+    let out = '';
+    let quote = null;
+    for (let i = 0; i < line.length; i += 1) {
+      const ch = line[i];
+      if (quote) {
+        out += ch;
+        if (ch === quote && line[i - 1] !== String.fromCharCode(92)) quote = null;
+        continue;
+      }
+      if (ch === ';' && line.slice(i + 1).trimStart().startsWith('//')) break;
+      if (ch === String.fromCharCode(39) || ch === String.fromCharCode(34) || ch === String.fromCharCode(96)) quote = ch;
+      out += ch;
+    }
+    const trimmed = out.trim();
+    if (trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*')) continue;
+    kept.push(out);
+  }
+  return kept.join(String.fromCharCode(10));
 }
 
 // --- client calls ------------------------------------------------------------
@@ -127,7 +144,7 @@ for (const file of walk(join(root, 'client', 'src'), (f) => f.endsWith('.ts') ||
 // A full page navigation is still a client call: the account page sends the
 // operator to the OIDC bind endpoint with window.location, and the contract
 // report used to list that route as "no client call" (review team, r143).
-const NAVIGATION = /['"]([^'"]*\/api\/v1\/[^'"]*)['"]/g;
+const NAVIGATION = /['"`]([^'"`]*\/api\/v1\/[^'"`]*)['"`]/g;
 for (const file of walk(join(root, 'client', 'src'), (f) => f.endsWith('.ts') || f.endsWith('.tsx'))) {
   const source = codeLines(readFileSync(file, 'utf8'));
   for (const match of source.matchAll(NAVIGATION)) {
