@@ -229,6 +229,7 @@ export const copy = {
     overrideLoading: '正在读取覆盖配置…',
     overrideClear: '清除覆盖',
     advanced: '高级配置',
+    readOnly: '只读',
   },
   networkSettings: {
     secretTitle: '网络密钥',

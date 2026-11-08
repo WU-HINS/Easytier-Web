@@ -36,6 +36,9 @@ export interface NetworkSummary {
   networking_method: string;
   member_count: number;
   secure_mode: boolean;
+  // Server decides, the page hides controls: a read-only network must not offer
+  // buttons that answer 403 (HiDNS convention).
+  can_write?: boolean;
 }
 
 export interface BlockedMachine {
@@ -54,6 +57,7 @@ export interface NetworkDetail {
   peer_urls: string[] | null;
   virtual_cidr: string | null;
   secure_mode: Record<string, unknown> | null;
+  can_write?: boolean;
 }
 
 export interface AclStatsResponse {

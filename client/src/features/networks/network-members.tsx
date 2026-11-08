@@ -31,6 +31,10 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
     queryFn: () => api.network(networkID),
   });
 
+  // The server decides; the panel hides what it would refuse. A read-only network
+  // shows no delete, no add, no remove - not a button that answers 403.
+  const canWrite = detail.data?.can_write !== false;
+
   const refresh = () => {
     void queryClient.invalidateQueries({ queryKey: ['network-members', networkID] });
     void queryClient.invalidateQueries({ queryKey: ['networks'] });
@@ -70,15 +74,19 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
                 {copy.networks.back}
               </Button>
             ) : null}
-            <Button
-              variant="ghost"
-              disabled={destroy.isPending}
-              onClick={() => {
-                if (window.confirm(copy.networks.confirmDelete)) destroy.mutate();
-              }}
-            >
-              {copy.networks.deleteNetwork}
-            </Button>
+            {canWrite ? (
+              <Button
+                variant="ghost"
+                disabled={destroy.isPending}
+                onClick={() => {
+                  if (window.confirm(copy.networks.confirmDelete)) destroy.mutate();
+                }}
+              >
+                {copy.networks.deleteNetwork}
+              </Button>
+            ) : (
+              <Badge>{copy.networks.readOnly}</Badge>
+            )}
           </div>
         </div>
 
@@ -145,15 +153,17 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
                     {copy.networks.instance}
                   </Button>
                 ) : null}
-                <Button
-                  variant="ghost"
-                  disabled={remove.isPending}
-                  onClick={() => remove.mutate(member.device_id)}
-                >
-                  {copy.networks.remove}
-                </Button>
+                {canWrite ? (
+                  <Button
+                    variant="ghost"
+                    disabled={remove.isPending}
+                    onClick={() => remove.mutate(member.device_id)}
+                  >
+                    {copy.networks.remove}
+                  </Button>
+                ) : null}
               </div>
-              {editing === member.device_id ? (
+              {canWrite && editing === member.device_id ? (
                 <div className="w-full">
                   <MemberEditor
                     networkID={networkID}
@@ -176,6 +186,7 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
           ))}
         </div>
 
+        {canWrite ? (
         <div className="mt-[var(--u-6)] flex flex-wrap items-end gap-[var(--u-3)]">
           <label className="min-w-0 flex-1">
             <span className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">
@@ -204,6 +215,7 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
             {copy.networks.addMember}
           </Button>
         </div>
+        ) : null}
         {candidates.length === 0 ? (
           <p className="mt-[var(--u-2)] text-phi-sm text-muted-foreground">{copy.networks.noCandidates}</p>
         ) : null}

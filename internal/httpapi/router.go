@@ -760,7 +760,12 @@ func (s *Server) handleListNetworks(w http.ResponseWriter, r *http.Request, user
 			return
 		}
 		items = append(items, map[string]any{
-			"network_id":        network.ID,
+			"network_id": network.ID,
+			// The UI hides mutating controls when this is false instead of letting the
+			// operator click through to a 403 (HiDNS convention: expose the decision,
+			// render from it). Ownership is the rule today, so it is also the place a
+			// shared or delegated network would be decided later.
+			"can_write":         network.UserID == user.ID,
 			"display_name":      network.DisplayName,
 			"network_name":      network.NetworkName,
 			"networking_method": network.NetworkingMethod,
@@ -867,6 +872,7 @@ func (s *Server) handleGetNetwork(w http.ResponseWriter, r *http.Request, user b
 		"peer_urls":         network.PeerURLs,
 		"virtual_cidr":      network.VirtualCIDR,
 		"secure_mode":       network.SecureMode,
+		"can_write":         network.UserID == user.ID,
 	})
 }
 

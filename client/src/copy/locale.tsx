@@ -237,6 +237,7 @@ const enUS: Record<string, unknown> = {
     overrideLoading: 'Loading override...',
     overrideClear: 'Reset to network default',
     advanced: 'Advanced config',
+    readOnly: 'read-only',
   },
   networkSettings: {
     secretTitle: 'Network secret',
