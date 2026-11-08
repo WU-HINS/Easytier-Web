@@ -402,6 +402,11 @@ const enUS: Record<string, unknown> = {
     public_server_url: 'Public server address',
     unknown: 'This field',
   },
+  notFound: {
+    title: 'This address does not exist',
+    hint: 'The link may be stale, or the address was mistyped. This is the path you asked for:',
+    back: 'Back to the overview',
+  },
   common: {
     logout: 'Sign out',
     theme: 'Theme',

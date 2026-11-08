@@ -396,5 +396,10 @@ export const copy = {
     public_server_url: '公共服务器地址',
     unknown: '该字段',
   },
+  notFound: {
+    title: '这个地址不存在',
+    hint: '可能链接已经失效，或者地址打错了。下面是你访问的路径：',
+    back: '回到概览',
+  },
   common: { logout: '退出登录', theme: '主题', background: '背景图地址', save: '保存', loading: '加载中…', retry: '重试', failed: '加载失败', routeLoading: '加载中 · Loading' },
 } as const;

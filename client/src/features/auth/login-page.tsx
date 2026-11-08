@@ -108,25 +108,29 @@ export function LoginPage() {
             </form>
           ) : (
           <form className="mt-[var(--u-8)] space-y-[var(--u-5)]" onSubmit={submit}>
-            <label className="block">
-              <span className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">{copy.login.username}</span>
+            <div>
+              <label htmlFor="login-username" className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">{copy.login.username}</label>
               <Input
+                id="login-username"
+                name="username"
                 value={username}
                 autoComplete="username"
                 onChange={(event) => setUsername(event.target.value)}
                 required
               />
-            </label>
-            <label className="block">
-              <span className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">{copy.login.password}</span>
+            </div>
+            <div>
+              <label htmlFor="login-password" className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">{copy.login.password}</label>
               <Input
+                id="login-password"
+                name="password"
                 type="password"
                 value={password}
                 autoComplete="current-password"
                 onChange={(event) => setPassword(event.target.value)}
                 required
               />
-            </label>
+            </div>
             {error ? <p role="alert" className="text-phi-sm text-destructive">{error}</p> : null}
             <Button type="submit" size="lg" className="w-full" disabled={login.isPending}>
               {login.isPending ? copy.login.submitting : copy.login.submit}
@@ -137,20 +141,22 @@ export function LoginPage() {
           {registering || !canRegister ? null : signup ? (
             <form className="mt-[var(--u-6)] space-y-[var(--u-5)]" onSubmit={submitSignUp}>
               <h2 className="text-phi-xl font-semibold tracking-tight">{copy.login.signUpTitle}</h2>
-              <label className="block">
-                <span className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">{copy.login.username}</span>
-                <Input value={username} autoComplete="username" onChange={(event) => setUsername(event.target.value)} required />
-              </label>
-              <label className="block">
-                <span className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">{copy.login.password}</span>
+              <div>
+                <label htmlFor="signup-username" className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">{copy.login.username}</label>
+                <Input id="signup-username" name="username" value={username} autoComplete="username" onChange={(event) => setUsername(event.target.value)} required />
+              </div>
+              <div>
+                <label htmlFor="signup-password" className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">{copy.login.password}</label>
                 <Input
+                  id="signup-password"
+                  name="new-password"
                   type="password"
                   value={password}
                   autoComplete="new-password"
                   onChange={(event) => setPassword(event.target.value)}
                   required
                 />
-              </label>
+              </div>
               {error ? <p role="alert" className="text-phi-sm text-destructive">{error}</p> : null}
               <Button type="submit" size="lg" className="w-full" disabled={signUp.isPending}>
                 {signUp.isPending ? copy.login.submitting : copy.login.signUpSubmit}

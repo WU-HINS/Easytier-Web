@@ -1,7 +1,8 @@
 import { Suspense, lazy } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { ProtectedShell } from './app/protected-shell';
 import { RequireAdmin } from './app/require-admin';
+import { NotFoundPage } from './app/not-found';
 import { SetupGate } from './app/setup-gate';
 import { AppShell } from './app/app-shell';
 import { LoginPage } from './features/auth/login-page';
@@ -59,9 +60,12 @@ export default function App() {
               <Route path="/admin/users" element={<AdminUsersPage />} />
               <Route path="/admin/settings" element={<AdminSettingsPage />} />
             </Route>
+            {/* Inside the shell, so an unknown address still has navigation; the
+                address bar keeps the path the user asked for (R-C, r259). */}
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
+
       </Routes>
     </Suspense>
   );
