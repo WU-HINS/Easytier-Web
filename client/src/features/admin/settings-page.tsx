@@ -87,6 +87,13 @@ export function AdminSettingsPage() {
 
   if (!draft) return <p className="text-phi-sm text-muted-foreground">{settings.isLoading ? copy.adminSettings.loading : copy.adminSettings.readFailed}</p>;
 
+  // Stale data is readable but not writable: the banner says so before the form.
+  const staleBanner = settings.isError ? (
+    <div role="alert" className="mb-[var(--gap-card)] rounded-[calc(var(--radius)*0.8)] border border-destructive/40 bg-destructive/5 px-[var(--u-6)] py-[var(--u-4)] text-phi-sm text-destructive">
+      {copy.adminSettings.readFailedReadOnly}
+    </div>
+  ) : null;
+
   const update = <K extends keyof AdminSettings>(key: K, value: AdminSettings[K]) => {
     setDraft({ ...draft, [key]: value });
     setTouched({ ...touched, [String(key)]: true });
@@ -125,6 +132,8 @@ export function AdminSettingsPage() {
         <h1 className="text-phi-2xl font-semibold tracking-tight">{copy.adminSettings.title}</h1>
         <p className="mt-[var(--u-2)] text-phi-sm text-muted-foreground">{copy.adminSettings.subtitle}</p>
       </header>
+
+      {staleBanner}
 
       <div className="phi-split gap-[var(--gap-card)]">
         <Card>
@@ -226,7 +235,12 @@ export function AdminSettingsPage() {
       </div>
 
       <div className="flex items-center gap-[var(--u-4)]">
-        <Button type="submit" disabled={save.isPending}>{save.isPending ? copy.adminSettings.saving : copy.adminSettings.save}</Button>
+        {/* Writing needs a value that came back from the server in this session.
+            An admin who saves during an outage would write empty quotas and an empty
+            OIDC issuer, which locks everyone out (review team, r259). */}
+        <Button type="submit" disabled={save.isPending || settings.isError}>
+          {save.isPending ? copy.adminSettings.saving : copy.adminSettings.save}
+        </Button>
         {feedback ? <span className="text-phi-sm text-muted-foreground">{feedback}</span> : null}
       </div>
     </form>

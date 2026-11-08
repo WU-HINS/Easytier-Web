@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCopy } from '../../copy/locale';
 import { api } from '../../lib/http';
-import { Badge, Card, CardBody, CardHeader, Skeleton } from '../../ui';
+import { Badge, Button, Card, CardBody, CardHeader, Skeleton } from '../../ui';
 
 export function DashboardPage() {
   const copy = useCopy();
@@ -19,11 +19,19 @@ export function DashboardPage() {
   const networkRows = networks.data ?? [];
   const instanceCount = devices.reduce((total, machine) => total + (machine.running_network_instances || []).length, 0);
 
+  // A failed request must not render as zero: "0 networks" when the API is down is
+  // the interface telling the operator they have nothing (review team, r259).
+  const failed = summary.isError || machines.isError || networks.isError;
+  const retry = () => {
+    void summary.refetch();
+    void machines.refetch();
+    void networks.refetch();
+  };
   const stats = [
-    { label: copy.dashboard.devices, value: summary.data ? summary.data.device_count : undefined },
-    { label: copy.dashboard.online, value: summary.data ? summary.data.online_device_count : undefined },
-    { label: copy.dashboard.networks, value: networks.isLoading ? undefined : networkRows.length },
-    { label: copy.dashboard.instances, value: machines.isLoading ? undefined : instanceCount },
+    { label: copy.dashboard.devices, value: summary.isError ? undefined : summary.data?.device_count, failed: summary.isError },
+    { label: copy.dashboard.online, value: summary.isError ? undefined : summary.data?.online_device_count, failed: summary.isError },
+    { label: copy.dashboard.networks, value: networks.isError || networks.isLoading ? undefined : networkRows.length, failed: networks.isError },
+    { label: copy.dashboard.instances, value: machines.isError || machines.isLoading ? undefined : instanceCount, failed: machines.isError },
   ];
 
   const recentDevices = devices.filter((machine) => machine.online).slice(0, 5);
@@ -39,13 +47,26 @@ export function DashboardPage() {
         </label>
       </header>
 
+      {failed ? (
+        <div role="alert" className="flex flex-wrap items-center justify-between gap-[var(--u-4)] rounded-[calc(var(--radius)*0.8)] border border-destructive/40 bg-destructive/5 px-[var(--u-6)] py-[var(--u-4)] text-phi-sm text-destructive">
+          <span>{copy.dashboard.loadFailed}</span>
+          <Button variant="secondary" size="sm" onClick={retry}>{copy.common.retry}</Button>
+        </div>
+      ) : null}
+
       <div className="grid gap-[var(--gap-card)] sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <Card key={stat.label}>
             <CardBody>
               <p className="text-phi-sm text-muted-foreground">{stat.label}</p>
               <p className="mt-[var(--u-2)] text-phi-3xl font-semibold tabular-nums">
-                {stat.value === undefined ? <Skeleton className="h-[var(--u-10)] w-[var(--u-11)]" /> : stat.value}
+                {stat.failed ? (
+                  <span className="text-muted-foreground">—</span>
+                ) : stat.value === undefined ? (
+                  <Skeleton className="h-[var(--u-10)] w-[var(--u-11)]" />
+                ) : (
+                  stat.value
+                )}
               </p>
             </CardBody>
           </Card>
@@ -57,7 +78,7 @@ export function DashboardPage() {
           <CardHeader title={copy.dashboard.recent} />
           <CardBody className="space-y-[var(--u-3)]">
             {machines.isLoading ? <Skeleton className="h-[var(--u-12)]" /> : null}
-            {!machines.isLoading && recentDevices.length === 0 ? (
+            {!machines.isLoading && !machines.isError && recentDevices.length === 0 ? (
               <p className="text-phi-sm text-muted-foreground">{copy.dashboard.empty}</p>
             ) : null}
             {recentDevices.map((machine) => (
@@ -79,7 +100,7 @@ export function DashboardPage() {
           <CardHeader title={copy.dashboard.networks} />
           <CardBody className="space-y-[var(--u-3)]">
             {networks.isLoading ? <Skeleton className="h-[var(--u-12)]" /> : null}
-            {!networks.isLoading && recentNetworks.length === 0 ? (
+            {!networks.isLoading && !networks.isError && recentNetworks.length === 0 ? (
               <p className="text-phi-sm text-muted-foreground">{copy.dashboard.noNetworks}</p>
             ) : null}
             {recentNetworks.map((network) => (

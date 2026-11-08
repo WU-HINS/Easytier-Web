@@ -91,6 +91,7 @@ const enUS: Record<string, unknown> = {
     networks: 'Networks',
     recent: 'Recently online',
     empty: 'No devices have connected yet.',
+    loadFailed: 'The data could not be loaded; what you see below is not the current state.',
   },
   devices: {
     enrollTitle: 'Device enrolment',
@@ -356,6 +357,7 @@ const enUS: Record<string, unknown> = {
     revisionConflict: 'Another session changed the settings; the form was refreshed, review it and try again',
     loading: 'Loading...',
     readFailed: 'Cannot read the settings',
+    readFailedReadOnly: 'The latest settings could not be read; this is the last value received. Saving is disabled so an outage cannot overwrite them; reload to try again.',
     errorMaxInstances: 'Must be 0 or a positive integer (0 means unlimited)',
     errorPasswordLength: 'Must be between 6 and 128',
     errorPasswordClasses: 'Must be between 1 and 4',

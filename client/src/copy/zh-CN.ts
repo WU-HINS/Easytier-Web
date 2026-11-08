@@ -81,6 +81,7 @@ export const copy = {
     networks: '网络数',
     recent: '最近在线',
     empty: '还没有设备接入。在设备上运行 easytier-core --config-server 即可接入。',
+    loadFailed: '数据加载失败，下面显示的不是当前状态。',
   },
   devices: {
     enrollTitle: '设备接入',
@@ -348,6 +349,7 @@ export const copy = {
     revisionConflict: '配置已被其他会话修改，已刷新为最新值，请确认后重试',
     loading: '加载中…',
     readFailed: '无法读取配置',
+    readFailedReadOnly: '无法读取最新配置，当前显示的是上次读取到的值；为避免写坏设置，保存已禁用，请刷新重试。',
     invalidCount: (count: number) => '有 ' + count + ' 项校验未通过，请修正后再保存',
     errorMaxInstances: '必须是 0 或正整数（0 表示不限制）',
     errorPasswordLength: '必须在 6–128 之间',
