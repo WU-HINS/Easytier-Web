@@ -141,7 +141,7 @@
 | 3 条 PG 引用用例 | 声明式跳过 | 同上；登记在 `scripts/env-gated-tests.txt`，缺 DSN 时才允许跳过 | 同上；DSN 设置后仍跳过则守卫判红 |
 | data plane / overlay smoke | **SKIP** | 本机无 tun（TUNSETIFF: EPERM） | 有 `/dev/net/tun` 的主机：`EASYTIER_OVERLAY_SMOKE=1 ET_BIN=... ./scripts/gate.sh` |
 | CI 的 data-plane job | **从未执行** | 工作流已配 tun，但还没有一次运行 | 看 CI 该 job 的首次结果 |
-| F-283 数据面语义 | **OPEN** | 同上；另外「停掉 console 后设备 fail-open 还是 fail-closed」没有答案 | 真机两台：跑 overlay smoke + 手工停 console 观察 |
+| F-283 数据面**连通性** | **OPEN** | 控制面语义问题已定（见下），但"配置真的到设备、设备真的按它转发"仍无一次真机闭环 | 真机两台：跑 overlay smoke + 双向 ping |
 | 真机移动端 / 真读屏器 | **未验证** | 本机只有 Linux 无头 Chromium，无真机、无 VoiceOver/NVDA | 用户手机（含 iOS Safari）走一遍四页签；任一读屏器听一次页签切换与表单报错 |
 | 前端调用面扫描的两类盲区 | **未验证** | `scripts/check-contract.mjs` 未修：模板字符串模板导航与行尾内联注释的假调用都判不出红 | 以 `scripts/audit-gates.sh` 的红证方式覆盖，或在交付中把"无未调用路由"限定为非模板串、非行尾注释的写法 |
 | 长时间运行稳定性 | **部分验证** | `./scripts/soak.sh 1000` 已跑通：1000 轮 / 53 秒，SQLite；**未**在机器有其他负载时复跑，也未覆盖 PostgreSQL | 空闲时再跑一次；有 PG 的机器用 `EASYTIER_E2E_PG=... ./scripts/soak.sh 1000` |
@@ -170,3 +170,18 @@
 > **R-E（安全）**：本次交付**不含 PostgreSQL 路径与数据面验证**：postgres 相关 4 项为声明式 SKIP（本机无 PG），数据面与 F-283 的 fail-open/fail-closed 语义在无 tun 环境无法取得证据，F-323 为已接受的弱网首屏限制；另 `scripts/check-contract.mjs` 存在两类已知漏检（模板串导航、行尾内联注释假调用）未修，故"无未调用路由"这一断言对该两类不成立。
 
 > **R-D（并发）**：本交付的验证边界：不含 PostgreSQL 路径（gate 中 postgres tests SKIP，3 条 PG 引用用例为声明式跳过）；不含真 tun 数据面与 overlay 通过性（data plane / overlay smoke SKIP，CI 的 data-plane job 从未执行），F-283「停掉 console 后设备 fail-open 还是 fail-closed」**无答案**；不含超过门禁默认轮次的长时运行稳定性证据；不含真机移动端。弱网首屏 F-323 为 ACCEPTED（有实测数字，非 FIXED）；前端导航式调用扫描仍有一处已知漏洞未修（R-C，r254）。**以上各项均为"未验证"，不得表述为"通过"。**
+
+### 控制面停机后的语义：已定（2026-11-08）
+
+设备在控制面停机后**继续按最后一份成功下发的配置转发**，这是官方 EasyTier 语义（fail-open），本项目有意识对齐、不做私有扩展。
+详见 `docs/PROTOCOL.md` 的「控制面不可用时的行为」。
+
+因此 F-283 拆成两件事，只保留后者为 OPEN：
+
+| 问题 | 结论 |
+|---|---|
+| 停机后设备是 fail-open 还是 fail-closed | **已定：fail-open（上游语义）**，不再是未知 |
+| 配置是否真的到了设备、设备是否真的按它转发 | **仍 OPEN**：本环境无 tun，从未有真机闭环 |
+
+**运维后果（必须随交付带走）**：ACL 收紧、成员删除、密钥轮换在控制台不可达期间**不生效**；
+吊销类操作要以"该实例是否完成过一次下发"为准（revision 前进 / 日志出现 `pushed=`），而不是点完即视为生效。
