@@ -118,3 +118,38 @@
 守卫：`scripts/check-errors.mjs` 进 gate 与 CI（组件不得直接渲染传输层英文）；ui-tour 增加三条 UX 断言（中文报错含界面字段名、不含列名、移动端主操作 ≥40px）。
 
 实测：ui-tour **27 条全绿**；gate **23 项 PASS**（本容器已无 PostgreSQL，postgres 相关项如实 SKIP）。
+
+## 交付说明：已验证 / 未验证（r254）
+
+验收一份交付，"范围说清楚了"和"全部验证过"是两件事。下表按 gate 的实际输出逐项列出：**SKIP 不是 PASS，OPEN 不是 FIXED**。
+
+### 已验证（本机跑通）
+
+| 项 | 证据 |
+|---|---|
+| gate 23 项（22 PASS / 1 SKIP） | `totals: PASS 22 / FAIL 0 / SKIP 1`，跳过项逐条列名 |
+| 引用用例 cited tests | `232 cited test(s) ran, 3 skipped for a declared dependency, none failed` |
+| 竞态检测 -race | `EASYTIER_RACE=1 ./scripts/gate.sh` 全绿；期间发现并修掉一处真实数据竞争（UDP 监听器上限测试） |
+| ui-tour | 29 条断言全绿（错误文案、深浅主题对比度、移动端触达、英文页） |
+| 升级 / 回滚 | `scripts/upgrade-drill.sh` 在 SQLite 与 PostgreSQL 上各走一遍 |
+
+### 未验证（本机无法取得证据）
+
+| 项 | 状态 | 为什么没跑 | 谁 / 怎么跑 |
+|---|---|---|---|
+| postgres tests | **SKIP** | 本容器无 PostgreSQL，apt 源里也没有该包 | 有 PG 的机器：`EASYTIER_TEST_PG_DSN=... EASYTIER_FULL_GATE=1 ./scripts/gate.sh` |
+| 3 条 PG 引用用例 | 声明式跳过 | 同上；登记在 `scripts/env-gated-tests.txt`，缺 DSN 时才允许跳过 | 同上；DSN 设置后仍跳过则守卫判红 |
+| data plane / overlay smoke | **SKIP** | 本机无 tun（TUNSETIFF: EPERM） | 有 `/dev/net/tun` 的主机：`EASYTIER_OVERLAY_SMOKE=1 ET_BIN=... ./scripts/gate.sh` |
+| CI 的 data-plane job | **从未执行** | 工作流已配 tun，但还没有一次运行 | 看 CI 该 job 的首次结果 |
+| F-283 数据面语义 | **OPEN** | 同上；另外「停掉 console 后设备 fail-open 还是 fail-closed」没有答案 | 真机两台：跑 overlay smoke + 手工停 console 观察 |
+
+### 明示但不阻塞
+
+| 项 | 状态 | 说明 |
+|---|---|---|
+| F-323 弱网首屏 | **ACCEPTED** | 400ms/50KB/s 下 300ms 与 900ms 无内容、1500ms 起显示加载壳；head 里的 boot.js 是故意阻塞（防主题白闪），bundle 369KB 需代码分割才能根治 |
+| 28/78 条服务端路由无客户端调用 | 已豁免 | 豁免表只拦新增，不代表这些路由被客户端走过 |
+
+### 一句话
+
+**这份交付证明的是：本机能验证的部分都已验证，且每项都留下可重跑的命令；本机不能验证的部分逐条点名，没有一条被算进"通过"。**
