@@ -98,7 +98,9 @@ if (seedState.status !== 200) {
 // --- dashboard ---------------------------------------------------------------
 await page.goto(BASE + '/', { waitUntil: 'networkidle' });
 await page.waitForTimeout(800);
-const cards = await page.locator('p.text-phi-3xl').allInnerTexts();
+// Locate the counts by what they are, not by the font class: the type scale moved
+// once already and broke this assertion for the wrong reason (r265).
+const cards = await page.locator('main .panel p.tabular-nums').allInnerTexts();
 check('dashboard shows four counts', cards.length === 4, cards.join('/'));
 const machineRequests = [];
 page.on('request', (request) => { if (request.url().includes('/api/v1/machines')) machineRequests.push(request.url()); });
@@ -296,6 +298,113 @@ await page.waitForTimeout(400);
 await shot('02a-dashboard-en');
 await page.locator('select[aria-label="Language"], select[aria-label="语言"]').first().selectOption('zh-CN');
 await page.waitForTimeout(400);
+
+// ── HiDNS alignment: the properties this round established (r265) ────────────
+// Each of these was a one-off probe when it was fixed; without an assertion here a
+// later refactor could quietly undo it.
+
+await page.goto(BASE + '/', { waitUntil: 'networkidle' });
+await page.waitForTimeout(500);
+const navGroups = await page.evaluate(() => {
+  const nav = document.querySelector('aside nav');
+  if (!nav) return [];
+  return [...nav.children].map((group) => ({
+    label: (group.querySelector('p')?.textContent || '').trim(),
+    items: [...group.querySelectorAll('a')].map((a) => (a.textContent || '').trim()),
+  }));
+});
+check(
+  'navigation is grouped, not a flat list',
+  navGroups.length >= 2 && navGroups.some((g) => g.label === '我的账户'),
+  JSON.stringify(navGroups.map((g) => g.label || '(workspace)')),
+);
+check(
+  'the administrator group is visible to an administrator',
+  navGroups.some((g) => g.label === '管理' && g.items.length >= 2),
+  JSON.stringify(navGroups.find((g) => g.label === '管理')?.items || []),
+);
+check(
+  'workspace entries stay in the first group',
+  (navGroups[0]?.items || []).includes('概览') && (navGroups[0]?.items || []).includes('网络'),
+  JSON.stringify(navGroups[0]?.items || []),
+);
+
+// An address that does not exist has to say so and keep the address bar honest.
+await page.goto(BASE + '/definitely-not-a-page', { waitUntil: 'networkidle' });
+await page.waitForTimeout(500);
+const unknownRoute = await page.evaluate(() => ({
+  path: window.location.pathname,
+  heading: (document.querySelector('h1')?.textContent || '').trim(),
+  hasNav: !!document.querySelector('aside nav'),
+}));
+check(
+  'an unknown address is reported instead of redirected',
+  unknownRoute.path === '/definitely-not-a-page' && unknownRoute.heading.includes('不存在'),
+  JSON.stringify(unknownRoute),
+);
+check('the unknown address is still inside the shell', unknownRoute.hasNav, String(unknownRoute.hasNav));
+
+// A failed request is not an empty account.
+await page.route('**/api/v1/summary*', (route) => route.fulfill({ status: 500, body: '{}' }));
+await page.route('**/api/v1/machines*', (route) => route.fulfill({ status: 500, body: '{}' }));
+await page.goto(BASE + '/', { waitUntil: 'networkidle' });
+await page.waitForTimeout(700);
+const failedOverview = await page.evaluate(() => ({
+  alerts: document.querySelectorAll('[role=alert]').length,
+  dashes: (document.querySelectorAll('main .panel p.tabular-nums').length > 0)
+    ? [...document.querySelectorAll('main .panel p.tabular-nums')].filter((p) => p.textContent.trim() === '—').length
+    : 0,
+  emptyClaims: (document.body.innerText.match(/还没有设备接入/g) || []).length,
+}));
+check('a failed load raises an alert', failedOverview.alerts >= 1, JSON.stringify(failedOverview));
+check('statistics show a dash rather than zero on failure', failedOverview.dashes >= 2, JSON.stringify(failedOverview));
+check('an empty state is not shown when the request failed', failedOverview.emptyClaims === 0, JSON.stringify(failedOverview));
+await page.unroute('**/api/v1/summary*');
+await page.unroute('**/api/v1/machines*');
+
+// A read-only resource offers no write controls.
+if (seededNetworkID) {
+  await page.route(new RegExp('/api/v1/networks/' + seededNetworkID + '$'), async (route) => {
+    const response = await route.fetch();
+    const body = await response.json();
+    body.can_write = false;
+    await route.fulfill({ response, body: JSON.stringify(body) });
+  });
+  await page.goto(BASE + '/networks/' + seededNetworkID, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(700);
+  const readOnly = await page.evaluate(() => ({
+    deleteButton: [...document.querySelectorAll('button')].some((b) => (b.textContent || '').trim() === '删除网络'),
+    addButton: [...document.querySelectorAll('button')].some((b) => (b.textContent || '').trim() === '添加成员'),
+    badge: document.body.innerText.includes('只读'),
+  }));
+  check(
+    'a read-only network hides its write controls',
+    !readOnly.deleteButton && !readOnly.addButton && readOnly.badge,
+    JSON.stringify(readOnly),
+  );
+  await page.unroute(new RegExp('/api/v1/networks/' + seededNetworkID + '$'));
+}
+
+// The login form has to be identifiable by a screen reader and a password manager.
+const anonymous = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: 'zh-CN' });
+const anonymousPage = await anonymous.newPage();
+await anonymousPage.goto(BASE + '/login', { waitUntil: 'networkidle' });
+await anonymousPage.waitForTimeout(400);
+const loginFields = await anonymousPage.evaluate(() =>
+  [...document.querySelectorAll('input')].map((el) => ({
+    id: el.id,
+    name: el.name,
+    autocomplete: el.autocomplete,
+    labelled: !!(el.labels && el.labels.length) || !!el.getAttribute('aria-label'),
+  })),
+);
+check(
+  'login inputs carry id, name, autocomplete and a label',
+  loginFields.length >= 2 && loginFields.every((f) => f.id && f.name && f.autocomplete && f.labelled),
+  JSON.stringify(loginFields),
+);
+await anonymous.close();
+
 
 // Remove the network this run created so the next run starts from the same place.
 if (seededNetworkID) {
