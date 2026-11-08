@@ -66,8 +66,8 @@ export function LoginPage() {
 
   return (
     <div className="phi-split min-h-screen">
-      <section className="relative hidden flex-col justify-between overflow-hidden p-[var(--gap-section)] lg:flex">
-        <div className="grid-lines absolute inset-0 opacity-40" aria-hidden />
+      <section className="relative hidden flex-col justify-center overflow-hidden p-[var(--gap-section)] lg:flex">
+        <div className="grid-lines absolute inset-0 opacity-20" aria-hidden />
         <div className="relative">
           <div className="flex items-baseline gap-[var(--u-2)]">
             <span className="text-phi-3xl font-semibold tracking-tight">{copy.brand}</span>
@@ -84,7 +84,7 @@ export function LoginPage() {
       </section>
 
       <section className="flex items-center justify-center p-[var(--gap-card)]">
-        <div className="panel w-full max-w-[calc(var(--u-12)*6.2)] p-[var(--pad-card)]">
+        <div className="panel w-full max-w-[var(--w-auth-card)] p-[var(--pad-card)]">
           <h1 className="text-phi-xl font-semibold tracking-tight">{registering ? copy.login.registerTitle : copy.login.title}</h1>
           {registering ? (
             <p className="mt-[var(--u-2)] text-phi-sm text-muted-foreground">{copy.login.registerHint}</p>

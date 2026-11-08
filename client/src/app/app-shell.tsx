@@ -111,7 +111,7 @@ export function AppShell() {
             </Button>
           </div>
         </header>
-        <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-[var(--w-content)] flex-1 px-[var(--gap-card)] py-[var(--gap-section)]">
+        <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-[var(--w-content)] flex-1 px-[var(--pad-page-x)] py-[var(--pad-page-y)]">
           <Outlet />
         </main>
       </div>
