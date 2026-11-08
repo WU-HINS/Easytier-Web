@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { ProtectedShell } from './app/protected-shell';
+import { RequireAdmin } from './app/require-admin';
 import { SetupGate } from './app/setup-gate';
 import { AppShell } from './app/app-shell';
 import { LoginPage } from './features/auth/login-page';
@@ -52,8 +53,12 @@ export default function App() {
             <Route path="/networks/:networkID" element={<NetworkDetailPage />} />
             <Route path="/account" element={<AccountPage />} />
             <Route path="/settings" element={<AppearancePage />} />
-            <Route path="/admin/users" element={<AdminUsersPage />} />
-            <Route path="/admin/settings" element={<AdminSettingsPage />} />
+            {/* One guard for every administrator page, so a new page cannot be
+                added without the check. */}
+            <Route element={<RequireAdmin />}>
+              <Route path="/admin/users" element={<AdminUsersPage />} />
+              <Route path="/admin/settings" element={<AdminSettingsPage />} />
+            </Route>
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

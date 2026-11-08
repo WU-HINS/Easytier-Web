@@ -52,6 +52,8 @@ export const copy = {
     blocked: '封禁设备',
     password: '修改密码',
     docs: '文档',
+    groupAccount: '我的账户',
+    groupAdmin: '管理',
   },
   shell: {
     disconnected: '无法连接控制台',

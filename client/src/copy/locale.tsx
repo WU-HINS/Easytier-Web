@@ -62,6 +62,8 @@ const enUS: Record<string, unknown> = {
     blocked: 'Blocked devices',
     password: 'Password',
     docs: 'Docs',
+    groupAccount: 'My account',
+    groupAdmin: 'Administration',
   },
   shell: {
     disconnected: 'Cannot reach the console',
