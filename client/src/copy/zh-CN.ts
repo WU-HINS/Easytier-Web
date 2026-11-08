@@ -18,6 +18,11 @@ export const copy = {
     footer: '控制面协议与 2.7.0 对齐 · 会话始终经服务端校验',
     checkingSso: '正在检查单点登录…',
     or: '或',
+    noAccount: '还没有账户？',
+    signUp: '注册一个',
+    signUpTitle: '注册新账户',
+    signUpSubmit: '创建账户并登录',
+    backToLogin: '返回登录',
   },
   setup: {
     mismatch: '两次输入的密码不一致',

@@ -9,6 +9,9 @@ package oidc
 import (
 	"context"
 	"crypto"
+	"crypto/ecdsa"
+	"crypto/ed25519"
+	"crypto/elliptic"
 	"crypto/rsa"
 	"crypto/sha256"
 	"encoding/base64"
@@ -300,6 +303,101 @@ func PKCEChallenge(verifier string) string {
 	return base64.RawURLEncoding.EncodeToString(sum[:])
 }
 
+// verifyJWTSignature checks one JWS signature against the key the JWKS returned.
+//
+// The algorithm is taken from the token header, so the key type has to agree with
+// it: an ES384 token must be verified with a P-384 key. HMAC algorithms are refused
+// outright - with a public client the "secret" would be public key material, which
+// is the classic key confusion attack.
+func verifyJWTSignature(alg string, key crypto.PublicKey, signed, signature []byte) error {
+	if alg == "none" || strings.HasPrefix(alg, "HS") {
+		return fmt.Errorf("oidc: id_token alg %q is not accepted", alg)
+	}
+	// EdDSA signs the message itself, so it must not go through a digest.
+	if alg == "EdDSA" {
+		edKey, ok := key.(ed25519.PublicKey)
+		if !ok {
+			return fmt.Errorf("oidc: id_token alg %q needs an Ed25519 key, jwks returned %T", alg, key)
+		}
+		if !ed25519.Verify(edKey, signed, signature) {
+			return errors.New("oidc: id_token signature is invalid")
+		}
+		return nil
+	}
+	hash, err := signatureHash(alg)
+	if err != nil {
+		return err
+	}
+	digest := hash.New()
+	digest.Write(signed)
+	sum := digest.Sum(nil)
+
+	switch {
+	case strings.HasPrefix(alg, "RS"):
+		rsaKey, ok := key.(*rsa.PublicKey)
+		if !ok {
+			return fmt.Errorf("oidc: id_token alg %q needs an RSA key, jwks returned %T", alg, key)
+		}
+		if err := rsa.VerifyPKCS1v15(rsaKey, hash, sum, signature); err != nil {
+			return fmt.Errorf("oidc: id_token signature is invalid: %w", err)
+		}
+	case strings.HasPrefix(alg, "PS"):
+		rsaKey, ok := key.(*rsa.PublicKey)
+		if !ok {
+			return fmt.Errorf("oidc: id_token alg %q needs an RSA key, jwks returned %T", alg, key)
+		}
+		if err := rsa.VerifyPSS(rsaKey, hash, sum, signature, &rsa.PSSOptions{SaltLength: rsa.PSSSaltLengthEqualsHash}); err != nil {
+			return fmt.Errorf("oidc: id_token signature is invalid: %w", err)
+		}
+	case strings.HasPrefix(alg, "ES"):
+		ecKey, ok := key.(*ecdsa.PublicKey)
+		if !ok {
+			return fmt.Errorf("oidc: id_token alg %q needs an EC key, jwks returned %T", alg, key)
+		}
+		if want, got := curveForAlg(alg), ecKey.Curve.Params().Name; want != got {
+			return fmt.Errorf("oidc: id_token alg %q needs curve %s, jwks returned %s", alg, want, got)
+		}
+		// JOSE signs the raw r||s pair, not an ASN.1 structure.
+		if len(signature)%2 != 0 {
+			return errors.New("oidc: id_token ECDSA signature has odd length")
+		}
+		half := len(signature) / 2
+		r := new(big.Int).SetBytes(signature[:half])
+		s := new(big.Int).SetBytes(signature[half:])
+		if !ecdsa.Verify(ecKey, sum, r, s) {
+			return errors.New("oidc: id_token signature is invalid")
+		}
+
+	default:
+		return fmt.Errorf("oidc: unsupported id_token alg %q", alg)
+	}
+	return nil
+}
+
+func signatureHash(alg string) (crypto.Hash, error) {
+	switch alg[len(alg)-3:] {
+	case "256":
+		return crypto.SHA256, nil
+	case "384":
+		return crypto.SHA384, nil
+	case "512":
+		return crypto.SHA512, nil
+	}
+	return 0, fmt.Errorf("oidc: unsupported id_token alg %q", alg)
+}
+
+func curveForAlg(alg string) string {
+	switch alg {
+	case "ES256":
+		return "P-256"
+	case "ES384":
+		return "P-384"
+	case "ES512":
+		return "P-521"
+	}
+	return ""
+}
+
 // VerifyIDToken validates signature and claims of an ID token.
 func (p *Provider) VerifyIDToken(ctx context.Context, token, expectedNonce string) (Claims, error) {
 	parts := strings.Split(token, ".")
@@ -317,17 +415,7 @@ func (p *Provider) VerifyIDToken(ctx context.Context, token, expectedNonce strin
 	if err := json.Unmarshal(headerJSON, &header); err != nil {
 		return Claims{}, fmt.Errorf("oidc: parse id_token header: %w", err)
 	}
-	var hash crypto.Hash
-	switch header.Alg {
-	case "RS256":
-		hash = crypto.SHA256
-	case "RS384":
-		hash = crypto.SHA384
-	case "RS512":
-		hash = crypto.SHA512
-	default:
-		return Claims{}, fmt.Errorf("oidc: unsupported id_token alg %q", header.Alg)
-	}
+
 	key, err := p.signingKey(ctx, header.Kid)
 	if err != nil {
 		return Claims{}, err
@@ -337,10 +425,8 @@ func (p *Provider) VerifyIDToken(ctx context.Context, token, expectedNonce strin
 	if err != nil {
 		return Claims{}, fmt.Errorf("oidc: decode id_token signature: %w", err)
 	}
-	digest := hash.New()
-	digest.Write(signed)
-	if err := rsa.VerifyPKCS1v15(key, hash, digest.Sum(nil), signature); err != nil {
-		return Claims{}, fmt.Errorf("oidc: id_token signature is invalid: %w", err)
+	if err := verifyJWTSignature(header.Alg, key, signed, signature); err != nil {
+		return Claims{}, err
 	}
 
 	payloadJSON, err := base64.RawURLEncoding.DecodeString(parts[1])
@@ -403,7 +489,7 @@ func (p *Provider) VerifyIDToken(ctx context.Context, token, expectedNonce strin
 	}, nil
 }
 
-func (p *Provider) signingKey(ctx context.Context, kid string) (*rsa.PublicKey, error) {
+func (p *Provider) signingKey(ctx context.Context, kid string) (crypto.PublicKey, error) {
 	if key, ok := p.cachedKey(kid); ok {
 		return key, nil
 	}
@@ -416,25 +502,23 @@ func (p *Provider) signingKey(ctx context.Context, kid string) (*rsa.PublicKey, 
 	return nil, fmt.Errorf("oidc: no signing key for kid %q", kid)
 }
 
-func (p *Provider) cachedKey(kid string) (*rsa.PublicKey, bool) {
+func (p *Provider) cachedKey(kid string) (crypto.PublicKey, bool) {
 	p.cache.mu.Lock()
 	defer p.cache.mu.Unlock()
 	if time.Since(p.cache.keysAt) > jwksTTL {
 		return nil, false
 	}
+	// A token without a kid is only unambiguous when the provider publishes one key.
 	if kid == "" && len(p.cache.keys) == 1 {
 		for _, key := range p.cache.keys {
-			if rsaKey, ok := key.(*rsa.PublicKey); ok {
-				return rsaKey, true
-			}
+			return key, true
 		}
 	}
 	key, ok := p.cache.keys[kid]
 	if !ok {
 		return nil, false
 	}
-	rsaKey, ok := key.(*rsa.PublicKey)
-	return rsaKey, ok
+	return key, true
 }
 
 func (p *Provider) refreshKeys(ctx context.Context) error {
@@ -462,8 +546,11 @@ func (p *Provider) refreshKeys(ctx context.Context) error {
 		Keys []struct {
 			Kty string "json:\"kty\""
 			Kid string "json:\"kid\""
+			Crv string "json:\"crv\""
 			N   string "json:\"n\""
 			E   string "json:\"e\""
+			X   string "json:\"x\""
+			Y   string "json:\"y\""
 		} "json:\"keys\""
 	}
 	if err := json.Unmarshal(body, &document); err != nil {
@@ -471,28 +558,57 @@ func (p *Provider) refreshKeys(ctx context.Context) error {
 	}
 	keys := map[string]crypto.PublicKey{}
 	for _, key := range document.Keys {
-		if key.Kty != "RSA" {
-			continue
+		switch key.Kty {
+		case "RSA":
+			modulus, err := base64.RawURLEncoding.DecodeString(key.N)
+			if err != nil {
+				continue
+			}
+			exponent, err := base64.RawURLEncoding.DecodeString(key.E)
+			if err != nil {
+				continue
+			}
+			value := 0
+			for _, b := range exponent {
+				value = value<<8 | int(b)
+			}
+			if value == 0 {
+				continue
+			}
+			keys[key.Kid] = &rsa.PublicKey{N: new(big.Int).SetBytes(modulus), E: value}
+		case "EC":
+			// ES256/384/512 publish the curve and the two coordinates; without them
+			// an EC token cannot be verified at all (some IdPs sign with ES384).
+			var curve elliptic.Curve
+			switch key.Crv {
+			case "P-256":
+				curve = elliptic.P256()
+			case "P-384":
+				curve = elliptic.P384()
+			case "P-521":
+				curve = elliptic.P521()
+			default:
+				continue
+			}
+			x, errX := base64.RawURLEncoding.DecodeString(key.X)
+			y, errY := base64.RawURLEncoding.DecodeString(key.Y)
+			if errX != nil || errY != nil {
+				continue
+			}
+			keys[key.Kid] = &ecdsa.PublicKey{Curve: curve, X: new(big.Int).SetBytes(x), Y: new(big.Int).SetBytes(y)}
+		case "OKP":
+			if key.Crv != "Ed25519" {
+				continue
+			}
+			raw, err := base64.RawURLEncoding.DecodeString(key.X)
+			if err != nil || len(raw) != ed25519.PublicKeySize {
+				continue
+			}
+			keys[key.Kid] = ed25519.PublicKey(raw)
 		}
-		modulus, err := base64.RawURLEncoding.DecodeString(key.N)
-		if err != nil {
-			continue
-		}
-		exponent, err := base64.RawURLEncoding.DecodeString(key.E)
-		if err != nil {
-			continue
-		}
-		value := 0
-		for _, b := range exponent {
-			value = value<<8 | int(b)
-		}
-		if value == 0 {
-			continue
-		}
-		keys[key.Kid] = &rsa.PublicKey{N: new(big.Int).SetBytes(modulus), E: value}
 	}
 	if len(keys) == 0 {
-		return errors.New("oidc: jwks document has no usable RSA key")
+		return errors.New("oidc: jwks document has no usable signing key")
 	}
 	p.cache.mu.Lock()
 	p.cache.keys = keys

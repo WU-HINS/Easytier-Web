@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { ShieldCheck } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { absolute, api } from '../../lib/http';
 import { Button, Input } from '../../ui';
 
@@ -13,12 +13,17 @@ import { Button, Input } from '../../ui';
  * is declared once in .phi-split so the brand panel and the card never drift.
  */
 export function LoginPage() {
+  const copy = useCopy();
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const oidc = useQuery({ queryKey: ['oidc-config'], queryFn: api.oidcConfig, staleTime: 60_000 });
+  // The console tells us whether self-registration is open, so a fresh
+  // deployment has a visible way in instead of a login box and no sign-up.
+  const setup = useQuery({ queryKey: ['setup'], queryFn: api.setupStatus, staleTime: 60_000 });
+  const [signup, setSignup] = useState(false);
 
   // First OIDC sign-in lands back here with ?register=1: the identity is verified
   // but has no account, and the name typed now never changes afterwards.
@@ -45,6 +50,18 @@ export function LoginPage() {
     event.preventDefault();
     setError(null);
     login.mutate();
+  };
+
+  const canRegister = setup.data?.initialized === true && setup.data?.registration_open === true;
+  const signUp = useMutation({
+    mutationFn: () => api.register(username, password),
+    onSuccess: () => login.mutate(),
+    onError: (failure: Error) => setError(failure.message || copy.login.registerFailed),
+  });
+  const submitSignUp = (event: FormEvent) => {
+    event.preventDefault();
+    setError(null);
+    signUp.mutate();
   };
 
   return (
@@ -115,6 +132,48 @@ export function LoginPage() {
               {login.isPending ? copy.login.submitting : copy.login.submit}
             </Button>
           </form>
+          )}
+
+          {registering || !canRegister ? null : signup ? (
+            <form className="mt-[var(--u-6)] space-y-[var(--u-5)]" onSubmit={submitSignUp}>
+              <h2 className="text-phi-lg font-semibold tracking-tight">{copy.login.signUpTitle}</h2>
+              <label className="block">
+                <span className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">{copy.login.username}</span>
+                <Input value={username} autoComplete="username" onChange={(event) => setUsername(event.target.value)} required />
+              </label>
+              <label className="block">
+                <span className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">{copy.login.password}</span>
+                <Input
+                  type="password"
+                  value={password}
+                  autoComplete="new-password"
+                  onChange={(event) => setPassword(event.target.value)}
+                  required
+                />
+              </label>
+              {error ? <p role="alert" className="text-phi-sm text-destructive">{error}</p> : null}
+              <Button type="submit" size="lg" className="w-full" disabled={signUp.isPending}>
+                {signUp.isPending ? copy.login.submitting : copy.login.signUpSubmit}
+              </Button>
+              <button
+                type="button"
+                className="text-phi-sm text-muted-foreground underline underline-offset-4"
+                onClick={() => setSignup(false)}
+              >
+                {copy.login.backToLogin}
+              </button>
+            </form>
+          ) : (
+            <p className="mt-[var(--u-4)] text-phi-sm text-muted-foreground">
+              {copy.login.noAccount}{' '}
+              <button
+                type="button"
+                className="underline underline-offset-4"
+                onClick={() => setSignup(true)}
+              >
+                {copy.login.signUp}
+              </button>
+            </p>
           )}
 
           {registering ? null : (<>

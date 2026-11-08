@@ -28,6 +28,8 @@ const (
 // SetupStatus is what the client asks for before rendering anything.
 type SetupStatus struct {
 	Initialized bool "json:\"initialized\""
+	// RegistrationOpen tells the login page whether to offer a sign-up link.
+	RegistrationOpen bool "json:\"registration_open\""
 }
 
 func (s *Server) handleSetupStatus(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +39,12 @@ func (s *Server) handleSetupStatus(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "internal error")
 		return
 	}
-	writeJSON(w, http.StatusOK, SetupStatus{Initialized: initialized})
+	// The login page needs this to decide whether to offer a registration link;
+	// without it a fresh deployment has no visible way in.
+	writeJSON(w, http.StatusOK, SetupStatus{
+		Initialized:      initialized,
+		RegistrationOpen: s.cfg.Settings.Bool(r.Context(), settings.KeyRegistrationOpen, true),
+	})
 }
 
 // handleSetup creates the single administrator and closes the setup endpoint.

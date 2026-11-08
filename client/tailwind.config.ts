@@ -33,12 +33,15 @@ const config: Config = {
         'phi-9': 'var(--u-9)', 'phi-10': 'var(--u-10)', 'phi-11': 'var(--u-11)', 'phi-12': 'var(--u-12)',
       },
       fontSize: {
-        'phi-sm': ['var(--u-5)', { lineHeight: '1.618' }],
-        'phi-base': ['var(--u-6)', { lineHeight: '1.618' }],
-        'phi-lg': ['var(--u-7)', { lineHeight: '1.5' }],
-        'phi-xl': ['var(--u-8)', { lineHeight: '1.382' }],
-        'phi-2xl': ['var(--u-9)', { lineHeight: '1.236' }],
-        'phi-3xl': ['var(--u-11)', { lineHeight: '1.118' }],
+        // A normal reading scale. The spacing ladder stays golden-ratio on purpose,
+        // but text sizes were taken from it too and landed on 13/21/27/34/55px:
+        // jumps that read as an accident rather than a hierarchy.
+        'phi-sm': ['13px', { lineHeight: '1.5' }],
+        'phi-base': ['16px', { lineHeight: '1.6' }],
+        'phi-lg': ['18px', { lineHeight: '1.5' }],
+        'phi-xl': ['21px', { lineHeight: '1.35' }],
+        'phi-2xl': ['26px', { lineHeight: '1.25' }],
+        'phi-3xl': ['32px', { lineHeight: '1.2' }],
       },
       maxWidth: { content: 'var(--w-content)', narrow: 'var(--w-narrow)' },
       boxShadow: {

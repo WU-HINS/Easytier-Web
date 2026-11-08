@@ -177,6 +177,7 @@ export interface AdminSettings {
 
 export interface SetupStatus {
   initialized: boolean;
+  registration_open?: boolean;
 }
 
 export const api = {

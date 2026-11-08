@@ -130,10 +130,14 @@ func (s *Server) validateCallbackURL(raw string, r *http.Request, allowInsecure 
 	if parsed.Scheme == "https" {
 		return parsed.String(), nil
 	}
-	if parsed.Scheme == "http" && allowInsecure && isLoopback(r.Host) {
+	// The switch is the operator saying "this console is reachable over plain http"
+	// (a LAN deployment, or a proxy that terminates TLS without trust_proxy). It
+	// has to cover every host, not only loopback, or the switch does nothing for
+	// the deployment that needs it.
+	if parsed.Scheme == "http" && allowInsecure {
 		return parsed.String(), nil
 	}
-	return "", fmt.Errorf("callback url must use https")
+	return "", fmt.Errorf("callback url must use https: put the console behind TLS and enable server.trust_proxy, or allow plain http with oidc.allow_insecure")
 }
 
 func isLoopback(host string) bool {

@@ -28,6 +28,11 @@ const enUS: Record<string, unknown> = {
     footer: 'Control protocol aligned with 2.7.0; every session is checked server side',
     checkingSso: 'Checking single sign-on...',
     or: 'or',
+    noAccount: 'No account yet?',
+    signUp: 'Create one',
+    signUpTitle: 'Create an account',
+    signUpSubmit: 'Create the account and sign in',
+    backToLogin: 'Back to sign-in',
   },
   setup: {
     mismatch: 'The two passwords do not match',
