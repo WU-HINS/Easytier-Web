@@ -144,7 +144,7 @@
 | F-283 数据面语义 | **OPEN** | 同上；另外「停掉 console 后设备 fail-open 还是 fail-closed」没有答案 | 真机两台：跑 overlay smoke + 手工停 console 观察 |
 | 真机移动端 / 真读屏器 | **未验证** | 本机只有 Linux 无头 Chromium，无真机、无 VoiceOver/NVDA | 用户手机（含 iOS Safari）走一遍四页签；任一读屏器听一次页签切换与表单报错 |
 | 前端调用面扫描的两类盲区 | **未验证** | `scripts/check-contract.mjs` 未修：模板字符串模板导航与行尾内联注释的假调用都判不出红 | 以 `scripts/audit-gates.sh` 的红证方式覆盖，或在交付中把"无未调用路由"限定为非模板串、非行尾注释的写法 |
-| 长时间运行稳定性 | **未验证** | `./scripts/soak.sh 1000` 在本机可跑（纯 Go e2e，不需 tun）但本轮没跑；门禁只跑默认轮次 | 机器空闲时跑一次 `EASYTIER_SOAK_ROUNDS=1000 ./scripts/soak.sh`，另在有其他负载时再跑一次 |
+| 长时间运行稳定性 | **部分验证** | `./scripts/soak.sh 1000` 已跑通：1000 轮 / 53 秒，SQLite；**未**在机器有其他负载时复跑，也未覆盖 PostgreSQL | 空闲时再跑一次；有 PG 的机器用 `EASYTIER_E2E_PG=... ./scripts/soak.sh 1000` |
 
 ### 明示但不阻塞
 
