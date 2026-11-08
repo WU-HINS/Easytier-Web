@@ -22,7 +22,11 @@ func TestUDPListenerStopsAtItsTunnelLimit(t *testing.T) {
 	if err != nil {
 		t.Fatalf("cast: %v", err)
 	}
+	// The listener is already reading, and production reads limit under mu; a bare
+	// write here is a data race that the race detector catches (review team, r253).
+	udp.mu.Lock()
 	udp.limit = 2
+	udp.mu.Unlock()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

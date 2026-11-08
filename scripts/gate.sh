@@ -165,18 +165,9 @@ else
 fi
 
 printf '\n== gate summary ==%b\n' "$summary"
-# Count the outcomes instead of leaving the reader to count lines: a SKIP is not a
-# PASS, and a summary that does not say how many of each invites the reader to
-# round "23 items, result PASS" up to "everything verified" (review team, r253).
-PASS_COUNT=$(printf '%b' "$summary" | grep -c '^  PASS  ' || true)
-FAIL_COUNT=$(printf '%b' "$summary" | grep -c '^  FAIL  ' || true)
-SKIP_COUNT=$(printf '%b' "$summary" | grep -c '^  SKIP  ' || true)
-printf '\n  totals: PASS %s / FAIL %s / SKIP %s\n' "$PASS_COUNT" "$FAIL_COUNT" "$SKIP_COUNT"
-if [ "$SKIP_COUNT" -ne 0 ]; then
-  printf '  skip list: '
-  printf '%b' "$summary" | grep '^  SKIP  ' | sed 's/^  SKIP  //' | paste -sd '; ' -
-  printf '\n'
-fi
+# Counting lives in scripts/gate-summary.sh so this file stays a plain list of steps.
+./scripts/gate-summary.sh <<< "$summary"
+
 if [ "$FAILED" -ne 0 ]; then
   echo "
 result: FAIL"
