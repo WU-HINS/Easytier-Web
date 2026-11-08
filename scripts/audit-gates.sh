@@ -56,7 +56,7 @@ echo "== gate audit: every check must be able to fail =="
 
 audit "design tokens" "client/src/ui/tokens.css" "p='client/src/ui/tokens.css'; s=open(p).read(); s=s.replace('--phi: 1.618034;','--phi: 1.5;',1); open(p,'w').write(s)" "node scripts/check-design-tokens.mjs"
 
-audit "design contrast" "client/src/ui/tokens.css" "p='client/src/ui/tokens.css'; s=open(p).read(); s=s.replace('--muted-foreground: 215 22% 40%;','--muted-foreground: 215 22% 97%;',1); open(p,'w').write(s)" "node scripts/check-contrast.mjs"
+audit "design contrast" "client/src/ui/tokens.css" "p='client/src/ui/tokens.css'; s=open(p).read(); s=s.replace('--muted-foreground: 215 20% 40%;','--muted-foreground: 215 20% 97%;',1); open(p,'w').write(s)" "node scripts/check-contrast.mjs"
 
 audit "api contract" "client/src/lib/http.ts" "p='client/src/lib/http.ts'; s=open(p).read(); s=s.replace(chr(39)+'/networks'+chr(39),chr(39)+'/networksX'+chr(39),1); open(p,'w').write(s)" "node scripts/check-contract.mjs"
 
@@ -94,7 +94,7 @@ audit "root charter" "root.md" \
 "p='root.md'; s=open(p).read(); old='postgres e2e'; assert old in s, 'anchor missing'; open(p,'w').write(s.replace(old, 'postgres end-to-end',1))" \
 "node scripts/check-docs.mjs"
 audit "dark theme tokens" "client/src/ui/tokens.css" \
-"p='client/src/ui/tokens.css'; s=open(p).read(); old='--muted-foreground: 215 20% 68%;'; assert old in s, 'anchor missing'; open(p,'w').write(s.replace(old, '',1))" \
+"p='client/src/ui/tokens.css'; s=open(p).read(); old='--muted-foreground: 215 20% 70%;'; assert old in s, 'anchor missing'; open(p,'w').write(s.replace(old, '',1))" \
 "node scripts/check-contrast.mjs"
 audit "read route session" "internal/httpapi/router.go" \
 "p='internal/httpapi/router.go'; s=open(p).read(); old='s.requireUser(s.handleListMachines)'; assert old in s, 'anchor missing'; open(p,'w').write(s.replace(old, 's.handleListMachines',1))" \
