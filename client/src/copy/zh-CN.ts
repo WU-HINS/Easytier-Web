@@ -387,5 +387,5 @@ export const copy = {
     public_server_url: '公共服务器地址',
     unknown: '该字段',
   },
-  common: { logout: '退出登录', theme: '主题', background: '背景图地址', save: '保存', loading: '加载中…', retry: '重试', failed: '加载失败' },
+  common: { logout: '退出登录', theme: '主题', background: '背景图地址', save: '保存', loading: '加载中…', retry: '重试', failed: '加载失败', routeLoading: '加载中 · Loading' },
 } as const;

@@ -401,6 +401,7 @@ const enUS: Record<string, unknown> = {
     loading: 'Loading...',
     retry: 'Retry',
     failed: 'Failed to load',
+    routeLoading: 'Loading...',
   },
 };
 

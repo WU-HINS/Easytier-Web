@@ -6,6 +6,7 @@ import { AppShell } from './app/app-shell';
 import { LoginPage } from './features/auth/login-page';
 import { DashboardPage } from './features/dashboard/dashboard-page';
 import { SetupPage } from './features/setup/setup-page';
+import { useCopy } from './copy/locale';
 
 // Everything behind the shell is split out. On a slow link the first screen used to
 // wait for the whole console - 369 KB, about seven seconds at 50 KB/s - before it
@@ -25,10 +26,11 @@ const AdminSettingsPage = lazy(() => import('./features/admin/settings-page').th
 // A screen reader has to know the route is loading, so this is a live status region
 // rather than a bare spinner.
 function RouteFallback() {
+  const copy = useCopy();
   return (
     <div role="status" aria-live="polite" className="flex items-center justify-center gap-[var(--u-2)] p-[var(--pad-card)] text-phi-sm text-muted-foreground">
       <span aria-hidden="true" className="inline-block h-[var(--u-4)] w-[var(--u-4)] animate-spin rounded-full border-2 border-border border-t-primary" />
-      加载中 · Loading
+      {copy.common.routeLoading}
     </div>
   );
 }
