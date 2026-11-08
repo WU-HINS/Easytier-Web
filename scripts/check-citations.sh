@@ -36,13 +36,37 @@ FAILED=$(grep -c '^--- FAIL' "$WORK/out.log" || true)
 fail=0
 if [ "$STATUS" -ne 0 ] || [ "$FAILED" -ne 0 ]; then
   echo "citations: $FAILED cited test(s) failed"
-  grep '^--- FAIL' "$WORK/out.log" | head -n 10 | sed 's/^/  /'
+  grep "^--- FAIL" "$WORK/out.log" | head -n 10 | sed "s/^/  /"
   fail=1
 fi
+
+# A cited test may only skip when it is declared environment gated and the
+# dependency it names is genuinely absent. Anything else is a test that was turned
+# off while the ledger still cites it as evidence.
+DECLARED=0
 if [ "$SKIPPED" -ne 0 ]; then
-  echo "citations: $SKIPPED cited test(s) skipped; the evidence is missing, not green"
-  grep -B1 '^--- SKIP' "$WORK/out.log" | grep '^=== RUN' | head -n 10 | sed 's/^/  /'
-  fail=1
+  UNDECLARED=0
+  while IFS= read -r name; do
+    [ -z "$name" ] && continue
+    dependency=$(awk -F'|' -v n="$name" '$1 == n { print $2 }' scripts/env-gated-tests.txt)
+    if [ -z "$dependency" ]; then
+      echo "  undeclared skip: $name (not in scripts/env-gated-tests.txt)"
+      UNDECLARED=$((UNDECLARED + 1))
+      continue
+    fi
+    if [ -n "$(printenv "$dependency" || true)" ]; then
+      echo "  undeclared skip: $name ($dependency is set, so it should have run)"
+      UNDECLARED=$((UNDECLARED + 1))
+    else
+      DECLARED=$((DECLARED + 1))
+    fi
+  done <<EOF_SKIPS
+$(grep "^--- SKIP: Test" "$WORK/out.log" | sed "s/^--- SKIP: //; s/ (.*//")
+EOF_SKIPS
+  if [ "$UNDECLARED" -ne 0 ]; then
+    echo "citations: $UNDECLARED cited test(s) skipped without a declared dependency"
+    fail=1
+  fi
 fi
 if [ "$RAN" -lt 100 ]; then
   echo "citations: only $RAN tests ran; the -run pattern is not matching"
@@ -52,4 +76,4 @@ fi
 if [ "$fail" -ne 0 ]; then
   exit 1
 fi
-echo "citations: $RAN cited test(s) ran, none skipped, none failed"
+echo "citations: $RAN cited test(s) ran, $DECLARED skipped for a declared dependency, none failed"

@@ -1,0 +1,12 @@
+# Cited tests that need something this machine may not have.
+#
+# Format: <TestName>|<environment variable that proves the dependency is present>
+#
+# The citation guard reads this list: a skipped test is acceptable only when it
+# appears here AND the variable is unset. If the variable is set and the test still
+# skips, that is a test that was turned off while the ledger still cites it, and the
+# guard fails. Add an entry only with a reviewer note in the ledger saying why the
+# dependency cannot be part of the default gate.
+TestFreshPostgresBootstrap|EASYTIER_TEST_PG_DSN
+TestPostgresBackupCommand|EASYTIER_TEST_PG_DSN
+TestMissingTableIsRecreatedOnPostgres|EASYTIER_TEST_PG_DSN
