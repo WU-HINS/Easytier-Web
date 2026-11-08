@@ -23,8 +23,8 @@ func TestFeedWorstCaseTiming(t *testing.T) {
 		_, _ = mux.feed(testCase.packet)
 		elapsed := time.Since(start)
 		t.Logf("%-26s %v", testCase.name, elapsed)
-		if elapsed > 200*time.Millisecond {
-			t.Fatalf("%s took %v, that is a slow path an attacker can repeat", testCase.name, elapsed)
+		if elapsed > time.Duration(200*raceOverheadFactor)*time.Millisecond {
+			t.Fatalf("%s took %v (budget %v, race factor %d), that is a slow path an attacker can repeat", testCase.name, elapsed, time.Duration(200*raceOverheadFactor)*time.Millisecond, raceOverheadFactor)
 		}
 	}
 }
