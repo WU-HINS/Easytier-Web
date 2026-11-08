@@ -243,6 +243,13 @@ func run() error {
 	// deliver them: every push test calls the reconciler directly.
 	go enforcer.Run(ctx)
 	log.Printf("central network reconciler started (interval 5s)")
+	// A delete is a revocation: let the API push immediately instead of waiting for
+	// the next tick, so a 204 means the device has been told.
+	api.SetReconcileNow(func(pushCtx context.Context) {
+		if _, err := enforcer.ReconcileAll(pushCtx); err != nil {
+			log.Printf("immediate reconcile after revocation: %v", err)
+		}
+	})
 
 	// Record this process and warn if the database is shared with another
 	// console: device tunnels live in memory, so a second replica would see half

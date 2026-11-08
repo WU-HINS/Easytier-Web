@@ -268,10 +268,10 @@ HeartbeatResponse 只有两个可选字段：`heartbeat_interval_ms` / `heartbea
 
 | 设备状态 | 何时停止 | 证据 |
 |---|---|---|
-| 在线 | **一个对账周期内**（默认 5 秒） | `Reconciler.stopOrphans`：控制台创建的实例若不在期望集合里，用 `RetainNetworkInstance` 传空集合停掉；见 `TestDeletingTheLastNetworkStopsTheInstance` |
+| 在线 | **删除请求返回前**（同步触发一次对账，最长 3 秒；超时则退回下一周期 ≤5 秒） | `Reconciler.stopOrphans`：控制台创建的实例若不在期望集合里，用 `RetainNetworkInstance` 传空集合停掉；见 `TestDeletingTheLastNetworkStopsTheInstance` |
 | 离线 | 重新连回控制台时 | 同上，第一次对账即生效 |
 | 设备自己的实例 | **不下手** | 控制台只停自己创建的实例；见 `TestForeignInstancesAreLeftAlone` |
 
-所以"删除即吊销"对**在线**设备成立（秒级），对**离线**设备成立但发生在它回来那一刻。控制面联系不上的设备，任何控制面都吊销不了——这一点无法用实现弥补，只能靠"设备必须连回才能持续被管理"这个前提。
+所以"删除即吊销"对**在线**设备成立，且是**请求返回前**就已下发（`handleDeleteNetwork` / `handleRemoveMember` 调用 `reconcileAfterRevocation`）；对**离线**设备成立，但发生在它连回来那一刻。控制面联系不上的设备，任何控制面都吊销不了——这一点无法用实现弥补，只能靠"设备必须连回才能持续被管理"这个前提。
 
 > 界面文案必须与本节一致：不得写成"立即断网"，也不得写成"删除不影响网络"。

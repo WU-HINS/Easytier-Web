@@ -179,6 +179,9 @@ func (s *Server) handleRemoveMember(w http.ResponseWriter, r *http.Request, user
 		return
 	}
 	log.Sub("Network").Tag("MEMBER").Info("member removed " + member.ID)
+	// Removing a member is a revocation too: push before answering, so the device
+	// stops holding the network the moment the operator sees it gone.
+	s.reconcileAfterRevocation(r.Context())
 	w.WriteHeader(http.StatusNoContent)
 }
 

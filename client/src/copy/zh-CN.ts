@@ -197,7 +197,7 @@ export const copy = {
     addMember: '添加成员',
     remove: '移除',
     deleteNetwork: '删除网络',
-    confirmDelete: '确认删除这个网络？成员关系会一并移除，网络实例随即停止：在线设备在一个对账周期内（通常 ≤5 秒）被停止，离线设备在重新连回控制台时被停止。',
+    confirmDelete: '确认删除这个网络？成员关系会一并移除并立即下发吊销：在线设备在本次请求返回前被停止，离线设备在重新连回时被停止。',
     noCandidates: '没有可添加的设备（先让设备接入选一台）',
     noMembers: '这个网络还没有成员',
     compileError: '编译失败：',

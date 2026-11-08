@@ -36,6 +36,7 @@ type harness struct {
 	manager *session.Manager
 	cfg     *settings.Settings
 	server  *httptest.Server
+	api     *httpapi.Server
 }
 
 func newHarness(t *testing.T) *harness {
@@ -61,7 +62,7 @@ func newHarness(t *testing.T) *harness {
 	}
 	server := httptest.NewServer(api.Handler())
 	t.Cleanup(server.Close)
-	return &harness{store: store, manager: manager, cfg: cfg, server: server}
+	return &harness{store: store, manager: manager, cfg: cfg, server: server, api: api}
 }
 
 func (h *harness) client(t *testing.T) *http.Client {

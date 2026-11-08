@@ -205,7 +205,7 @@ const enUS: Record<string, unknown> = {
     addMember: 'Add member',
     remove: 'Remove',
     deleteNetwork: 'Delete network',
-    confirmDelete: 'Delete this network and every membership in it? The network instance is stopped as part of the deletion: online devices within one reconcile pass (a few seconds), offline devices when they reconnect.',
+    confirmDelete: 'Delete this network and every membership in it? The revocation is pushed before this request returns: online devices are stopped now, offline devices when they reconnect.',
     noCandidates: 'No device left to add (a device has to connect first)',
     noMembers: 'This network has no members yet',
     compileError: 'Compile error',

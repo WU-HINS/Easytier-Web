@@ -73,6 +73,11 @@ type Server struct {
 	cfg Config
 	mux *http.ServeMux
 
+	// reconcileNow, when set, pushes the compiled intent immediately. A delete is a
+	// revocation, and waiting for the next tick means the operator sees a 204 while
+	// the device is still running the network (review team, r257).
+	reconcileMu  sync.RWMutex
+	reconcileNow func(context.Context)
 	oidcMu       sync.RWMutex
 	oidcProvider *oidc.Provider
 
@@ -875,6 +880,9 @@ func (s *Server) handleDeleteNetwork(w http.ResponseWriter, r *http.Request, use
 		writeError(w, http.StatusInternalServerError, "internal error")
 		return
 	}
+	// Revocation first, then the answer: the operator should not see 204 while the
+	// device is still running the network it just deleted.
+	s.reconcileAfterRevocation(r.Context())
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -1065,6 +1073,27 @@ func writeJSON(w http.ResponseWriter, status int, payload any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(payload)
+}
+
+// SetReconcileNow installs the push used after a revocation. The daemon wires it to
+// the reconciler it already runs; tests wire it to a counter.
+func (s *Server) SetReconcileNow(fn func(context.Context)) {
+	s.reconcileMu.Lock()
+	s.reconcileNow = fn
+	s.reconcileMu.Unlock()
+}
+
+// reconcileAfterRevocation pushes without letting a slow device delay the response.
+func (s *Server) reconcileAfterRevocation(ctx context.Context) {
+	s.reconcileMu.RLock()
+	push := s.reconcileNow
+	s.reconcileMu.RUnlock()
+	if push == nil {
+		return
+	}
+	bounded, cancel := context.WithTimeout(context.WithoutCancel(ctx), 3*time.Second)
+	defer cancel()
+	push(bounded)
 }
 
 func writeError(w http.ResponseWriter, status int, message string) {
