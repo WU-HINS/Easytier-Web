@@ -63,7 +63,7 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
     <Card>
       <CardBody>
         <div className="flex flex-wrap items-center justify-between gap-[var(--u-3)]">
-          <h2 className="text-phi-lg font-semibold">{copy.networks.membersTitle}</h2>
+          <h2 className="text-phi-xl font-semibold">{copy.networks.membersTitle}</h2>
           <div className="flex items-center gap-[var(--u-2)]">
             {onClose ? (
               <Button variant="ghost" onClick={onClose}>

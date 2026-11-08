@@ -129,7 +129,7 @@ export function AdminSettingsPage() {
   return (
     <form className="space-y-[var(--gap-section)]" onSubmit={submit} noValidate>
       <header>
-        <h1 className="text-phi-2xl font-semibold tracking-tight">{copy.adminSettings.title}</h1>
+        <h1 className="text-phi-3xl font-semibold tracking-tight">{copy.adminSettings.title}</h1>
         <p className="mt-[var(--u-2)] text-phi-sm text-muted-foreground">{copy.adminSettings.subtitle}</p>
       </header>
 
@@ -138,7 +138,7 @@ export function AdminSettingsPage() {
       <div className="phi-split gap-[var(--gap-card)]">
         <Card>
           <CardBody className="space-y-[var(--u-5)]">
-            <h2 className="text-phi-lg font-semibold">{copy.adminSettings.sectionRegistration}</h2>
+            <h2 className="text-phi-xl font-semibold">{copy.adminSettings.sectionRegistration}</h2>
             <Field label={copy.adminSettings.maxInstancesLabel} hint={copy.adminSettings.maxInstancesHint} error={errorFor('max_instances_per_user')}>
               <Input type="number" min={0} value={draft.max_instances_per_user}
                 aria-invalid={Boolean(errorFor('max_instances_per_user'))}
@@ -169,7 +169,7 @@ export function AdminSettingsPage() {
 
         <Card>
           <CardBody className="space-y-[var(--u-5)]">
-            <h2 className="text-phi-lg font-semibold">OIDC</h2>
+            <h2 className="text-phi-xl font-semibold">OIDC</h2>
             <label className="flex items-center gap-[var(--u-3)] text-phi-base">
               <input type="checkbox" checked={draft.oidc_enabled}
                 onChange={(event) => update('oidc_enabled', event.target.checked)} />
@@ -208,7 +208,7 @@ export function AdminSettingsPage() {
 
         <Card>
           <CardBody className="space-y-[var(--u-5)]">
-            <h2 className="text-phi-lg font-semibold">{copy.adminSettings.sectionAccess}</h2>
+            <h2 className="text-phi-xl font-semibold">{copy.adminSettings.sectionAccess}</h2>
             <p className="text-phi-sm text-muted-foreground">
               {copy.adminSettings.wsHintPrefix}<code>{copy.adminSettings.wsSample}</code>
             </p>

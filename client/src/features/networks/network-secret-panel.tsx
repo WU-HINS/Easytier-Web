@@ -26,7 +26,7 @@ export function NetworkSecretPanel({ networkID }: { networkID: string }) {
     <Card>
       <CardBody className="space-y-[var(--u-3)]">
         <div>
-          <h2 className="text-phi-lg font-semibold">{copy.networkSettings.secretTitle}</h2>
+          <h2 className="text-phi-xl font-semibold">{copy.networkSettings.secretTitle}</h2>
           <p className="mt-[var(--u-1)] text-phi-sm text-muted-foreground">{copy.networkSettings.secretHint}</p>
         </div>
         <div className="flex flex-wrap items-center gap-[var(--u-2)]">

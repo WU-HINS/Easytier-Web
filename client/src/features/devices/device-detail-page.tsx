@@ -81,7 +81,7 @@ export function DeviceDetailPage() {
         </Link>
         <div className="flex flex-wrap items-end justify-between gap-[var(--gap-card)]">
           <div className="min-w-0">
-            <h1 className="truncate text-phi-2xl font-semibold tracking-tight">
+            <h1 className="truncate text-phi-3xl font-semibold tracking-tight">
               {device.alias || device.hostname || device.machine_id}
             </h1>
             <p className="mt-[var(--u-2)] break-all text-phi-sm text-muted-foreground">{device.machine_id}</p>
@@ -110,7 +110,7 @@ export function DeviceDetailPage() {
       </header>
       <Card>
         <CardBody className="space-y-[var(--u-3)]">
-          <h2 className="text-phi-lg font-semibold">{copy.devices.detailNetworks}</h2>
+          <h2 className="text-phi-xl font-semibold">{copy.devices.detailNetworks}</h2>
           {memberships.length === 0 ? (
             <p className="text-phi-sm text-muted-foreground">{copy.devices.detailNoNetworks}</p>
           ) : null}

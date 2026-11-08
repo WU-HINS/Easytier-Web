@@ -40,7 +40,7 @@ export function DashboardPage() {
   return (
     <div className="space-y-[var(--gap-section)]">
       <header className="flex flex-wrap items-end justify-between gap-[var(--gap-card)]">
-        <h1 className="text-phi-2xl font-semibold tracking-tight">{copy.dashboard.title}</h1>
+        <h1 className="text-phi-3xl font-semibold tracking-tight">{copy.dashboard.title}</h1>
         <label className="flex items-center gap-[var(--u-2)] text-phi-sm text-muted-foreground">
           <input type='checkbox' checked={autoRefresh} onChange={(event) => setAutoRefresh(event.target.checked)} />
           {copy.dashboard.autoRefresh}
@@ -59,7 +59,7 @@ export function DashboardPage() {
           <Card key={stat.label}>
             <CardBody>
               <p className="text-phi-sm text-muted-foreground">{stat.label}</p>
-              <p className="mt-[var(--u-2)] text-phi-3xl font-semibold tabular-nums">
+              <p className="mt-[var(--u-2)] text-phi-2xl font-semibold tabular-nums">
                 {stat.failed ? (
                   <span className="text-muted-foreground">—</span>
                 ) : stat.value === undefined ? (

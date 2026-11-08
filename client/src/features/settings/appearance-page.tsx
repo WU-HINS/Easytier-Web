@@ -24,14 +24,14 @@ const modes: { value: ThemeMode; label: string }[] = [
   return (
     <div className="space-y-[var(--gap-section)]">
       <header>
-        <h1 className="text-phi-2xl font-semibold tracking-tight">{copy.appearance.title}</h1>
+        <h1 className="text-phi-3xl font-semibold tracking-tight">{copy.appearance.title}</h1>
         <p className="mt-[var(--u-2)] text-phi-sm text-muted-foreground">{copy.appearance.subtitle}</p>
       </header>
 
       <div className="phi-split gap-[var(--gap-card)]">
         <Card>
           <CardBody className="space-y-[var(--u-4)]">
-            <h2 className="text-phi-lg font-semibold">{copy.common.theme}</h2>
+            <h2 className="text-phi-xl font-semibold">{copy.common.theme}</h2>
             <div className="flex gap-[var(--u-2)]">
               {modes.map((item) => (
                 <Button
@@ -49,7 +49,7 @@ const modes: { value: ThemeMode; label: string }[] = [
 
         <Card>
           <CardBody>
-            <h2 className="text-phi-lg font-semibold">{copy.common.background}</h2>
+            <h2 className="text-phi-xl font-semibold">{copy.common.background}</h2>
             <form className="mt-[var(--u-4)] space-y-[var(--u-3)]" onSubmit={submit}>
               <Input
                 aria-label={copy.common.background}

@@ -27,7 +27,7 @@ export function BlockedDevices() {
     <Card>
       <CardBody className="space-y-[var(--u-3)]">
         <div>
-          <h2 className="text-phi-lg font-semibold">{copy.devices.blockedTitle}</h2>
+          <h2 className="text-phi-xl font-semibold">{copy.devices.blockedTitle}</h2>
           <p className="mt-[var(--u-1)] text-phi-sm text-muted-foreground">{copy.devices.blockedHint}</p>
         </div>
         {rows.map((machine) => (

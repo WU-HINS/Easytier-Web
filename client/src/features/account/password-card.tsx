@@ -32,7 +32,7 @@ export function PasswordCard() {
 		<Card>
 			<CardBody className="space-y-[var(--u-4)]">
 				<div>
-					<h2 className="text-phi-lg font-semibold">{copy.account.passwordTitle}</h2>
+					<h2 className="text-phi-xl font-semibold">{copy.account.passwordTitle}</h2>
 					<p className="mt-[var(--u-1)] text-phi-sm text-muted-foreground">{copy.account.passwordHint}</p>
 				</div>
 				<label className="block">

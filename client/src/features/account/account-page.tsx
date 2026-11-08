@@ -41,7 +41,7 @@ export function AccountPage() {
   return (
     <div className="space-y-[var(--gap-section)]">
       <header>
-        <h1 className="text-phi-2xl font-semibold tracking-tight">{copy.account.title}</h1>
+        <h1 className="text-phi-3xl font-semibold tracking-tight">{copy.account.title}</h1>
         <p className="mt-[var(--u-2)] text-phi-sm text-muted-foreground">{copy.account.subtitle}</p>
       </header>
 

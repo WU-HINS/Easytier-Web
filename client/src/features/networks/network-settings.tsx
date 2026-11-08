@@ -32,7 +32,7 @@ export function NetworkSettings({ networkID, displayName }: { networkID: string;
 		<div className="space-y-[var(--gap-card)]">
 			<Card>
 				<CardBody className="space-y-[var(--u-3)]">
-					<h2 className="text-phi-lg font-semibold">{copy.networkSettings.title}</h2>
+					<h2 className="text-phi-xl font-semibold">{copy.networkSettings.title}</h2>
 					<div className="flex flex-wrap items-end gap-[var(--u-3)]">
 						<label className="min-w-0 flex-1">
 							<span className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">{copy.networkSettings.name}</span>

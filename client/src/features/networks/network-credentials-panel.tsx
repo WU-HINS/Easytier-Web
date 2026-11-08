@@ -61,7 +61,7 @@ export function NetworkCredentialsPanel({ networkID }: { networkID: string }) {
     <Card>
       <CardBody className="space-y-[var(--u-3)]">
         <div className="flex flex-wrap items-center justify-between gap-[var(--u-3)]">
-          <h2 className="text-phi-lg font-semibold">{copy.networkSettings.credentials}</h2>
+          <h2 className="text-phi-xl font-semibold">{copy.networkSettings.credentials}</h2>
           <Button type='button' disabled={issue.isPending} onClick={() => issue.mutate()}>
             {copy.networkSettings.issue}
           </Button>

@@ -136,7 +136,7 @@ export function LoginPage() {
 
           {registering || !canRegister ? null : signup ? (
             <form className="mt-[var(--u-6)] space-y-[var(--u-5)]" onSubmit={submitSignUp}>
-              <h2 className="text-phi-lg font-semibold tracking-tight">{copy.login.signUpTitle}</h2>
+              <h2 className="text-phi-xl font-semibold tracking-tight">{copy.login.signUpTitle}</h2>
               <label className="block">
                 <span className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">{copy.login.username}</span>
                 <Input value={username} autoComplete="username" onChange={(event) => setUsername(event.target.value)} required />

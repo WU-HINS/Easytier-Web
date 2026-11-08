@@ -78,7 +78,7 @@ export function NetworkDetailPage() {
         </Link>
         <div className="flex flex-wrap items-end justify-between gap-[var(--gap-card)]">
           <div className="min-w-0">
-            <h1 className="truncate text-phi-2xl font-semibold tracking-tight">{network.display_name}</h1>
+            <h1 className="truncate text-phi-3xl font-semibold tracking-tight">{network.display_name}</h1>
             <p className="mt-[var(--u-2)] truncate text-phi-sm text-muted-foreground">
               {network.network_name} · {network.networking_method} · {network.virtual_cidr ?? '—'}
             </p>

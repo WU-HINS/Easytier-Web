@@ -75,7 +75,7 @@ export function NetworkAclPanel({ networkID }: { networkID: string }) {
       <CardBody className="space-y-[var(--u-4)]">
         <div className="flex flex-wrap items-center justify-between gap-[var(--u-3)]">
           <div>
-            <h2 className="text-phi-lg font-semibold">{copy.networkSettings.acl}</h2>
+            <h2 className="text-phi-xl font-semibold">{copy.networkSettings.acl}</h2>
             <p className="mt-[var(--u-1)] text-phi-sm text-muted-foreground">{copy.networkSettings.aclHint}</p>
           </div>
           <div className="flex items-center gap-[var(--u-2)]">

@@ -55,7 +55,7 @@ export function EnrollCard() {
     <Card>
       <CardBody className="space-y-[var(--u-3)]">
         <div>
-          <h2 className="text-phi-lg font-semibold">{copy.devices.enrollTitle}</h2>
+          <h2 className="text-phi-xl font-semibold">{copy.devices.enrollTitle}</h2>
           <p className="mt-[var(--u-1)] text-phi-sm text-muted-foreground">{copy.devices.enrollHint}</p>
         </div>
         <div className="flex flex-wrap items-center gap-[var(--u-2)]">

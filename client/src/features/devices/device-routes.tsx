@@ -35,7 +35,7 @@ export function DeviceRoutes({ machine, onClose }: { machine: Machine; onClose: 
     <Card>
       <CardBody>
         <div className="flex flex-wrap items-center justify-between gap-[var(--u-3)]">
-          <h2 className="text-phi-lg font-semibold">{copy.routes.title}</h2>
+          <h2 className="text-phi-xl font-semibold">{copy.routes.title}</h2>
           <div className="flex items-center gap-[var(--u-2)]">
             <Badge tone={machine.online ? 'success' : 'neutral'}>
               {machine.online ? copy.devices.online : copy.devices.offline}

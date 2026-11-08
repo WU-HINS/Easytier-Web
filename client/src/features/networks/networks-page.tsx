@@ -62,7 +62,7 @@ export function NetworksPage() {
     <div className="space-y-[var(--gap-section)]">
       <header className="flex flex-wrap items-end justify-between gap-[var(--gap-card)]">
         <div>
-          <h1 className="text-phi-2xl font-semibold tracking-tight">{copy.networks.title}</h1>
+          <h1 className="text-phi-3xl font-semibold tracking-tight">{copy.networks.title}</h1>
           <p className="mt-[var(--u-2)] text-phi-sm text-muted-foreground">{copy.networks.subtitle}</p>
         </div>
       </header>
@@ -126,7 +126,7 @@ export function NetworksPage() {
 
         <Card>
           <CardBody>
-            <h2 className="text-phi-lg font-semibold">{copy.networks.create}</h2>
+            <h2 className="text-phi-xl font-semibold">{copy.networks.create}</h2>
             <form className="mt-[var(--u-5)] space-y-[var(--u-4)]" onSubmit={submit}>
               <label className="block">
                 <span className="mb-[var(--u-2)] block text-phi-sm text-muted-foreground">{copy.networks.name}</span>
