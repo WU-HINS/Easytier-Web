@@ -1,72 +1,89 @@
 /**
  * Design tokens (shadcn convention + golden-ratio geometry).
  *
- * Geometry ladder: every size is 8 * phi^(n/2), phi = 1.618034, so spacing,
- * radii and type sizes all share one ratio. Colour values are HSL triplets so
- * Tailwind can apply alpha without a second variable per shade.
+ * Values follow the HiDNS console: same semantics, same ladder, same layer model
+ * (L1 art / L2 scrim / L3 panels / L4 content). Where we differ it is written down
+ * next to the value so the difference is a decision, not drift.
  */
 @layer base {
   :root {
     --phi: 1.618034;
 
     /* ── semantic colours (light) ── */
-    --background: 220 33% 98%;
+    /* HiDNS keeps the light surface pure white because the art layer sits behind it;
+       a tinted background plus a tinted scrim reads as muddy. */
+    --background: 0 0% 100%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
-    --muted: 216 28% 95%;
-    --muted-foreground: 215 22% 40%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    /* 40%: 6.13:1 on white, 5.60:1 on muted (the old 47% only reached 4.29:1) */
+    --muted-foreground: 215 20% 40%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    /* 35%: 5.03:1 with white text */
     --primary: 199 89% 35%;
     --primary-foreground: 0 0% 100%;
     --destructive: 0 72% 45%;
-    --border: 216 22% 84%;
+    --destructive-foreground: 0 0% 100%;
+    /* --border is a decorative divider; --input is a control edge and has to clear
+       SC 1.4.11 (3:1), which 84% does and 91% did not. */
+    --border: 215 22% 84%;
     --input: 215 20% 58%;
     --ring: 199 89% 35%;
     --success: 158 64% 32%;
     --warning: 32 94% 40%;
     --radius: 0.5rem;
-		/* Geometry and elevation that globals.css references by name. r132
-		   tokenised these values but never declared them, so the focus ring,
-		   card borders, panel shadow and grid lines silently fell back to
-		   none (found by the review team in r134). */
-		--hairline: 1px;
-		--focus-ring-width: calc(var(--u-3) / 4);
-		/* A shadow is always dark. Using --foreground made every card glow white in
-		   the dark theme, because there the text colour is near white (review
-		   team, r140). */
-		--shadow-panel: 0 1px 2px hsl(222 47% 11% / 0.06), 0 18px 40px -28px hsl(222 47% 11% / 0.45);
-		/* The ladder stopped at 12 while two features already sized things at 16 and 24. */
-		--u-13: 89px;
-		--u-14: 113px;
-		--u-15: 144px;
-		--u-16: 183px;
-		--u-17: 232px;
-		--u-18: 295px;
-		--u-19: 376px;
-		--u-20: 478px;
-		--u-21: 608px;
-		--u-22: 774px;
-		--u-23: 984px;
-		--u-24: 1252px;
+
+    --hairline: 1px;
+    --focus-ring-width: calc(var(--u-3) / 4);
+    /* A shadow is always dark: using --foreground made every card glow white in the
+       dark theme (review team, r140). */
+    --shadow-panel: 0 1px 2px hsl(222 47% 11% / 0.06), 0 18px 40px -28px hsl(222 47% 11% / 0.45);
 
     /* ── golden ratio geometry (8 * phi^(n/2)) ── */
     --u-1: 5px;  --u-2: 6px;  --u-3: 8px;  --u-4: 10px;
     --u-5: 13px; --u-6: 16px; --u-7: 21px; --u-8: 27px;
     --u-9: 34px; --u-10: 43px; --u-11: 55px; --u-12: 70px;
+    /* The ladder stopped at 12 while two features already sized things at 16 and 24. */
+    --u-13: 89px;  --u-14: 113px; --u-15: 144px; --u-16: 183px;
+    --u-17: 232px; --u-18: 295px; --u-19: 376px; --u-20: 478px;
+    --u-21: 608px; --u-22: 774px; --u-23: 984px; --u-24: 1252px;
 
-    --h-header: var(--u-11);
-    --w-sidebar: calc(var(--u-12) * 3.3);
-    --w-content: calc(var(--u-12) * 17.9);
-    --w-narrow: calc(var(--u-12) * 14);
-    --pad-card: var(--u-8);
-    --gap-card: var(--u-6);
-    --gap-section: var(--u-10);
+    /* Layout numbers are literals, not products: a page gutter that reads 34px in
+       the design file should read 34px in devtools. */
+    --h-header: 55px;
+    --w-sidebar: 232px;
+    --w-sidebar-collapsed: 89px;
+    --w-content: 1252px;
+    --w-content-narrow: 984px;
+    --w-content-wide: 1592px;
+    --w-narrow: 984px;
+    --w-auth-card: 376px;
+    --pad-card: 27px;
+    --gap-card: 16px;
+    --gap-section: 43px;
+    --pad-page-x: 34px;
+    --pad-page-y: 27px;
+    --h-control-sm: 27px;
+    --h-control: 34px;
+    --h-control-lg: 43px;
+    --shell-h: 100dvh;
 
     /* ── background layers (L1 art / L2 scrim / L3 panels / L4 content) ── */
+    /* Deviation from HiDNS on purpose: their default art is a third-party photo feed.
+       A self-hosted console must not phone a stranger's server on every load, so the
+       art layer defaults to our own aurora and any http(s) URL can be set through
+       EASYTIER_BACKGROUND (or the appearance page) to get the HiDNS look. */
     --app-bg-image: none;
-    --scrim-rgb: 248 250 252;
-    --scrim-alpha: 0.78;
+    --scrim-rgb: 255 255 255;
+    --scrim-alpha: 0.72;
+    /* Panels are near-opaque on purpose: a translucent panel over art drops the card
+       contrast to ~1.0 and makes two cards on one page differ in hue. */
     --panel-alpha: 1;
+    --panel-blur: 0px;
     --chrome-alpha: 0.92;
     --chrome-blur: 18px;
     --aurora-a: 199 89% 60%;
@@ -75,24 +92,35 @@
   }
 
   .dark {
-    --background: 222 47% 7%;
+    --background: 222 45% 7%;
     --foreground: 210 40% 96%;
-    --card: 222 40% 10%;
+    /* 14%, not 10%: against a 7% background a 10% card sat 3% away and every panel
+       leaned entirely on its 1px border to exist (review round r259, R-A). */
+    --card: 222 38% 14%;
     --card-foreground: 210 40% 96%;
-    --muted: 217 33% 15%;
-    --muted-foreground: 215 20% 68%;
-    --primary: 199 89% 48%;
-    --primary-foreground: 222 47% 7%;
+    --popover: 222 38% 14%;
+    --popover-foreground: 210 40% 96%;
+    --muted: 222 30% 18%;
+    --muted-foreground: 215 20% 70%;
+    --accent: 222 30% 18%;
+    --accent-foreground: 210 40% 96%;
+    --primary: 199 89% 55%;
+    --primary-foreground: 222 45% 7%;
+    /* HiDNS uses 0 63% 50% here because it only fills destructive buttons with it.
+    /* We also render it as text (23 error messages), where 50% on a 7% background
+    /* is 3.77:1 - below AA. 58% keeps the same hue and clears 4.5:1. */
     --destructive: 0 72% 58%;
-    --border: 217 28% 20%;
-    --input: 215 22% 47%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 217 28% 26%;
+    --input: 215 25% 46%;
     --ring: 199 89% 55%;
     --success: 158 64% 45%;
     --warning: 32 94% 55%;
 
-    --scrim-rgb: 9 14 24;
-    --scrim-alpha: 0.72;
-    --chrome-alpha: 0.86;
+    --scrim-rgb: 8 13 24;
+    --scrim-alpha: 0.76;
+    --panel-alpha: 0.98;
+    --chrome-alpha: 1;
     --aurora-a: 199 89% 40%;
     --aurora-b: 268 74% 44%;
     --aurora-c: 162 66% 34%;
