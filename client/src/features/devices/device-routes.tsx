@@ -1,9 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useCopy } from '../../copy/locale';
-import { api, formatIpv4, type Machine, type RouteEntry } from '../../lib/http';
+import { formatIpv4, type Machine, type RouteEntry } from '../../lib/http';
 import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
 import { describeError } from '../../lib/errors';
+import { useMachineRoutes, useRpcCapabilities } from './use-devices';
 
 /**
  * Route table of one network instance on one device. The data comes from the
@@ -15,18 +15,15 @@ export function DeviceRoutes({ machine, onClose }: { machine: Machine; onClose: 
   const instances = machine.running_network_instances ?? [];
   const [instance, setInstance] = useState(instances[0] ?? '');
 
-  const capabilities = useQuery({ queryKey: ['rpc-capabilities'], queryFn: api.rpcCapabilities, staleTime: 60_000 });
+  const capabilities = useRpcCapabilities();
   const listRouteAvailable = Boolean(
     capabilities.data?.services
       .find((service) => service.name === 'api.instance.PeerManageRpc')
       ?.methods.find((method) => method.name === 'ListRoute')?.available,
   );
 
-  const routes = useQuery({
-    queryKey: ['routes', machine.machine_id, instance],
-    queryFn: () => api.machineRoutes(machine.machine_id, instance),
+  const routes = useMachineRoutes(machine.machine_id, instance, {
     enabled: Boolean(instance) && listRouteAvailable && machine.online,
-    retry: false,
   });
 
   const rows: RouteEntry[] = routes.data?.routes ?? [];

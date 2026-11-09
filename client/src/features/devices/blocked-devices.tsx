@@ -1,8 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCopy } from '../../copy/locale';
-import { api } from '../../lib/http';
 import { Button, Card, CardBody } from '../../ui';
 import { describeError } from '../../lib/errors';
+import { useBlockedMachines, useUnblockMachine } from './use-devices';
 
 /**
  * Devices that were deleted with the "block" flag. The block list used to be a
@@ -11,9 +11,8 @@ import { describeError } from '../../lib/errors';
 export function BlockedDevices() {
   const copy = useCopy();
   const queryClient = useQueryClient();
-  const blocked = useQuery({ queryKey: ['blocked-machines'], queryFn: api.blockedMachines });
-  const unblock = useMutation({
-    mutationFn: (machineID: string) => api.unblockMachine(machineID),
+  const blocked = useBlockedMachines();
+  const unblock = useUnblockMachine({
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['blocked-machines'] });
       void queryClient.invalidateQueries({ queryKey: ['machines'] });

@@ -186,27 +186,6 @@ export interface SetupStatus {
 
 export const api = {
   summary: () => request<Summary>('/summary'),
-  renameMachine: (machineID: string, alias: string) =>
-    request<void>('/machines/' + machineID + '/alias', {
-      method: 'PUT',
-      body: JSON.stringify({ alias }),
-    }),
-  deleteMachine: (machineID: string) => request<void>('/machines/' + machineID, { method: 'DELETE' }),
-  rpcCapabilities: () => request<RpcCapabilities>('/rpc-capabilities'),
-  machineRoutes: (machineID: string, instanceID: string) => {
-    const parts = uuidParts(instanceID);
-    return request<{ routes: RouteEntry[] }>('/machines/' + machineID + '/proxy-rpc', {
-      method: 'POST',
-      body: JSON.stringify({
-        service_name: 'api.instance.PeerManageRpc',
-        method_name: 'list_route',
-        payload: { instance: { id: parts } },
-      }),
-    });
-  },
-  blockedMachines: () => request<{ blocked: BlockedMachine[] }>('/machines/blocked').then((r) => r.blocked ?? []),
-  unblockMachine: (machineID: string) => request<void>('/machines/blocked/' + machineID, { method: 'DELETE' }),
-  machines: () => request<{ machines: Machine[] }>('/machines').then((r) => r.machines ?? []),
   networks: () => request<{ networks: NetworkSummary[] }>('/networks').then((r) => r.networks ?? []),
   updateNetwork: (networkID: string, patch: Record<string, unknown>) =>
     request<{ network_id: string; display_name: string }>('/networks/' + networkID, {
@@ -322,7 +301,6 @@ export const api = {
     }),
 };
 
-import { uuidParts } from './wire';
 
 export { uuidParts, formatIpv4 } from "./wire";
 export { absolute, oidcCallbackURL, isSecureOrigin } from "./origin";

@@ -7,6 +7,7 @@ import { MemberEditor } from './member-editor';
 import { MemberOverride } from './member-override';
 import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
 import { describeError } from '../../lib/errors';
+import { useMachines } from '../devices/use-devices';
 
 /**
  * Member management for one network. Without this the console could create a
@@ -25,7 +26,7 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
     queryKey: ['network-members', networkID],
     queryFn: () => api.networkMembers(networkID),
   });
-  const machines = useQuery({ queryKey: ['machines'], queryFn: api.machines, refetchInterval: 5_000 });
+  const machines = useMachines(5_000);
   const detail = useQuery({
     queryKey: ['network', networkID],
     queryFn: () => api.network(networkID),

@@ -1,14 +1,14 @@
-import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCopy } from '../../copy/locale';
 import { QueryError } from '../../ui/query-error';
-import { api, type Machine } from '../../lib/http';
+import { type Machine } from '../../lib/http';
 import { Badge, Card, CardBody, Input, Skeleton } from '../../ui';
 import { EnrollCard } from './enroll-card';
 import { DeviceActions } from './device-actions';
 import { BlockedDevices } from './blocked-devices';
 import { DeviceRoutes } from './device-routes';
+import { useMachines } from './use-devices';
 
 function formatTime(value: string): string {
   if (!value) return '—';
@@ -23,7 +23,7 @@ function displayName(machine: Machine): string {
 
 export function DevicesPage() {
   const copy = useCopy();
-  const machines = useQuery({ queryKey: ['machines'], queryFn: api.machines, refetchInterval: 5_000 });
+  const machines = useMachines(5_000);
   const [query, setQuery] = useState('');
   const rows = machines.data ?? [];
   // Search by name, alias or machine id, the way the original device list does.

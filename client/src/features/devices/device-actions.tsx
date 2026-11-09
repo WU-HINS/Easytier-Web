@@ -1,9 +1,10 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useCopy } from '../../copy/locale';
-import { api, type Machine } from '../../lib/http';
+import { type Machine } from '../../lib/http';
 import { Button, Input } from '../../ui';
 import { describeError } from '../../lib/errors';
+import { useDeleteMachine, useRenameMachine } from './use-devices';
 
 /**
  * Rename and delete for one device. Deleting also drops the device from every
@@ -20,17 +21,13 @@ export function DeviceActions({ machine }: { machine: Machine }) {
     void queryClient.invalidateQueries({ queryKey: ['networks'] });
   };
 
-  const rename = useMutation({
-    mutationFn: (value: string) => api.renameMachine(machine.machine_id, value),
+  const rename = useRenameMachine({
     onSuccess: () => {
       setEditing(false);
       refresh();
     },
   });
-  const remove = useMutation({
-    mutationFn: () => api.deleteMachine(machine.machine_id),
-    onSuccess: refresh,
-  });
+  const remove = useDeleteMachine({ onSuccess: refresh });
 
   if (editing) {
     return (
@@ -45,7 +42,7 @@ export function DeviceActions({ machine }: { machine: Machine }) {
         <Button
           type="button"
           disabled={rename.isPending}
-          onClick={() => rename.mutate(alias.trim())}
+          onClick={() => rename.mutate({ machineID: machine.machine_id, alias: alias.trim() })}
         >
           {copy.devices.save}
         </Button>
@@ -69,7 +66,7 @@ export function DeviceActions({ machine }: { machine: Machine }) {
         variant="ghost"
         disabled={remove.isPending}
         onClick={() => {
-          if (window.confirm(copy.devices.confirmDelete)) remove.mutate();
+          if (window.confirm(copy.devices.confirmDelete)) remove.mutate(machine.machine_id);
         }}
       >
         {copy.devices.delete}

@@ -5,6 +5,7 @@ import { api } from '../../lib/http';
 import { Badge, Card, CardBody, Skeleton } from '../../ui';
 import { DeviceActions } from './device-actions';
 import { describeError } from '../../lib/errors';
+import { useMachines } from './use-devices';
 
 function formatTime(value: string): string {
   if (!value) return '—';
@@ -17,7 +18,7 @@ export function DeviceDetailPage() {
   const copy = useCopy();
   const params = useParams();
   const machineID = params.machineID || '';
-  const machines = useQuery({ queryKey: ['machines'], queryFn: api.machines, refetchInterval: 5000 });
+  const machines = useMachines(5000);
   const networks = useQuery({ queryKey: ['networks'], queryFn: api.networks });
   const networkRows = networks.data || [];
   const memberQueries = useQueries({
