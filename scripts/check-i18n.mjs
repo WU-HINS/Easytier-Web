@@ -73,7 +73,8 @@ const walkTsx = (dir) => {
 };
 const offenders = [];
 for (const file of walkTsx(srcRoot)) {
-  if (file.includes("copy/")) continue;
+  // Tests assert against the table on purpose, so they are allowed to import it.
+  if (file.includes("copy/") || file.includes(".test.")) continue;
   const body = readFileSync(file, "utf8");
   if (body.includes("copy/zh-CN")) offenders.push(file.replace(root, ""));
 }

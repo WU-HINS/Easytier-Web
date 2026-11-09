@@ -57,6 +57,8 @@ jobs:
       - name: client install
         working-directory: client
         run: npm ci --no-audit --no-fund
+      - name: client unit tests
+        run: cd client && npm test --silent
       - name: client build
         working-directory: client
         run: npm run build
