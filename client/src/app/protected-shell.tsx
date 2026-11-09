@@ -1,9 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { ApiError, api } from '../lib/http';
+import { ApiError } from '../lib/http';
 import { Skeleton } from '../ui';
 import { copy } from '../copy/zh-CN';
 import { describeError } from '../lib/errors';
+import { useConsoleInfo } from '../features/auth/use-auth';
 
 /**
  * Session guard. It asks the API who we are instead of trusting local state,
@@ -11,7 +11,7 @@ import { describeError } from '../lib/errors';
  */
 export function ProtectedShell() {
   const location = useLocation();
-  const query = useQuery({ queryKey: ['console-info'], queryFn: api.consoleInfo });
+  const query = useConsoleInfo();
 
   if (query.isLoading) {
     return (

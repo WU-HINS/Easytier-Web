@@ -1,6 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
 import { Navigate, Outlet } from 'react-router-dom';
-import { api } from '../lib/http';
+import { useConsoleInfo } from '../features/auth/use-auth';
 
 /**
  * The single place that decides "is this an administrator".
@@ -10,7 +9,7 @@ import { api } from '../lib/http';
  * out of step with the navigation that hides it.
  */
 export function RequireAdmin() {
-  const info = useQuery({ queryKey: ['console-info'], queryFn: api.consoleInfo });
+  const info = useConsoleInfo();
   if (info.isLoading) return null;
   if (info.data?.role !== 'admin') return <Navigate to="/" replace />;
   return <Outlet />;

@@ -1,10 +1,11 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { copy } from '../../copy/zh-CN';
 import { api } from '../../lib/http';
 import { Button, Card, Input } from '../../ui';
 import { describeError } from '../../lib/errors';
+import { useSetupStatus } from '../auth/use-auth';
 
 /**
  * First-run wizard. It is the only screen reachable while the console is
@@ -12,7 +13,7 @@ import { describeError } from '../../lib/errors';
  */
 export function SetupPage() {
   const navigate = useNavigate();
-  const status = useQuery({ queryKey: ['setup-status'], queryFn: api.setupStatus });
+  const status = useSetupStatus();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');

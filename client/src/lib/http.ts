@@ -185,14 +185,6 @@ export interface SetupStatus {
 }
 
 export const api = {
-  login: (username: string, password: string) =>
-    request<{ username: string; display_name?: string }>('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ username, password }),
-    }),
-  logout: () => request<{ status: string; redirect?: string }>('/auth/logout', { method: 'POST' }),
-  oidcConfig: () => request<OidcConfig>('/auth/oidc/config'),
-  setupStatus: () => request<SetupStatus>('/setup'),
   setup: (username: string, password: string) =>
     request<{ username: string; role: string }>('/setup', {
       method: 'POST',
@@ -217,7 +209,6 @@ export const api = {
       body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
     }),
   unbindOidc: () => request<void>('/account/oidc/unbind', { method: 'POST' }),
-  consoleInfo: () => request<ConsoleInfo>('/console-info'),
   summary: () => request<Summary>('/summary'),
   renameMachine: (machineID: string, alias: string) =>
     request<void>('/machines/' + machineID + '/alias', {

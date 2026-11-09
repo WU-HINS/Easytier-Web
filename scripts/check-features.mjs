@@ -25,7 +25,8 @@ for (const name of readdirSync(featuresDir)) {
     continue;
   }
   const body = sources.map((f) => readFileSync(join(dir, f), 'utf8')).join(String.fromCharCode(10));
-  const usesServerState = body.includes("lib/http") && body.includes("api.");
+  // A feature is server-backed when it owns an api module or touches the transport.
+  const usesServerState = files.includes("api.ts") || body.includes("lib/http");
   const hasApi = files.includes('api.ts');
   const hasHooks = files.some((f) => f.startsWith('use-') && f.endsWith('.ts'));
   if (usesServerState && !hasApi) problems.push(name + ': calls the server but has no api.ts');

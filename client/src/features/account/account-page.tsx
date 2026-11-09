@@ -4,6 +4,7 @@ import { useCopy } from '../../copy/locale';
 import { api, isSecureOrigin, oidcCallbackURL } from '../../lib/http';
 import { Badge, Button, Card, CardBody } from '../../ui';
 import { PasswordCard } from './password-card';
+import { useOidcConfig } from '../auth/use-auth';
 
 /**
  * Self-service OIDC binding. Binding always goes through a browser redirect, and
@@ -13,7 +14,7 @@ export function AccountPage() {
   const copy = useCopy();
   const queryClient = useQueryClient();
   const oidc = useQuery({ queryKey: ['account-oidc'], queryFn: api.accountOidc });
-  const config = useQuery({ queryKey: ['oidc-config'], queryFn: api.oidcConfig });
+  const config = useOidcConfig();
   const [error, setError] = useState<string | null>(null);
 
   const unbind = useMutation({

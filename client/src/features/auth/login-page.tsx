@@ -1,9 +1,9 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { ShieldCheck } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCopy } from '../../copy/locale';
-import { absolute, api } from '../../lib/http';
+import { absolute } from '../../lib/http';
+import { useLogin, useOidcConfig, useRegister, useRegisterOidc, useSetupStatus } from './use-auth';
 import { Button, Input } from '../../ui';
 
 /**
@@ -19,29 +19,27 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const oidc = useQuery({ queryKey: ['oidc-config'], queryFn: api.oidcConfig, staleTime: 60_000 });
+  const oidc = useOidcConfig();
   // The console tells us whether self-registration is open, so a fresh
   // deployment has a visible way in instead of a login box and no sign-up.
-  const setup = useQuery({ queryKey: ['setup'], queryFn: api.setupStatus, staleTime: 60_000 });
+  const setup = useSetupStatus();
   const [signup, setSignup] = useState(false);
 
   // First OIDC sign-in lands back here with ?register=1: the identity is verified
   // but has no account, and the name typed now never changes afterwards.
   const registering = new URLSearchParams(window.location.search).get('register') === '1';
   const [newUsername, setNewUsername] = useState('');
-  const register = useMutation({
-    mutationFn: () => api.registerOidc(newUsername),
+  const register = useRegisterOidc({
     onSuccess: () => navigate('/', { replace: true }),
     onError: (failure: Error) => setError(failure.message || copy.login.registerFailed),
   });
   const submitRegister = (event: FormEvent) => {
     event.preventDefault();
     setError(null);
-    register.mutate();
+    register.mutate(newUsername);
   };
 
-  const login = useMutation({
-    mutationFn: () => api.login(username, password),
+  const login = useLogin({
     onSuccess: () => navigate('/', { replace: true }),
     onError: (failure: Error) => setError(failure.message || copy.login.failed),
   });
@@ -49,19 +47,18 @@ export function LoginPage() {
   const submit = (event: FormEvent) => {
     event.preventDefault();
     setError(null);
-    login.mutate();
+    login.mutate({ username, password });
   };
 
   const canRegister = setup.data?.initialized === true && setup.data?.registration_open === true;
-  const signUp = useMutation({
-    mutationFn: () => api.register(username, password),
-    onSuccess: () => login.mutate(),
+  const signUp = useRegister({
+    onSuccess: () => login.mutate({ username, password }),
     onError: (failure: Error) => setError(failure.message || copy.login.registerFailed),
   });
   const submitSignUp = (event: FormEvent) => {
     event.preventDefault();
     setError(null);
-    signUp.mutate();
+    signUp.mutate({ username, password });
   };
 
   return (

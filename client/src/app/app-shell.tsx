@@ -1,11 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { LogOut, Monitor, Moon, Sun } from 'lucide-react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useCopy, useLocale } from '../copy/locale';
 import { buildNavigation } from './nav';
-import { api } from '../lib/http';
 import { useTheme } from '../lib/theme';
 import { Button, cn } from '../ui';
+import { useConsoleInfo, useLogout } from '../features/auth/use-auth';
 
 const themeIcon = { light: Sun, dark: Moon, auto: Monitor } as const;
 
@@ -15,7 +15,7 @@ export function AppShell() {
   // error in the console that looks like a defect. Only ask once signed in.
   const location = useLocation();
   const publicPage = location.pathname === '/login' || location.pathname === '/setup';
-  const info = useQuery({ queryKey: ['console-info'], queryFn: api.consoleInfo, enabled: !publicPage });
+  const info = useConsoleInfo({ enabled: !publicPage });
   const copy = useCopy();
   const { locale, setLocale } = useLocale();
   const navigation = buildNavigation(copy, info.data?.role);
@@ -23,8 +23,7 @@ export function AppShell() {
   const queryClient = useQueryClient();
   const Icon = themeIcon[mode];
 
-  const logout = useMutation({
-    mutationFn: api.logout,
+  const logout = useLogout({
     onSuccess: (result) => {
       queryClient.clear();
       if (result?.redirect) {

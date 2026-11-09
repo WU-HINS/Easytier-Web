@@ -1,8 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useCopy } from '../../copy/locale';
-import { api } from '../../lib/http';
 import { Button, Card, CardBody, Skeleton } from '../../ui';
+import { useConsoleInfo } from '../auth/use-auth';
 
 /**
  * The command a device runs to join this console. It is built from console-info
@@ -11,7 +10,7 @@ import { Button, Card, CardBody, Skeleton } from '../../ui';
  */
 export function EnrollCard() {
   const copy = useCopy();
-  const info = useQuery({ queryKey: ['console-info'], queryFn: api.consoleInfo, retry: false });
+  const info = useConsoleInfo({ retry: false });
   const [copied, setCopied] = useState(false);
 
   if (info.isLoading) {
