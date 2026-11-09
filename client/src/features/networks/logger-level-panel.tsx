@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { networksApi } from './api';
 import { Skeleton } from '../../ui';
 import { describeError } from '../../lib/errors';
@@ -11,6 +11,7 @@ const LEVELS = ['disabled', 'error', 'warning', 'info', 'debug', 'trace'];
  * so; the console does not have a per-instance switch to offer.
  */
 export function LoggerLevelPanel({ machineID }: { machineID: string }) {
+  const copy = useCopy();
   const queryClient = useQueryClient();
   const level = useQuery({ queryKey: ['logger-level', machineID], queryFn: () => networksApi.loggerLevel(machineID) });
   const save = useMutation({

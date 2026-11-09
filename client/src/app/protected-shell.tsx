@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { ApiError } from '../lib/http';
 import { Skeleton } from '../ui';
-import { copy } from '../copy/zh-CN';
+import { useCopy } from '../copy/locale';
 import { describeError } from '../lib/errors';
 import { useConsoleInfo } from '../features/auth/use-auth';
 
@@ -10,6 +10,7 @@ import { useConsoleInfo } from '../features/auth/use-auth';
  * so a revoked session lands on the login page on the next navigation.
  */
 export function ProtectedShell() {
+  const copy = useCopy();
   const location = useLocation();
   const query = useConsoleInfo();
 

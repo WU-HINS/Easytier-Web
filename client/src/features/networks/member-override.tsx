@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { networksApi } from './api';
 import { Button } from '../../ui';
 import { MemberTomlPanel } from './member-toml-panel';
@@ -12,6 +12,7 @@ import { describeError } from '../../lib/errors';
  * one device's config.
  */
 export function MemberOverride({ networkID, deviceID }: { networkID: string; deviceID: string }) {
+  const copy = useCopy();
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);

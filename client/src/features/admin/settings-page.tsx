@@ -6,11 +6,11 @@ type Errors = Record<string, string>;
 
 const usernamePattern = /^[a-zA-Z0-9._-]{1,32}$/;
 
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { useAdminSettings, useSaveAdminSettings } from './use-admin';
 import { ApiError, isSecureOrigin, oidcCallbackURL, type AdminSettings } from '../../lib/http';
 /** Field level validation, so a save never fails as one opaque error. */
-export function validateSettings(draft: AdminSettings): Errors {
+export function validateSettings(draft: AdminSettings, copy: ReturnType<typeof useCopy>): Errors {
   const errors: Errors = {};
   if (!Number.isInteger(draft.max_instances_per_user) || draft.max_instances_per_user < 0) {
     errors.max_instances_per_user = copy.adminSettings.errorMaxInstances;
@@ -54,6 +54,7 @@ export function validateSettings(draft: AdminSettings): Errors {
 }
 
 export function AdminSettingsPage() {
+  const copy = useCopy();
   const queryClient = useQueryClient();
   const settings = useAdminSettings();
   const [draft, setDraft] = useState<AdminSettings | null>(null);
@@ -64,7 +65,7 @@ export function AdminSettingsPage() {
     if (settings.data) setDraft(settings.data);
   }, [settings.data]);
 
-  const errors = useMemo<Errors>(() => (draft ? validateSettings(draft) : {}), [draft]);
+  const errors = useMemo<Errors>(() => (draft ? validateSettings(draft, copy) : {}), [draft, copy]);
 
   const save = useSaveAdminSettings({
     onSuccess: (next) => {

@@ -219,6 +219,7 @@
 | 28 | data plane | 先跑 `scripts/tun-check.sh`：没有 tun 驱动/节点/CAP_NET_ADMIN 时打印**具体原因**并 SKIP（绝不当作通过），有能力时才继续 overlay smoke |
 | 29 | i18n coverage | 中文文案表里的每个键都必须有英文对应，缺键会让页面半中半英 |
 | 30 | error contract | 表单错误必须用页面自己的语言解释：服务端给 code + field，前端按文案表渲染 |
+| 31 | feature layout | 每个 feature 自持 api.ts + use-*.ts + 页面；端点不再集中在 lib/http |
 
 ## 7. 版本发布流程
 

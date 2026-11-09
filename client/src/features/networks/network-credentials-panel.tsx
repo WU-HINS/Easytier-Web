@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { type NetworkCredential } from '../../lib/http';
 import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
 import { describeError } from '../../lib/errors';
 import { networksApi } from './api';
 
 // expiryLabel renders 0 as permanent and anything else as a local timestamp.
-function expiryLabel(credential: NetworkCredential): string {
+function expiryLabel(credential: NetworkCredential, copy: ReturnType<typeof useCopy>): string {
   if (!credential.expiry_unix) return copy.networkSettings.forever;
   return new Date(credential.expiry_unix * 1000).toLocaleString('zh-CN', { hour12: false });
 }
@@ -18,6 +18,7 @@ function expiryLabel(credential: NetworkCredential): string {
  * whether it can be reused, and when it expires.
  */
 export function NetworkCredentialsPanel({ networkID }: { networkID: string }) {
+  const copy = useCopy();
   const queryClient = useQueryClient();
   const [secret, setSecret] = useState('');
   const [copied, setCopied] = useState(false);
@@ -116,7 +117,7 @@ export function NetworkCredentialsPanel({ networkID }: { networkID: string }) {
                     <td className="py-[var(--u-3)] pr-[var(--u-3)]">
                       {credential.reusable ? copy.networkSettings.yes : copy.networkSettings.no}
                     </td>
-                    <td className="py-[var(--u-3)] pr-[var(--u-3)] tabular-nums">{expiryLabel(credential)}</td>
+                    <td className="py-[var(--u-3)] pr-[var(--u-3)] tabular-nums">{expiryLabel(credential, copy)}</td>
                     <td className="py-[var(--u-3)] text-right">
                       <Button type='button' variant='ghost' onClick={() => revoke.mutate(credential.credential_id)}>
                         {copy.networkSettings.revoke}

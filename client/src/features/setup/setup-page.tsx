@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { copy } from '../../copy/zh-CN';
+import { useCopy } from '../../copy/locale';
 import { Button, Card, Input } from '../../ui';
 import { describeError } from '../../lib/errors';
 import { useSetupStatus } from '../auth/use-auth';
@@ -11,6 +11,7 @@ import { useCreateAdmin } from './use-setup';
  * uninitialized, and it creates the single administrator account.
  */
 export function SetupPage() {
+  const copy = useCopy();
   const navigate = useNavigate();
   const status = useSetupStatus();
   const [username, setUsername] = useState('');

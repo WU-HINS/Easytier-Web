@@ -58,7 +58,7 @@ audit "design tokens" "client/src/ui/tokens.css" "p='client/src/ui/tokens.css'; 
 
 audit "design contrast" "client/src/ui/tokens.css" "p='client/src/ui/tokens.css'; s=open(p).read(); s=s.replace('--muted-foreground: 215 20% 40%;','--muted-foreground: 215 20% 97%;',1); open(p,'w').write(s)" "node scripts/check-contrast.mjs"
 
-audit "api contract" "client/src/lib/http.ts" "p='client/src/lib/http.ts'; s=open(p).read(); s=s.replace(chr(39)+'/networks'+chr(39),chr(39)+'/networksX'+chr(39),1); open(p,'w').write(s)" "node scripts/check-contract.mjs"
+audit "api contract" "client/src/features/networks/api.ts" "p='client/src/features/networks/api.ts'; s=open(p).read(); s=s.replace(chr(39)+'/networks'+chr(39),chr(39)+'/networksX'+chr(39),1); open(p,'w').write(s)" "node scripts/check-contract.mjs"
 
 audit "wire format" "client/src/lib/wire.ts" "p='client/src/lib/wire.ts'; s=open(p).read(); s=s.replace('offset + 8','offset + 6',1); open(p,'w').write(s)" "node --experimental-strip-types scripts/check-wire.mjs"
 
