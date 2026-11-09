@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useCopy } from '../../copy/locale';
-import { api } from '../../lib/http';
+import { networksApi } from './api';
 import { Button, Card, CardBody, Input } from '../../ui';
 
 // The network level settings: one JSON blob, edited as the handful of fields the
@@ -37,7 +37,7 @@ const switches = [
   { key: 'multi_thread', label: copy.networks.advancedSwitchMultiThread },
 ];
   const queryClient = useQueryClient();
-  const advanced = useQuery({ queryKey: ['advanced', networkID], queryFn: () => api.networkAdvanced(networkID) });
+  const advanced = useQuery({ queryKey: ['advanced', networkID], queryFn: () => networksApi.advanced(networkID) });
   const [mtu, setMtu] = useState('');
   const [rateLimit, setRateLimit] = useState('');
   const [listeners, setListeners] = useState('');
@@ -76,7 +76,7 @@ const switches = [
   };
 
   const save = useMutation({
-    mutationFn: () => api.putNetworkAdvanced(networkID, buildBlob()),
+    mutationFn: () => networksApi.saveAdvanced(networkID, buildBlob()),
     onSuccess: () => {
       setError(null);
       setSaved(true);

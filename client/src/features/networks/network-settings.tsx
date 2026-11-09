@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useCopy } from '../../copy/locale';
-import { api } from '../../lib/http';
+import { networksApi } from './api';
 import { Button, Card, CardBody, Input } from '../../ui';
 import { NetworkAdvanced } from './network-advanced';
 import { NetworkSecretPanel } from './network-secret-panel';
@@ -21,7 +21,7 @@ export function NetworkSettings({ networkID, displayName }: { networkID: string;
 	}, [displayName]);
 
 	const rename = useMutation({
-		mutationFn: () => api.updateNetwork(networkID, { display_name: name.trim() }),
+		mutationFn: () => networksApi.update(networkID, { display_name: name.trim() }),
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: ['networks'] });
 			void queryClient.invalidateQueries({ queryKey: ['network', networkID] });

@@ -1,11 +1,12 @@
-import { useQueries, useQuery } from '@tanstack/react-query';
+import { useQueries } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
 import { useCopy } from '../../copy/locale';
-import { api } from '../../lib/http';
 import { Badge, Card, CardBody, Skeleton } from '../../ui';
 import { DeviceActions } from './device-actions';
 import { describeError } from '../../lib/errors';
 import { useMachines } from './use-devices';
+import { useNetworks } from '../networks/use-networks';
+import { networksApi } from '../networks/api';
 
 function formatTime(value: string): string {
   if (!value) return '—';
@@ -19,12 +20,12 @@ export function DeviceDetailPage() {
   const params = useParams();
   const machineID = params.machineID || '';
   const machines = useMachines(5000);
-  const networks = useQuery({ queryKey: ['networks'], queryFn: api.networks });
+  const networks = useNetworks();
   const networkRows = networks.data || [];
   const memberQueries = useQueries({
     queries: networkRows.map((network) => ({
       queryKey: ['members', network.network_id],
-      queryFn: () => api.networkMembers(network.network_id),
+      queryFn: () => networksApi.members(network.network_id),
     })),
   });
   const device = (machines.data || []).find((row) => row.machine_id === machineID);

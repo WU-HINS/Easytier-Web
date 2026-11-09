@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useCopy } from '../../copy/locale';
-import { api } from '../../lib/http';
+import { networksApi } from './api';
 import { Button, Card, CardBody } from '../../ui';
 import { describeError } from '../../lib/errors';
 
@@ -15,7 +15,7 @@ export function NetworkSecretPanel({ networkID }: { networkID: string }) {
   const [secret, setSecret] = useState('');
   const [copied, setCopied] = useState(false);
   const rotate = useMutation({
-    mutationFn: () => api.rotateNetworkSecret(networkID),
+    mutationFn: () => networksApi.rotateSecret(networkID),
     onSuccess: (result) => {
       setSecret(result.network_secret);
       setCopied(false);

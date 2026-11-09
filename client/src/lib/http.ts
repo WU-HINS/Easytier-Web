@@ -2,7 +2,6 @@
  * Typed HTTP layer. Every request goes through request.ts so cookie handling,
  * error mapping and the API prefix live in exactly one place.
  */
-import { request } from "./request";
 
 export { ApiError, API_PREFIX, request } from "./request";
 export interface ConsoleInfo {
@@ -184,122 +183,8 @@ export interface SetupStatus {
   registration_open?: boolean;
 }
 
-export const api = {
-  summary: () => request<Summary>('/summary'),
-  networks: () => request<{ networks: NetworkSummary[] }>('/networks').then((r) => r.networks ?? []),
-  updateNetwork: (networkID: string, patch: Record<string, unknown>) =>
-    request<{ network_id: string; display_name: string }>('/networks/' + networkID, {
-      method: 'PATCH',
-      body: JSON.stringify(patch),
-    }),
-  aclPolicy: (networkID: string) =>
-    request<{ acl_policy: string }>('/networks/' + networkID + '/acl-policy'),
-  putAclPolicy: (networkID: string, policy: string) =>
-    request<void>('/networks/' + networkID + '/acl-policy', {
-      method: 'PUT',
-      body: JSON.stringify({ acl_policy: policy }),
-    }),
-  credentials: (networkID: string) =>
-    request<{ credentials: NetworkCredential[] }>('/networks/' + networkID + '/credentials'),
-  createCredential: (networkID: string, payload: Record<string, unknown>) =>
-    request<{ credential_id: string; credential_secret: string }>('/networks/' + networkID + '/credentials', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    }),
-  revokeCredential: (networkID: string, credentialID: string) =>
-    request<void>('/networks/' + networkID + '/credentials/' + credentialID, { method: 'DELETE' }),
-  // ACL counters live on the device, one call per running instance.
-  // What the device reports for one running instance: peers, their connections and
-  // the route table. The response is keyed by instance id.
-  instanceInfo: (machineID: string, instanceID: string) =>
-    request<{ info?: Record<string, InstanceRunningInfo> }>(
-      `/machines/${machineID}/networks/info/${instanceID}`,
-    ),
-  // The log level belongs to the device process, not to one instance.
-  loggerLevel: (machineID: string) =>
-    request<{ level: string; value: number }>(`/machines/${machineID}/logger-level`),
-  setLoggerLevel: (machineID: string, level: string) =>
-    request<{ level: string; value: number }>(`/machines/${machineID}/logger-level`, {
-      method: "PUT",
-      body: JSON.stringify({ level }),
-    }),
-  aclStats: (machineID: string, instanceID: string) =>
-    request<AclStatsResponse>(
-      `/machines/${machineID}/networks/info/${instanceID}/acl-stats`,
-    ),
-  // The effective configuration of one member, rendered as TOML by the server so
-  // the console shows what will be pushed rather than what the panel thinks.
-  // Rotation answers with the new secret once: it is not part of the listing.
-  rotateNetworkSecret: (networkID: string) =>
-    request<{ network_secret: string; rotated_at: string }>(
-      `/networks/${networkID}/rotate-secret`,
-      { method: "POST" },
-    ),
-  memberToml: (networkID: string, deviceID: string) =>
-    request<{ toml_config?: string; error?: string }>(
-      `/networks/${networkID}/members/${deviceID}/toml`,
-    ),
-  parseConfig: (toml: string) =>
-    request<{ config?: unknown; error?: string }>("/parse-config", {
-      method: "POST",
-      body: JSON.stringify({ toml_config: toml }),
-    }),
-  networkMembers: (networkID: string) =>
-    request<NetworkMembers>('/networks/' + networkID + '/members'),
-  network: (networkID: string) => request<NetworkDetail>('/networks/' + networkID),
-  memberConfig: (networkID: string, deviceID: string) =>
-    request<{ override_config: string }>('/networks/' + networkID + '/members/' + deviceID + '/config')
-      .then((r) => r.override_config ?? ''),
-  putMemberConfig: (networkID: string, deviceID: string, override: string) =>
-    request<void>('/networks/' + networkID + '/members/' + deviceID + '/config', {
-      method: 'PUT',
-      body: JSON.stringify({ override_config: override }),
-    }),
-  // Field scoped on purpose: the server only writes the columns named here, so
-  // two people editing different fields cannot undo each other (F-228).
-  patchMember: (networkID: string, deviceID: string, patch: { hostname_override?: string; virtual_ipv4?: string }) =>
-    request<void>('/networks/' + networkID + '/members/' + deviceID, {
-      method: 'PATCH',
-      body: JSON.stringify(patch),
-    }),
-  addNetworkMembers: (networkID: string, deviceIDs: string[]) =>
-    request<void>('/networks/' + networkID + '/members', {
-      method: 'POST',
-      body: JSON.stringify({ device_ids: deviceIDs }),
-    }),
-  // First OIDC sign-in: the console carries the verified identity in a signed
-  // cookie, and the name chosen here becomes the account name for good.
-  // Network level settings: one JSON blob shared by the compiler layers.
-  networkAdvanced: (networkID: string) =>
-    request<{ advanced: string }>('/networks/' + networkID + '/advanced'),
-  putNetworkAdvanced: (networkID: string, advanced: string) =>
-    request<void>('/networks/' + networkID + '/advanced', {
-      method: 'PUT',
-      body: JSON.stringify({ advanced }),
-    }),
-  registerOidc: (username: string) =>
-    request<{ username: string }>('/auth/oidc/register', {
-      method: 'POST',
-      body: JSON.stringify({ username }),
-    }),
-  removeNetworkMember: (networkID: string, deviceID: string) =>
-    request<void>('/networks/' + networkID + '/members/' + deviceID, { method: 'DELETE' }),
-  deleteNetwork: (networkID: string) => request<void>('/networks/' + networkID, { method: 'DELETE' }),
-  // The wizard decides the method and its extra fields, so the call takes the
-  // whole settings object instead of a fixed pair of arguments.
-  createNetwork: (settings: {
-    display_name: string;
-    networking_method: string;
-    virtual_cidr: string;
-    peer_urls?: string[];
-    public_server_url?: string;
-    secure_mode?: boolean;
-  }) =>
-    request<{ network_id: string }>('/networks', {
-      method: "POST",
-      body: JSON.stringify({ settings }),
-    }),
-};
+// Every endpoint now lives with the feature that owns it (features/<domain>/api.ts).
+// This module is the transport: request(), ApiError, the base URL and the shared types.
 
 
 export { uuidParts, formatIpv4 } from "./wire";

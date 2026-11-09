@@ -2,12 +2,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { InstanceDetailPanel } from './instance-detail-panel';
 import { useCopy } from '../../copy/locale';
-import { api, type NetworkMember } from '../../lib/http';
+import { type NetworkMember } from '../../lib/http';
 import { MemberEditor } from './member-editor';
 import { MemberOverride } from './member-override';
 import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
 import { describeError } from '../../lib/errors';
 import { useMachines } from '../devices/use-devices';
+import { networksApi } from './api';
 
 /**
  * Member management for one network. Without this the console could create a
@@ -24,12 +25,12 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
 
   const members = useQuery({
     queryKey: ['network-members', networkID],
-    queryFn: () => api.networkMembers(networkID),
+    queryFn: () => networksApi.members(networkID),
   });
   const machines = useMachines(5_000);
   const detail = useQuery({
     queryKey: ['network', networkID],
-    queryFn: () => api.network(networkID),
+    queryFn: () => networksApi.get(networkID),
   });
 
   // The server decides; the panel hides what it would refuse. A read-only network
@@ -42,18 +43,18 @@ export function NetworkMembers({ networkID, onClose }: { networkID: string; onCl
   };
 
   const add = useMutation({
-    mutationFn: (deviceID: string) => api.addNetworkMembers(networkID, [deviceID]),
+    mutationFn: (deviceID: string) => networksApi.addMembers(networkID, [deviceID]),
     onSuccess: () => {
       setPick('');
       refresh();
     },
   });
   const remove = useMutation({
-    mutationFn: (deviceID: string) => api.removeNetworkMember(networkID, deviceID),
+    mutationFn: (deviceID: string) => networksApi.removeMember(networkID, deviceID),
     onSuccess: refresh,
   });
   const destroy = useMutation({
-    mutationFn: () => api.deleteNetwork(networkID),
+    mutationFn: () => networksApi.remove(networkID),
     onSuccess: () => {
       refresh();
       onClose?.();

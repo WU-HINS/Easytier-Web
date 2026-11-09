@@ -1,16 +1,17 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useCopy } from '../../copy/locale';
 import { QueryError } from '../../ui/query-error';
-import { api } from '../../lib/http';
+import { networksApi } from './api';
 import { Badge, Button, Card, CardBody, Input, Skeleton } from '../../ui';
 import { describeError } from '../../lib/errors';
+import { useNetworks } from './use-networks';
 
 export function NetworksPage() {
   const copy = useCopy();
   const queryClient = useQueryClient();
-  const networks = useQuery({ queryKey: ['networks'], queryFn: api.networks });
+  const networks = useNetworks();
   const [name, setName] = useState('');
   const [cidr, setCidr] = useState('10.42.0.0/24');
   const [method, setMethod] = useState('Standalone');
@@ -21,7 +22,7 @@ export function NetworksPage() {
 
   const create = useMutation({
     mutationFn: () =>
-      api.createNetwork({
+      networksApi.create({
         display_name: name.trim(),
         networking_method: method,
         virtual_cidr: cidr.trim(),

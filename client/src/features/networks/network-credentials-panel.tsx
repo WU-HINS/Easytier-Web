@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { copy } from '../../copy/zh-CN';
-import { api, type NetworkCredential } from '../../lib/http';
+import { type NetworkCredential } from '../../lib/http';
 import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
 import { describeError } from '../../lib/errors';
+import { networksApi } from './api';
 
 // expiryLabel renders 0 as permanent and anything else as a local timestamp.
 function expiryLabel(credential: NetworkCredential): string {
@@ -20,21 +21,21 @@ export function NetworkCredentialsPanel({ networkID }: { networkID: string }) {
   const queryClient = useQueryClient();
   const [secret, setSecret] = useState('');
   const [copied, setCopied] = useState(false);
-  const credentials = useQuery({ queryKey: ['credentials', networkID], queryFn: () => api.credentials(networkID) });
-  const network = useQuery({ queryKey: ['network', networkID], queryFn: () => api.network(networkID) });
+  const credentials = useQuery({ queryKey: ['credentials', networkID], queryFn: () => networksApi.credentials(networkID) });
+  const network = useQuery({ queryKey: ['network', networkID], queryFn: () => networksApi.get(networkID) });
 
   const refresh = () => {
     void queryClient.invalidateQueries({ queryKey: ['credentials', networkID] });
   };
   const issue = useMutation({
-    mutationFn: () => api.createCredential(networkID, { reusable: true }),
+    mutationFn: () => networksApi.createCredential(networkID, { reusable: true }),
     onSuccess: (created) => {
       setSecret(created.credential_secret);
       refresh();
     },
   });
   const revoke = useMutation({
-    mutationFn: (credentialID: string) => api.revokeCredential(networkID, credentialID),
+    mutationFn: (credentialID: string) => networksApi.revokeCredential(networkID, credentialID),
     onSuccess: () => {
       setSecret('');
       refresh();

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { copy } from '../../copy/zh-CN';
-import { api } from '../../lib/http';
+import { networksApi } from './api';
 import { Skeleton } from '../../ui';
 import { describeError } from '../../lib/errors';
 
@@ -12,9 +12,9 @@ const LEVELS = ['disabled', 'error', 'warning', 'info', 'debug', 'trace'];
  */
 export function LoggerLevelPanel({ machineID }: { machineID: string }) {
   const queryClient = useQueryClient();
-  const level = useQuery({ queryKey: ['logger-level', machineID], queryFn: () => api.loggerLevel(machineID) });
+  const level = useQuery({ queryKey: ['logger-level', machineID], queryFn: () => networksApi.loggerLevel(machineID) });
   const save = useMutation({
-    mutationFn: (next: string) => api.setLoggerLevel(machineID, next),
+    mutationFn: (next: string) => networksApi.setLoggerLevel(machineID, next),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['logger-level', machineID] });
     },

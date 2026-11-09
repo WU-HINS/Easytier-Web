@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import { useCopy } from '../../copy/locale';
-import { api } from '../../lib/http';
+import { networksApi } from './api';
 import { Button, Input } from '../../ui';
 import { describeError } from '../../lib/errors';
 
@@ -44,7 +44,7 @@ export function MemberEditor({
       if (nextHostname !== initial.current.hostname) patch.hostname_override = nextHostname;
       if (nextAddress !== initial.current.address) patch.virtual_ipv4 = nextAddress;
       if (Object.keys(patch).length === 0) return Promise.resolve();
-      return api.patchMember(networkID, deviceID, patch);
+      return networksApi.patchMember(networkID, deviceID, patch);
     },
     onSuccess: () => {
       // Keep the editor mounted so the confirmation can actually be seen and

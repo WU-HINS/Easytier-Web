@@ -1,14 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useCopy } from '../../copy/locale';
-import { api } from '../../lib/http';
 import { Badge, Card, CardBody, Skeleton } from '../../ui';
 import { NetworkMembers } from './network-members';
 import { NetworkAclPanel } from './network-acl-panel';
 import { NetworkCredentialsPanel } from './network-credentials-panel';
 import { NetworkSettings } from './network-settings';
 import { describeError } from '../../lib/errors';
+import { useNetwork, useNetworks } from './use-networks';
 
 /**
  * One network as its own page, the way the first console organised it: the list
@@ -21,8 +20,8 @@ export function NetworkDetailPage() {
   const [tab, setTab] = useState<'members' | 'acl' | 'credentials' | 'settings'>('members');
   // The header needs the subnet, which only the single-network endpoint returns,
   // so the page reads that and keeps the list around for the member count.
-  const detail = useQuery({ queryKey: ['network', networkID], queryFn: () => api.network(networkID), enabled: networkID !== '' });
-  const networks = useQuery({ queryKey: ['networks'], queryFn: api.networks });
+  const detail = useNetwork(networkID, { enabled: networkID !== '' });
+  const networks = useNetworks();
   const network = detail.data;
   const memberCount = (networks.data ?? []).find((row) => row.network_id === networkID)?.member_count;
 

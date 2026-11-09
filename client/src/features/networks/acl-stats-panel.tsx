@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCopy } from '../../copy/locale';
-import { api } from '../../lib/http';
+import { networksApi } from './api';
 import { Card, CardBody, Skeleton } from '../../ui';
 import { describeError } from '../../lib/errors';
 
@@ -12,7 +12,7 @@ export function AclStatsPanel({ machineID, instanceID }: { machineID: string; in
   const copy = useCopy();
   const stats = useQuery({
     queryKey: ['acl-stats', machineID, instanceID],
-    queryFn: () => api.aclStats(machineID, instanceID),
+    queryFn: () => networksApi.aclStats(machineID, instanceID),
   });
 
   if (stats.isLoading) return <Skeleton className="h-[var(--u-10)]" />;

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useCopy } from '../../copy/locale';
-import { api } from '../../lib/http';
+import { networksApi } from './api';
 import { Badge, Button, Card, CardBody, Input, Skeleton } from '../../ui';
 import { describeError } from '../../lib/errors';
 import {
@@ -27,7 +27,7 @@ export function NetworkAclPanel({ networkID }: { networkID: string }) {
   const [policy, setPolicy] = useState<AclPolicy>({ default_action: 'allow', rules: [] });
   const [view, setView] = useState<'rules' | 'json'>('rules');
   const [json, setJson] = useState('');
-  const acl = useQuery({ queryKey: ['acl', networkID], queryFn: () => api.aclPolicy(networkID) });
+  const acl = useQuery({ queryKey: ['acl', networkID], queryFn: () => networksApi.aclPolicy(networkID) });
 
   useEffect(() => {
     if (!acl.data) return;
@@ -37,7 +37,7 @@ export function NetworkAclPanel({ networkID }: { networkID: string }) {
   }, [acl.data]);
 
   const save = useMutation({
-    mutationFn: () => api.putAclPolicy(networkID, view === 'json' ? json : policyToJson(policy)),
+    mutationFn: () => networksApi.saveAclPolicy(networkID, view === 'json' ? json : policyToJson(policy)),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['acl', networkID] });
     },

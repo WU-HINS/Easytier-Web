@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { copy } from '../../copy/zh-CN';
-import { api } from '../../lib/http';
+import { networksApi } from './api';
 import { Button } from '../../ui';
 import { MemberTomlPanel } from './member-toml-panel';
 import { describeError } from '../../lib/errors';
@@ -19,11 +19,11 @@ export function MemberOverride({ networkID, deviceID }: { networkID: string; dev
 
   const config = useQuery({
     queryKey: ['member-config', networkID, deviceID],
-    queryFn: () => api.memberConfig(networkID, deviceID),
+    queryFn: () => networksApi.memberConfig(networkID, deviceID),
   });
 
   const save = useMutation({
-    mutationFn: (value: string) => api.putMemberConfig(networkID, deviceID, value),
+    mutationFn: (value: string) => networksApi.saveMemberConfig(networkID, deviceID, value),
     onSuccess: () => {
       setDraft(null);
       setError(null);

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useCopy } from '../../copy/locale';
-import { api } from '../../lib/http';
+import { networksApi } from './api';
 import { Button, Card, CardBody, Skeleton } from '../../ui';
 import { toMemberOverrides } from './toml-overrides';
 
@@ -18,7 +18,7 @@ export function MemberTomlPanel({ networkID, deviceID }: { networkID: string; de
   const [copied, setCopied] = useState(false);
   const toml = useQuery({
     queryKey: ['member-toml', networkID, deviceID],
-    queryFn: () => api.memberToml(networkID, deviceID),
+    queryFn: () => networksApi.memberToml(networkID, deviceID),
   });
 
   useEffect(() => {
@@ -27,11 +27,11 @@ export function MemberTomlPanel({ networkID, deviceID }: { networkID: string; de
 
   const apply = useMutation({
     mutationFn: async (text: string) => {
-      const parsed = await api.parseConfig(text);
+      const parsed = await networksApi.parseConfig(text);
       if (parsed.error) throw new Error(parsed.error);
       // An override takes a subset of the config in snake_case; sending the whole
       // parsed config is rejected with an unknown field error.
-      await api.putMemberConfig(networkID, deviceID, JSON.stringify(toMemberOverrides(parsed.config)));
+      await networksApi.saveMemberConfig(networkID, deviceID, JSON.stringify(toMemberOverrides(parsed.config)));
     },
     onSuccess: () => {
       setMessage(copy.networks.tomlSaved);

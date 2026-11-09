@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCopy } from '../../copy/locale';
-import { api, type InstancePeerConn } from '../../lib/http';
+import { type InstancePeerConn } from '../../lib/http';
 import { Badge, Card, CardBody, Skeleton } from '../../ui';
 import { AclStatsPanel } from './acl-stats-panel';
 import { LoggerLevelPanel } from './logger-level-panel';
 import { describeError } from '../../lib/errors';
+import { networksApi } from './api';
 
 const mb = (bytes?: number) => ((bytes ?? 0) / 1024 / 1024).toFixed(1) + ' MB';
 const ms = (micro?: number) => ((micro ?? 0) / 1000).toFixed(1) + ' ms';
@@ -24,7 +25,7 @@ export function InstanceDetailPanel({ machineID, instanceID }: { machineID: stri
   const copy = useCopy();
   const info = useQuery({
     queryKey: ['instance-info', machineID, instanceID],
-    queryFn: () => api.instanceInfo(machineID, instanceID),
+    queryFn: () => networksApi.instanceInfo(machineID, instanceID),
     refetchInterval: 5000,
   });
 
