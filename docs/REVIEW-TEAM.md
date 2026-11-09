@@ -96,6 +96,7 @@ EASYTIER_TEST_PG_DSN=... ./scripts/gate.sh     # 追加 PostgreSQL
 | i18n coverage | `scripts/check-i18n.mjs`：中文表里每个键都必须有英文，缺一个即失败 |
 | feature layout | `scripts/check-features.mjs`：调用服务端的 feature 必须有 api.ts 与 use-*.ts，纯本地页须写 local-only 说明 |
 | client unit tests | `client: npm test`（vitest）：纯逻辑（uuid 拆分、ACL 策略往返、设置校验、错误文案映射）；需要浏览器的部分由 ui-tour 覆盖 |
+| embedded client | `scripts/check-embedded-client.sh`：用合并产物起服务（不给 --web-dir），断言首页、深链接与 /api 不被 SPA 吞掉 |
 | error contract | scripts/check-errors.mjs：组件不得直接渲染传输层英文，错误文案表必须存在 |
 | deploy smoke | `bash scripts/smoke-deploy.sh`（空库→初始化→登录→注册→头→WS） |
 | port conflict | `./scripts/check-port-conflict.sh`（端口被占用必须非零退出且不得声称 listening） |

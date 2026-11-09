@@ -65,7 +65,19 @@ for (const line of main.split(NL)) {
   const name = quoted(line, at);
   if (name) definedFlags.add(name);
 }
+// A flag the project own scripts accept is legitimate to document: ./scripts/build.sh
+// takes --skip-client, which is not a daemon flag and never will be.
+const scriptFlags = new Set();
+for (const script of readdirSync(join(root, 'scripts'))) {
+  if (!script.endsWith('.sh')) continue;
+  // The audit harness injects a fake flag into documents to prove a checker can fail.
+  // Scanning it would whitelist that very flag and turn the probe into a no-op.
+  if (script === 'audit-gates.sh') continue;
+  const body = readFileSync(join(root, 'scripts', script), 'utf8');
+  for (const match of body.matchAll(/--([a-z][a-z-]+)/g)) scriptFlags.add(match[1]);
+}
 for (const match of readme.matchAll(/--([a-z][a-z-]+)/g)) {
+  if (definedFlags.has(match[1]) || scriptFlags.has(match[1])) continue;
   if (!definedFlags.has(match[1])) problems.push('README documents an unknown flag: --' + match[1]);
 }
 

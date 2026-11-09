@@ -8,3 +8,5 @@ psql/
 .env
 dist/
 .DS_Store
+internal/webui/dist/*
+!internal/webui/dist/.gitkeep

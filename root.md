@@ -221,6 +221,7 @@
 | 30 | error contract | 表单错误必须用页面自己的语言解释：服务端给 code + field，前端按文案表渲染 |
 | 31 | feature layout | 每个 feature 自持 api.ts + use-*.ts + 页面；端点不再集中在 lib/http |
 | 32 | client unit tests | 纯逻辑用 vitest 覆盖，浏览器行为用 ui-tour；两者分工写在每个用例的文件头 |
+| 33 | embedded client | 前后端解耦、构建时合并：产物必须能不依赖 --web-dir 独立提供前端 |
 
 ## 7. 版本发布流程
 

@@ -72,6 +72,7 @@ jobs:
           node scripts/check-contract.mjs
           node scripts/check-i18n.mjs
           node scripts/check-features.mjs
+          ./scripts/check-embedded-client.sh
           node scripts/check-errors.mjs
           node scripts/check-ui.mjs
           node scripts/check-editor-invariants.mjs

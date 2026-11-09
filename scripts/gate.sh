@@ -49,6 +49,7 @@ run "ui states"         node scripts/check-ui.mjs
 run "i18n coverage"   node scripts/check-i18n.mjs
 run "feature layout"    node scripts/check-features.mjs
 run "client unit tests"  bash -c "cd client && npm test --silent"
+run "embedded client"   ./scripts/check-embedded-client.sh
 run "error contract"  node scripts/check-errors.mjs
 run "deploy smoke"       bash scripts/smoke-deploy.sh
 run "port conflict"     ./scripts/check-port-conflict.sh

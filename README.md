@@ -210,3 +210,29 @@ GitHub 托管的 runner 是虚拟机：tun 驱动通常在，但设备节点缺�
 
 工作流 `.github/workflows/ci.yml` 的 `data-plane` job 会先拉取官方客户端，再执行这套流程与 `overlay-smoke.sh`。
 注意：给解释器加能力只适用于一次性的 CI 虚拟机，不要复制到共享机器上。
+
+## 构建：前后端解耦，构建时合并
+
+前端与后端是两个互不读取对方源码的项目：
+
+| 侧 | 怎么跑 | 依赖 |
+|---|---|---|
+| 前端 `client/` | `npm run dev` / `npm test` / `npm run build` | 只需要 Node |
+| 后端（Go） | `go build ./cmd/easytier-webd` | 只需要 Go |
+
+两者在**构建时**合并成一个产物：
+
+```bash
+./scripts/build.sh                # 构建前端 → 拷进 internal/webui/dist → 编进二进制
+./scripts/build.sh --skip-client  # 只重编后端，复用上一次的前端产物
+```
+
+`dist/easytier-webd` 不再需要 `--web-dir`，也没有旁边的 `dist` 目录要维护。
+
+**开发时的三条路**：
+
+1. 只改前端：`npm run dev`（Vite 代理到本机控制台）+ 后端 `--web-dir ./client/dist`；
+2. 只改后端：`go build` 后直接跑，指向同一个 `--web-dir`；
+3. 要发布：`./scripts/build.sh`，得到单文件。
+
+`--web-dir` 保留为**开发路径**；两者同时存在时以二进制内嵌的为准，因为那是被打包、被测试的那一份。

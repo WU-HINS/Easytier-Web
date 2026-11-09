@@ -13,6 +13,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/easytier/easytier-console/internal/webui"
 	"log"
 	"net"
 	"net/http"
@@ -169,6 +170,7 @@ func run() error {
 		SecureCookies:    opts.secureCookies,
 		SetupToken:       opts.setupToken,
 		WebDir:           opts.webDir,
+		WebFS:            webui.FS(),
 		OIDC:             provider,
 		Settings:         cfgLayer,
 		ConfigServerPort: rpcPort(opts.listenRPC),

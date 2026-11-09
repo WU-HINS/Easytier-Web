@@ -12,6 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"net/url"
 	"os"
@@ -42,8 +43,13 @@ type Config struct {
 	Sessions      *session.Manager
 	SecureCookies bool
 	// WebDir, when set, serves the built single page client from disk and
-	// falls back to index.html for client side routes.
+	// falls back to index.html for client side routes. It is the development path:
+	// the daemon runs against a live client build directory.
 	WebDir string
+	// WebFS carries the client that was compiled into the binary. A release build
+	// sets it; when both are present WebFS wins, because the binary is what was
+	// tested and shipped as one artifact.
+	WebFS fs.FS
 	// OIDC, when non-nil, enables the authorization-code login flow.
 	OIDC *oidc.Provider
 	// ConfigServerPort is the control-plane port devices dial. The enrolment guide
@@ -119,7 +125,7 @@ func New(cfg Config) (*Server, error) {
 	if err := s.reloadOIDC(context.Background()); err != nil {
 		log.Sub("OIDC").Tag("WARN").Warn("oidc not active: " + err.Error())
 	}
-	if cfg.WebDir != "" {
+	if cfg.WebDir != "" || cfg.WebFS != nil {
 		s.mountClient()
 	} else {
 		// Without a client to serve, the root still belongs to devices that dial it:
@@ -241,7 +247,30 @@ func (s *Server) Handler() http.Handler {
 // the client router owns deep links.
 func (s *Server) mountClient() {
 	dir := s.cfg.WebDir
-	files := http.FileServer(http.Dir(dir))
+	embedded := s.cfg.WebFS
+	var files http.Handler
+	if embedded != nil {
+		files = http.FileServer(http.FS(embedded))
+	} else {
+		files = http.FileServer(http.Dir(dir))
+	}
+	// has reports whether the client build contains this path.
+	has := func(name string) bool {
+		if embedded != nil {
+			_, err := fs.Stat(embedded, strings.TrimPrefix(filepath.Clean(name), "/"))
+			return err == nil
+		}
+		_, err := os.Stat(filepath.Join(dir, filepath.Clean(name)))
+		return err == nil
+	}
+	index := func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-cache")
+		if embedded != nil {
+			http.ServeFileFS(w, r, embedded, "index.html")
+			return
+		}
+		http.ServeFile(w, r, filepath.Join(dir, "index.html"))
+	}
 	s.mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		if isWebSocketUpgrade(r) && (r.URL.Path == "/" || r.URL.Path == "/ws") {
 			s.handleDeviceWSRoot(w, r)
@@ -258,14 +287,11 @@ func (s *Server) mountClient() {
 			writeError(w, http.StatusBadRequest, "device upload path must be /@up/<username>")
 			return
 		}
-		if r.URL.Path != "/" {
-			if _, err := os.Stat(filepath.Join(dir, filepath.Clean(r.URL.Path))); err == nil {
-				files.ServeHTTP(w, r)
-				return
-			}
+		if r.URL.Path != "/" && has(r.URL.Path) {
+			files.ServeHTTP(w, r)
+			return
 		}
-		w.Header().Set("Cache-Control", "no-cache")
-		http.ServeFile(w, r, filepath.Join(dir, "index.html"))
+		index(w, r)
 	})
 }
 
