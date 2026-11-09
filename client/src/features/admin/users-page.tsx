@@ -1,29 +1,28 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { copy } from '../../copy/zh-CN';
-import { api, type AdminUser } from '../../lib/http';
+import { useCopy } from '../../copy/locale';
 import { Badge, Button, Card, CardBody, Skeleton } from '../../ui';
 import { QueryError } from '../../ui/query-error';
+import { useAdminUsers, useDeleteUser, useSetUserDisabled } from './use-admin';
 
 /**
  * Read-only user administration: the console never exposes password, credential
  * or binding writes here, by design.
  */
 export function AdminUsersPage() {
+  const copy = useCopy();
   const queryClient = useQueryClient();
-  const users = useQuery({ queryKey: ['admin-users'], queryFn: api.adminUsers });
+  const users = useAdminUsers();
   const [error, setError] = useState<string | null>(null);
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ['admin-users'] });
 
-  const toggle = useMutation({
-    mutationFn: ({ user }: { user: AdminUser }) => api.setUserDisabled(user.id, !user.disabled),
+  const toggle = useSetUserDisabled({
     onSuccess: invalidate,
     onError: (failure: Error) => setError(failure.message),
   });
 
-  const remove = useMutation({
-    mutationFn: (user: AdminUser) => api.deleteUser(user.id),
+  const remove = useDeleteUser({
     onSuccess: invalidate,
     onError: (failure: Error) => setError(failure.message),
   });
@@ -81,7 +80,7 @@ export function AdminUsersPage() {
                         <span className="text-phi-sm text-muted-foreground">{copy.adminUsers.protectedBadge}</span>
                       ) : (
                         <div className="flex justify-end gap-[var(--u-2)]">
-                          <Button size="sm" variant="secondary" onClick={() => toggle.mutate({ user })}>
+                          <Button size="sm" variant="secondary" onClick={() => toggle.mutate({ id: user.id, disabled: user.disabled })}>
                             {user.disabled ? copy.adminUsers.enable : copy.adminUsers.disable}
                           </Button>
                           <Button
@@ -89,7 +88,7 @@ export function AdminUsersPage() {
                             variant="danger"
                             disabled={user.online_instances > 0}
                             title={user.online_instances > 0 ? copy.adminUsers.removeBlocked : undefined}
-                            onClick={() => remove.mutate(user)}
+                            onClick={() => remove.mutate(user.id)}
                           >
                             {copy.adminUsers.remove}
                           </Button>
@@ -117,11 +116,11 @@ export function AdminUsersPage() {
                     <span className="text-phi-sm text-muted-foreground">{copy.adminUsers.protectedAccount}</span>
                   ) : (
                     <div className="flex gap-[var(--u-2)]">
-                      <Button size="sm" variant="secondary" onClick={() => toggle.mutate({ user })}>
+                      <Button size="sm" variant="secondary" onClick={() => toggle.mutate({ id: user.id, disabled: user.disabled })}>
                         {user.disabled ? copy.adminUsers.enable : copy.adminUsers.disable}
                       </Button>
                       <Button size="sm" variant="danger" disabled={user.online_instances > 0}
-                        onClick={() => remove.mutate(user)}>{copy.adminUsers.remove}</Button>
+                        onClick={() => remove.mutate(user.id)}>{copy.adminUsers.remove}</Button>
                     </div>
                   )}
                 </div>

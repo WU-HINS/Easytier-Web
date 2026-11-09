@@ -1,14 +1,14 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
-import { ApiError, api, isSecureOrigin, oidcCallbackURL, type AdminSettings } from '../../lib/http';
 import { Button, Card, CardBody, Input } from '../../ui';
 
-type SettingsPatch = Partial<Omit<AdminSettings, 'oidc_client_secret_set'>> & { oidc_client_secret?: string; expected_revision?: number };
 type Errors = Record<string, string>;
 
 const usernamePattern = /^[a-zA-Z0-9._-]{1,32}$/;
 
 import { copy } from '../../copy/zh-CN';
+import { useAdminSettings, useSaveAdminSettings } from './use-admin';
+import { ApiError, isSecureOrigin, oidcCallbackURL, type AdminSettings } from '../../lib/http';
 /** Field level validation, so a save never fails as one opaque error. */
 export function validateSettings(draft: AdminSettings): Errors {
   const errors: Errors = {};
@@ -55,7 +55,7 @@ export function validateSettings(draft: AdminSettings): Errors {
 
 export function AdminSettingsPage() {
   const queryClient = useQueryClient();
-  const settings = useQuery({ queryKey: ['admin-settings'], queryFn: api.adminSettings });
+  const settings = useAdminSettings();
   const [draft, setDraft] = useState<AdminSettings | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -66,8 +66,7 @@ export function AdminSettingsPage() {
 
   const errors = useMemo<Errors>(() => (draft ? validateSettings(draft) : {}), [draft]);
 
-  const save = useMutation({
-    mutationFn: (patch: SettingsPatch) => api.saveAdminSettings(patch),
+  const save = useSaveAdminSettings({
     onSuccess: (next) => {
       setDraft(next);
       void queryClient.invalidateQueries({ queryKey: ['admin-settings'] });

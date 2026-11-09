@@ -185,13 +185,6 @@ export interface SetupStatus {
 }
 
 export const api = {
-  adminUsers: () => request<{ users: AdminUser[] }>('/admin/users').then((r) => r.users ?? []),
-  setUserDisabled: (id: number, disabled: boolean) =>
-    request<void>(`/admin/users/${id}/disabled`, { method: 'POST', body: JSON.stringify({ disabled }) }),
-  deleteUser: (id: number) => request<void>(`/admin/users/${id}`, { method: 'DELETE' }),
-  adminSettings: () => request<AdminSettings>('/admin/settings'),
-  saveAdminSettings: (patch: Record<string, unknown>) =>
-    request<AdminSettings>('/admin/settings', { method: 'PUT', body: JSON.stringify(patch) }),
   summary: () => request<Summary>('/summary'),
   renameMachine: (machineID: string, alias: string) =>
     request<void>('/machines/' + machineID + '/alias', {
