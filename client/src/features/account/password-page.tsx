@@ -1,9 +1,8 @@
-import { useMutation } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { useCopy } from '../../copy/locale';
-import { api } from '../../lib/http';
 import { Button, Card, CardBody, Input } from '../../ui';
 import { describeError } from '../../lib/errors';
+import { useChangePassword } from './use-account';
 
 /**
  * Change the signed-in account's password. The server checks the current one and
@@ -16,8 +15,7 @@ export function PasswordPage() {
   const [confirm, setConfirm] = useState('');
   const [localError, setLocalError] = useState('');
 
-  const change = useMutation({
-    mutationFn: () => api.changePassword(current, next),
+  const change = useChangePassword({
     onSuccess: () => {
       setCurrent('');
       setNext('');
@@ -33,7 +31,7 @@ export function PasswordPage() {
       return;
     }
     setLocalError('');
-    change.mutate();
+    change.mutate({ current, next });
   };
 
   return (

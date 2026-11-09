@@ -185,16 +185,6 @@ export interface SetupStatus {
 }
 
 export const api = {
-  setup: (username: string, password: string) =>
-    request<{ username: string; role: string }>('/setup', {
-      method: 'POST',
-      body: JSON.stringify({ username, password }),
-    }),
-  register: (username: string, password: string) =>
-    request<{ username: string; role: string }>('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify({ username, password }),
-    }),
   adminUsers: () => request<{ users: AdminUser[] }>('/admin/users').then((r) => r.users ?? []),
   setUserDisabled: (id: number, disabled: boolean) =>
     request<void>(`/admin/users/${id}/disabled`, { method: 'POST', body: JSON.stringify({ disabled }) }),
@@ -202,13 +192,6 @@ export const api = {
   adminSettings: () => request<AdminSettings>('/admin/settings'),
   saveAdminSettings: (patch: Record<string, unknown>) =>
     request<AdminSettings>('/admin/settings', { method: 'PUT', body: JSON.stringify(patch) }),
-  accountOidc: () => request<{ bound: boolean; issuer: string }>('/account/oidc'),
-  changePassword: (currentPassword: string, newPassword: string) =>
-    request<void>("/account/password", {
-      method: 'POST',
-      body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
-    }),
-  unbindOidc: () => request<void>('/account/oidc/unbind', { method: 'POST' }),
   summary: () => request<Summary>('/summary'),
   renameMachine: (machineID: string, alias: string) =>
     request<void>('/machines/' + machineID + '/alias', {

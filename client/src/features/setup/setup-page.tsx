@@ -1,11 +1,10 @@
-import { useMutation } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { copy } from '../../copy/zh-CN';
-import { api } from '../../lib/http';
 import { Button, Card, Input } from '../../ui';
 import { describeError } from '../../lib/errors';
 import { useSetupStatus } from '../auth/use-auth';
+import { useCreateAdmin } from './use-setup';
 
 /**
  * First-run wizard. It is the only screen reachable while the console is
@@ -19,8 +18,7 @@ export function SetupPage() {
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const setup = useMutation({
-    mutationFn: () => api.setup(username, password),
+  const setup = useCreateAdmin({
     onSuccess: () => navigate('/', { replace: true }),
     onError: (failure: Error) => setError(failure.message),
   });
@@ -32,7 +30,7 @@ export function SetupPage() {
       setError(copy.setup.mismatch);
       return;
     }
-    setup.mutate();
+    setup.mutate({ username, password });
   };
 
   if (status.isLoading) {

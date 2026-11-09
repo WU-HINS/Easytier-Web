@@ -1,21 +1,20 @@
-import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { copy } from "../../copy/zh-CN";
-import { api } from "../../lib/http";
+import { useCopy } from "../../copy/locale";
 import { Button, Card, CardBody, Input } from "../../ui";
+import { useChangePassword } from "./use-account";
 
 /**
  * Self service password rotation. The admin surface is read only on purpose, so
  * this is the only way a user can replace a leaked password.
  */
 export function PasswordCard() {
+	const copy = useCopy();
 	const [current, setCurrent] = useState("");
 	const [next, setNext] = useState("");
 	const [error, setError] = useState<string | null>(null);
 	const [done, setDone] = useState(false);
 
-	const change = useMutation({
-		mutationFn: () => api.changePassword(current, next),
+	const change = useChangePassword({
 		onSuccess: () => {
 			setCurrent("");
 			setNext("");
@@ -61,7 +60,7 @@ export function PasswordCard() {
 					<Button
 						type="button"
 						disabled={!current || !next || change.isPending}
-						onClick={() => change.mutate()}
+						onClick={() => change.mutate({ current, next })}
 					>
 						{copy.common.save}
 					</Button>

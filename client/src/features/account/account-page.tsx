@@ -1,10 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useCopy } from '../../copy/locale';
-import { api, isSecureOrigin, oidcCallbackURL } from '../../lib/http';
 import { Badge, Button, Card, CardBody } from '../../ui';
 import { PasswordCard } from './password-card';
 import { useOidcConfig } from '../auth/use-auth';
+import { useOidcBinding, useUnbindOidc } from './use-account';
+import { isSecureOrigin, oidcCallbackURL } from '../../lib/http';
 
 /**
  * Self-service OIDC binding. Binding always goes through a browser redirect, and
@@ -13,12 +14,11 @@ import { useOidcConfig } from '../auth/use-auth';
 export function AccountPage() {
   const copy = useCopy();
   const queryClient = useQueryClient();
-  const oidc = useQuery({ queryKey: ['account-oidc'], queryFn: api.accountOidc });
+  const oidc = useOidcBinding();
   const config = useOidcConfig();
   const [error, setError] = useState<string | null>(null);
 
-  const unbind = useMutation({
-    mutationFn: api.unbindOidc,
+  const unbind = useUnbindOidc({
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['account-oidc'] }),
     onError: (failure: Error) => setError(failure.message),
   });
