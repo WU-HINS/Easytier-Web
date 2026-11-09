@@ -1,3 +1,8 @@
+/**
+ * local-only: this page changes the theme and the background preference, both held
+ * in localStorage by lib/theme. It has no server state, so it needs no api.ts or
+ * use-*.ts - the feature checker reads this note and stops asking.
+ */
 import { useState, type FormEvent } from 'react';
 import { useCopy } from '../../copy/locale';
 import { useTheme, type ThemeMode } from '../../lib/theme';

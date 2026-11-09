@@ -1,8 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCopy } from '../../copy/locale';
-import { api } from '../../lib/http';
+import { useMachines, useNetworks, useSummary } from './use-dashboard';
 import { Badge, Button, Card, CardBody, CardHeader, Skeleton } from '../../ui';
 
 export function DashboardPage() {
@@ -11,9 +10,9 @@ export function DashboardPage() {
   // cluster should not be paying for a request every five seconds.
   const [autoRefresh, setAutoRefresh] = useState(true);
   const interval = autoRefresh ? 5000 : false;
-  const summary = useQuery({ queryKey: ['summary'], queryFn: api.summary, refetchInterval: interval });
-  const machines = useQuery({ queryKey: ['machines'], queryFn: api.machines, refetchInterval: interval });
-  const networks = useQuery({ queryKey: ['networks'], queryFn: api.networks, refetchInterval: interval });
+  const summary = useSummary(interval);
+  const machines = useMachines(interval);
+  const networks = useNetworks(interval);
 
   const devices = machines.data ?? [];
   const networkRows = networks.data ?? [];
